@@ -87,7 +87,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "Username",
+                                  "ชื่อผู้ใช้",
                                   style: TextStyle(fontSize: 20),
                                 ),
                                 TextFormField(

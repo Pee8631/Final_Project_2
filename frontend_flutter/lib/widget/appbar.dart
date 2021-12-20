@@ -13,7 +13,7 @@ AppBar buildAppBar(BuildContext context) {
     actions: [
       Row(
         children: [
-          Positioned(bottom: 0, child : Text(myprofile.name,style: TextStyle(fontSize: 10)),),
+          Text(myprofile.name, style: TextStyle(fontSize: 10)),
           ProfileWidget(
             imagePath: myprofile.imagePath,
             onClicked: () async {
