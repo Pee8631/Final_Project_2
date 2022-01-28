@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-class ProfileWidget extends StatelessWidget {
+class LargeProfileWidget extends StatelessWidget {
   final String imagePath;
   final VoidCallback onClicked;
 
-  const ProfileWidget(
+  const LargeProfileWidget(
       {Key? key, required this.imagePath, required this.onClicked})
       : super(key: key);
 
@@ -35,8 +35,8 @@ class ProfileWidget extends StatelessWidget {
         child: Ink.image(
           image: image,
           fit: BoxFit.cover,
-          width: 50,
-          height: 50,
+          width: 120,
+          height: 120,
           child: InkWell(onTap: onClicked),
         ),
       ),
@@ -45,10 +45,10 @@ class ProfileWidget extends StatelessWidget {
 
   Widget buildEditIcon(Color color) => buildCycle(
         color: Colors.white,
-        all: 0.5,
+        all: 3,
         child: buildCycle(
             color: color,
-            all: 1,
+            all: 8,
             child: Icon(Icons.edit, color: Colors.white, size: 20)),
       );
 

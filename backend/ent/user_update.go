@@ -3,7 +3,17 @@
 package ent
 
 import (
+	"FinalProject/ent/certification"
+	"FinalProject/ent/chatting"
+	"FinalProject/ent/data"
+	"FinalProject/ent/department"
+	"FinalProject/ent/disease"
+	"FinalProject/ent/hospital"
 	"FinalProject/ent/predicate"
+	"FinalProject/ent/role"
+	"FinalProject/ent/schedule"
+	"FinalProject/ent/telecom"
+	"FinalProject/ent/treatment"
 	"FinalProject/ent/user"
 	"context"
 	"fmt"
@@ -26,21 +36,443 @@ func (uu *UserUpdate) Where(ps ...predicate.User) *UserUpdate {
 	return uu
 }
 
-// SetUsername sets the "Username" field.
+// SetUsername sets the "username" field.
 func (uu *UserUpdate) SetUsername(s string) *UserUpdate {
 	uu.mutation.SetUsername(s)
 	return uu
 }
 
-// SetPassword sets the "Password" field.
+// SetPassword sets the "password" field.
 func (uu *UserUpdate) SetPassword(s string) *UserUpdate {
 	uu.mutation.SetPassword(s)
 	return uu
 }
 
+// SetEmail sets the "email" field.
+func (uu *UserUpdate) SetEmail(s string) *UserUpdate {
+	uu.mutation.SetEmail(s)
+	return uu
+}
+
+// SetTelephone sets the "telephone" field.
+func (uu *UserUpdate) SetTelephone(s string) *UserUpdate {
+	uu.mutation.SetTelephone(s)
+	return uu
+}
+
+// AddDoctorHasCertificationIDs adds the "doctor_has_certification" edge to the Certification entity by IDs.
+func (uu *UserUpdate) AddDoctorHasCertificationIDs(ids ...int) *UserUpdate {
+	uu.mutation.AddDoctorHasCertificationIDs(ids...)
+	return uu
+}
+
+// AddDoctorHasCertification adds the "doctor_has_certification" edges to the Certification entity.
+func (uu *UserUpdate) AddDoctorHasCertification(c ...*Certification) *UserUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return uu.AddDoctorHasCertificationIDs(ids...)
+}
+
+// AddUserChattingWithWhomIDs adds the "user_chatting_with_whom" edge to the Chatting entity by IDs.
+func (uu *UserUpdate) AddUserChattingWithWhomIDs(ids ...int) *UserUpdate {
+	uu.mutation.AddUserChattingWithWhomIDs(ids...)
+	return uu
+}
+
+// AddUserChattingWithWhom adds the "user_chatting_with_whom" edges to the Chatting entity.
+func (uu *UserUpdate) AddUserChattingWithWhom(c ...*Chatting) *UserUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return uu.AddUserChattingWithWhomIDs(ids...)
+}
+
+// AddWhoIsOwnerThisMsgIDs adds the "who_is_owner_this_msg" edge to the Chatting entity by IDs.
+func (uu *UserUpdate) AddWhoIsOwnerThisMsgIDs(ids ...int) *UserUpdate {
+	uu.mutation.AddWhoIsOwnerThisMsgIDs(ids...)
+	return uu
+}
+
+// AddWhoIsOwnerThisMsg adds the "who_is_owner_this_msg" edges to the Chatting entity.
+func (uu *UserUpdate) AddWhoIsOwnerThisMsg(c ...*Chatting) *UserUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return uu.AddWhoIsOwnerThisMsgIDs(ids...)
+}
+
+// AddUserHasDatumIDs adds the "user_has_data" edge to the Data entity by IDs.
+func (uu *UserUpdate) AddUserHasDatumIDs(ids ...int) *UserUpdate {
+	uu.mutation.AddUserHasDatumIDs(ids...)
+	return uu
+}
+
+// AddUserHasData adds the "user_has_data" edges to the Data entity.
+func (uu *UserUpdate) AddUserHasData(d ...*Data) *UserUpdate {
+	ids := make([]int, len(d))
+	for i := range d {
+		ids[i] = d[i].ID
+	}
+	return uu.AddUserHasDatumIDs(ids...)
+}
+
+// AddDoctorHasScheduleIDs adds the "doctor_has_schedule" edge to the Schedule entity by IDs.
+func (uu *UserUpdate) AddDoctorHasScheduleIDs(ids ...int) *UserUpdate {
+	uu.mutation.AddDoctorHasScheduleIDs(ids...)
+	return uu
+}
+
+// AddDoctorHasSchedule adds the "doctor_has_schedule" edges to the Schedule entity.
+func (uu *UserUpdate) AddDoctorHasSchedule(s ...*Schedule) *UserUpdate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return uu.AddDoctorHasScheduleIDs(ids...)
+}
+
+// AddUserHaveTelecomIDs adds the "user_have_telecoms" edge to the Telecom entity by IDs.
+func (uu *UserUpdate) AddUserHaveTelecomIDs(ids ...int) *UserUpdate {
+	uu.mutation.AddUserHaveTelecomIDs(ids...)
+	return uu
+}
+
+// AddUserHaveTelecoms adds the "user_have_telecoms" edges to the Telecom entity.
+func (uu *UserUpdate) AddUserHaveTelecoms(t ...*Telecom) *UserUpdate {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return uu.AddUserHaveTelecomIDs(ids...)
+}
+
+// AddDoctorRecordTreatmentIDs adds the "doctor_record_treatment" edge to the Treatment entity by IDs.
+func (uu *UserUpdate) AddDoctorRecordTreatmentIDs(ids ...int) *UserUpdate {
+	uu.mutation.AddDoctorRecordTreatmentIDs(ids...)
+	return uu
+}
+
+// AddDoctorRecordTreatment adds the "doctor_record_treatment" edges to the Treatment entity.
+func (uu *UserUpdate) AddDoctorRecordTreatment(t ...*Treatment) *UserUpdate {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return uu.AddDoctorRecordTreatmentIDs(ids...)
+}
+
+// AddUserHaveTreatmentIDs adds the "user_have_treatment" edge to the Treatment entity by IDs.
+func (uu *UserUpdate) AddUserHaveTreatmentIDs(ids ...int) *UserUpdate {
+	uu.mutation.AddUserHaveTreatmentIDs(ids...)
+	return uu
+}
+
+// AddUserHaveTreatment adds the "user_have_treatment" edges to the Treatment entity.
+func (uu *UserUpdate) AddUserHaveTreatment(t ...*Treatment) *UserUpdate {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return uu.AddUserHaveTreatmentIDs(ids...)
+}
+
+// SetHasDepartmentID sets the "has_department" edge to the Department entity by ID.
+func (uu *UserUpdate) SetHasDepartmentID(id int) *UserUpdate {
+	uu.mutation.SetHasDepartmentID(id)
+	return uu
+}
+
+// SetNillableHasDepartmentID sets the "has_department" edge to the Department entity by ID if the given value is not nil.
+func (uu *UserUpdate) SetNillableHasDepartmentID(id *int) *UserUpdate {
+	if id != nil {
+		uu = uu.SetHasDepartmentID(*id)
+	}
+	return uu
+}
+
+// SetHasDepartment sets the "has_department" edge to the Department entity.
+func (uu *UserUpdate) SetHasDepartment(d *Department) *UserUpdate {
+	return uu.SetHasDepartmentID(d.ID)
+}
+
+// SetFromHospitalID sets the "from_hospital" edge to the Hospital entity by ID.
+func (uu *UserUpdate) SetFromHospitalID(id int) *UserUpdate {
+	uu.mutation.SetFromHospitalID(id)
+	return uu
+}
+
+// SetNillableFromHospitalID sets the "from_hospital" edge to the Hospital entity by ID if the given value is not nil.
+func (uu *UserUpdate) SetNillableFromHospitalID(id *int) *UserUpdate {
+	if id != nil {
+		uu = uu.SetFromHospitalID(*id)
+	}
+	return uu
+}
+
+// SetFromHospital sets the "from_hospital" edge to the Hospital entity.
+func (uu *UserUpdate) SetFromHospital(h *Hospital) *UserUpdate {
+	return uu.SetFromHospitalID(h.ID)
+}
+
+// AddUserHaveDiseaseIDs adds the "user_have_disease" edge to the Disease entity by IDs.
+func (uu *UserUpdate) AddUserHaveDiseaseIDs(ids ...int) *UserUpdate {
+	uu.mutation.AddUserHaveDiseaseIDs(ids...)
+	return uu
+}
+
+// AddUserHaveDisease adds the "user_have_disease" edges to the Disease entity.
+func (uu *UserUpdate) AddUserHaveDisease(d ...*Disease) *UserUpdate {
+	ids := make([]int, len(d))
+	for i := range d {
+		ids[i] = d[i].ID
+	}
+	return uu.AddUserHaveDiseaseIDs(ids...)
+}
+
+// AddUserHaveRoleIDs adds the "user_have_role" edge to the Role entity by IDs.
+func (uu *UserUpdate) AddUserHaveRoleIDs(ids ...int) *UserUpdate {
+	uu.mutation.AddUserHaveRoleIDs(ids...)
+	return uu
+}
+
+// AddUserHaveRole adds the "user_have_role" edges to the Role entity.
+func (uu *UserUpdate) AddUserHaveRole(r ...*Role) *UserUpdate {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return uu.AddUserHaveRoleIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uu *UserUpdate) Mutation() *UserMutation {
 	return uu.mutation
+}
+
+// ClearDoctorHasCertification clears all "doctor_has_certification" edges to the Certification entity.
+func (uu *UserUpdate) ClearDoctorHasCertification() *UserUpdate {
+	uu.mutation.ClearDoctorHasCertification()
+	return uu
+}
+
+// RemoveDoctorHasCertificationIDs removes the "doctor_has_certification" edge to Certification entities by IDs.
+func (uu *UserUpdate) RemoveDoctorHasCertificationIDs(ids ...int) *UserUpdate {
+	uu.mutation.RemoveDoctorHasCertificationIDs(ids...)
+	return uu
+}
+
+// RemoveDoctorHasCertification removes "doctor_has_certification" edges to Certification entities.
+func (uu *UserUpdate) RemoveDoctorHasCertification(c ...*Certification) *UserUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return uu.RemoveDoctorHasCertificationIDs(ids...)
+}
+
+// ClearUserChattingWithWhom clears all "user_chatting_with_whom" edges to the Chatting entity.
+func (uu *UserUpdate) ClearUserChattingWithWhom() *UserUpdate {
+	uu.mutation.ClearUserChattingWithWhom()
+	return uu
+}
+
+// RemoveUserChattingWithWhomIDs removes the "user_chatting_with_whom" edge to Chatting entities by IDs.
+func (uu *UserUpdate) RemoveUserChattingWithWhomIDs(ids ...int) *UserUpdate {
+	uu.mutation.RemoveUserChattingWithWhomIDs(ids...)
+	return uu
+}
+
+// RemoveUserChattingWithWhom removes "user_chatting_with_whom" edges to Chatting entities.
+func (uu *UserUpdate) RemoveUserChattingWithWhom(c ...*Chatting) *UserUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return uu.RemoveUserChattingWithWhomIDs(ids...)
+}
+
+// ClearWhoIsOwnerThisMsg clears all "who_is_owner_this_msg" edges to the Chatting entity.
+func (uu *UserUpdate) ClearWhoIsOwnerThisMsg() *UserUpdate {
+	uu.mutation.ClearWhoIsOwnerThisMsg()
+	return uu
+}
+
+// RemoveWhoIsOwnerThisMsgIDs removes the "who_is_owner_this_msg" edge to Chatting entities by IDs.
+func (uu *UserUpdate) RemoveWhoIsOwnerThisMsgIDs(ids ...int) *UserUpdate {
+	uu.mutation.RemoveWhoIsOwnerThisMsgIDs(ids...)
+	return uu
+}
+
+// RemoveWhoIsOwnerThisMsg removes "who_is_owner_this_msg" edges to Chatting entities.
+func (uu *UserUpdate) RemoveWhoIsOwnerThisMsg(c ...*Chatting) *UserUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return uu.RemoveWhoIsOwnerThisMsgIDs(ids...)
+}
+
+// ClearUserHasData clears all "user_has_data" edges to the Data entity.
+func (uu *UserUpdate) ClearUserHasData() *UserUpdate {
+	uu.mutation.ClearUserHasData()
+	return uu
+}
+
+// RemoveUserHasDatumIDs removes the "user_has_data" edge to Data entities by IDs.
+func (uu *UserUpdate) RemoveUserHasDatumIDs(ids ...int) *UserUpdate {
+	uu.mutation.RemoveUserHasDatumIDs(ids...)
+	return uu
+}
+
+// RemoveUserHasData removes "user_has_data" edges to Data entities.
+func (uu *UserUpdate) RemoveUserHasData(d ...*Data) *UserUpdate {
+	ids := make([]int, len(d))
+	for i := range d {
+		ids[i] = d[i].ID
+	}
+	return uu.RemoveUserHasDatumIDs(ids...)
+}
+
+// ClearDoctorHasSchedule clears all "doctor_has_schedule" edges to the Schedule entity.
+func (uu *UserUpdate) ClearDoctorHasSchedule() *UserUpdate {
+	uu.mutation.ClearDoctorHasSchedule()
+	return uu
+}
+
+// RemoveDoctorHasScheduleIDs removes the "doctor_has_schedule" edge to Schedule entities by IDs.
+func (uu *UserUpdate) RemoveDoctorHasScheduleIDs(ids ...int) *UserUpdate {
+	uu.mutation.RemoveDoctorHasScheduleIDs(ids...)
+	return uu
+}
+
+// RemoveDoctorHasSchedule removes "doctor_has_schedule" edges to Schedule entities.
+func (uu *UserUpdate) RemoveDoctorHasSchedule(s ...*Schedule) *UserUpdate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return uu.RemoveDoctorHasScheduleIDs(ids...)
+}
+
+// ClearUserHaveTelecoms clears all "user_have_telecoms" edges to the Telecom entity.
+func (uu *UserUpdate) ClearUserHaveTelecoms() *UserUpdate {
+	uu.mutation.ClearUserHaveTelecoms()
+	return uu
+}
+
+// RemoveUserHaveTelecomIDs removes the "user_have_telecoms" edge to Telecom entities by IDs.
+func (uu *UserUpdate) RemoveUserHaveTelecomIDs(ids ...int) *UserUpdate {
+	uu.mutation.RemoveUserHaveTelecomIDs(ids...)
+	return uu
+}
+
+// RemoveUserHaveTelecoms removes "user_have_telecoms" edges to Telecom entities.
+func (uu *UserUpdate) RemoveUserHaveTelecoms(t ...*Telecom) *UserUpdate {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return uu.RemoveUserHaveTelecomIDs(ids...)
+}
+
+// ClearDoctorRecordTreatment clears all "doctor_record_treatment" edges to the Treatment entity.
+func (uu *UserUpdate) ClearDoctorRecordTreatment() *UserUpdate {
+	uu.mutation.ClearDoctorRecordTreatment()
+	return uu
+}
+
+// RemoveDoctorRecordTreatmentIDs removes the "doctor_record_treatment" edge to Treatment entities by IDs.
+func (uu *UserUpdate) RemoveDoctorRecordTreatmentIDs(ids ...int) *UserUpdate {
+	uu.mutation.RemoveDoctorRecordTreatmentIDs(ids...)
+	return uu
+}
+
+// RemoveDoctorRecordTreatment removes "doctor_record_treatment" edges to Treatment entities.
+func (uu *UserUpdate) RemoveDoctorRecordTreatment(t ...*Treatment) *UserUpdate {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return uu.RemoveDoctorRecordTreatmentIDs(ids...)
+}
+
+// ClearUserHaveTreatment clears all "user_have_treatment" edges to the Treatment entity.
+func (uu *UserUpdate) ClearUserHaveTreatment() *UserUpdate {
+	uu.mutation.ClearUserHaveTreatment()
+	return uu
+}
+
+// RemoveUserHaveTreatmentIDs removes the "user_have_treatment" edge to Treatment entities by IDs.
+func (uu *UserUpdate) RemoveUserHaveTreatmentIDs(ids ...int) *UserUpdate {
+	uu.mutation.RemoveUserHaveTreatmentIDs(ids...)
+	return uu
+}
+
+// RemoveUserHaveTreatment removes "user_have_treatment" edges to Treatment entities.
+func (uu *UserUpdate) RemoveUserHaveTreatment(t ...*Treatment) *UserUpdate {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return uu.RemoveUserHaveTreatmentIDs(ids...)
+}
+
+// ClearHasDepartment clears the "has_department" edge to the Department entity.
+func (uu *UserUpdate) ClearHasDepartment() *UserUpdate {
+	uu.mutation.ClearHasDepartment()
+	return uu
+}
+
+// ClearFromHospital clears the "from_hospital" edge to the Hospital entity.
+func (uu *UserUpdate) ClearFromHospital() *UserUpdate {
+	uu.mutation.ClearFromHospital()
+	return uu
+}
+
+// ClearUserHaveDisease clears all "user_have_disease" edges to the Disease entity.
+func (uu *UserUpdate) ClearUserHaveDisease() *UserUpdate {
+	uu.mutation.ClearUserHaveDisease()
+	return uu
+}
+
+// RemoveUserHaveDiseaseIDs removes the "user_have_disease" edge to Disease entities by IDs.
+func (uu *UserUpdate) RemoveUserHaveDiseaseIDs(ids ...int) *UserUpdate {
+	uu.mutation.RemoveUserHaveDiseaseIDs(ids...)
+	return uu
+}
+
+// RemoveUserHaveDisease removes "user_have_disease" edges to Disease entities.
+func (uu *UserUpdate) RemoveUserHaveDisease(d ...*Disease) *UserUpdate {
+	ids := make([]int, len(d))
+	for i := range d {
+		ids[i] = d[i].ID
+	}
+	return uu.RemoveUserHaveDiseaseIDs(ids...)
+}
+
+// ClearUserHaveRole clears all "user_have_role" edges to the Role entity.
+func (uu *UserUpdate) ClearUserHaveRole() *UserUpdate {
+	uu.mutation.ClearUserHaveRole()
+	return uu
+}
+
+// RemoveUserHaveRoleIDs removes the "user_have_role" edge to Role entities by IDs.
+func (uu *UserUpdate) RemoveUserHaveRoleIDs(ids ...int) *UserUpdate {
+	uu.mutation.RemoveUserHaveRoleIDs(ids...)
+	return uu
+}
+
+// RemoveUserHaveRole removes "user_have_role" edges to Role entities.
+func (uu *UserUpdate) RemoveUserHaveRole(r ...*Role) *UserUpdate {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return uu.RemoveUserHaveRoleIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -107,12 +539,7 @@ func (uu *UserUpdate) ExecX(ctx context.Context) {
 func (uu *UserUpdate) check() error {
 	if v, ok := uu.mutation.Username(); ok {
 		if err := user.UsernameValidator(v); err != nil {
-			return &ValidationError{Name: "Username", err: fmt.Errorf("ent: validator failed for field \"Username\": %w", err)}
-		}
-	}
-	if v, ok := uu.mutation.Password(); ok {
-		if err := user.PasswordValidator(v); err != nil {
-			return &ValidationError{Name: "Password", err: fmt.Errorf("ent: validator failed for field \"Password\": %w", err)}
+			return &ValidationError{Name: "username", err: fmt.Errorf("ent: validator failed for field \"username\": %w", err)}
 		}
 	}
 	return nil
@@ -150,6 +577,630 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: user.FieldPassword,
 		})
 	}
+	if value, ok := uu.mutation.Email(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: user.FieldEmail,
+		})
+	}
+	if value, ok := uu.mutation.Telephone(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: user.FieldTelephone,
+		})
+	}
+	if uu.mutation.DoctorHasCertificationCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DoctorHasCertificationTable,
+			Columns: []string{user.DoctorHasCertificationColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: certification.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RemovedDoctorHasCertificationIDs(); len(nodes) > 0 && !uu.mutation.DoctorHasCertificationCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DoctorHasCertificationTable,
+			Columns: []string{user.DoctorHasCertificationColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: certification.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.DoctorHasCertificationIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DoctorHasCertificationTable,
+			Columns: []string{user.DoctorHasCertificationColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: certification.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uu.mutation.UserChattingWithWhomCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserChattingWithWhomTable,
+			Columns: []string{user.UserChattingWithWhomColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: chatting.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RemovedUserChattingWithWhomIDs(); len(nodes) > 0 && !uu.mutation.UserChattingWithWhomCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserChattingWithWhomTable,
+			Columns: []string{user.UserChattingWithWhomColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: chatting.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.UserChattingWithWhomIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserChattingWithWhomTable,
+			Columns: []string{user.UserChattingWithWhomColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: chatting.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uu.mutation.WhoIsOwnerThisMsgCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.WhoIsOwnerThisMsgTable,
+			Columns: []string{user.WhoIsOwnerThisMsgColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: chatting.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RemovedWhoIsOwnerThisMsgIDs(); len(nodes) > 0 && !uu.mutation.WhoIsOwnerThisMsgCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.WhoIsOwnerThisMsgTable,
+			Columns: []string{user.WhoIsOwnerThisMsgColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: chatting.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.WhoIsOwnerThisMsgIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.WhoIsOwnerThisMsgTable,
+			Columns: []string{user.WhoIsOwnerThisMsgColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: chatting.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uu.mutation.UserHasDataCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserHasDataTable,
+			Columns: []string{user.UserHasDataColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: data.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RemovedUserHasDataIDs(); len(nodes) > 0 && !uu.mutation.UserHasDataCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserHasDataTable,
+			Columns: []string{user.UserHasDataColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: data.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.UserHasDataIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserHasDataTable,
+			Columns: []string{user.UserHasDataColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: data.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uu.mutation.DoctorHasScheduleCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DoctorHasScheduleTable,
+			Columns: []string{user.DoctorHasScheduleColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: schedule.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RemovedDoctorHasScheduleIDs(); len(nodes) > 0 && !uu.mutation.DoctorHasScheduleCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DoctorHasScheduleTable,
+			Columns: []string{user.DoctorHasScheduleColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: schedule.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.DoctorHasScheduleIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DoctorHasScheduleTable,
+			Columns: []string{user.DoctorHasScheduleColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: schedule.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uu.mutation.UserHaveTelecomsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserHaveTelecomsTable,
+			Columns: []string{user.UserHaveTelecomsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: telecom.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RemovedUserHaveTelecomsIDs(); len(nodes) > 0 && !uu.mutation.UserHaveTelecomsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserHaveTelecomsTable,
+			Columns: []string{user.UserHaveTelecomsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: telecom.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.UserHaveTelecomsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserHaveTelecomsTable,
+			Columns: []string{user.UserHaveTelecomsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: telecom.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uu.mutation.DoctorRecordTreatmentCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DoctorRecordTreatmentTable,
+			Columns: []string{user.DoctorRecordTreatmentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: treatment.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RemovedDoctorRecordTreatmentIDs(); len(nodes) > 0 && !uu.mutation.DoctorRecordTreatmentCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DoctorRecordTreatmentTable,
+			Columns: []string{user.DoctorRecordTreatmentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: treatment.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.DoctorRecordTreatmentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DoctorRecordTreatmentTable,
+			Columns: []string{user.DoctorRecordTreatmentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: treatment.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uu.mutation.UserHaveTreatmentCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserHaveTreatmentTable,
+			Columns: []string{user.UserHaveTreatmentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: treatment.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RemovedUserHaveTreatmentIDs(); len(nodes) > 0 && !uu.mutation.UserHaveTreatmentCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserHaveTreatmentTable,
+			Columns: []string{user.UserHaveTreatmentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: treatment.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.UserHaveTreatmentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserHaveTreatmentTable,
+			Columns: []string{user.UserHaveTreatmentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: treatment.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uu.mutation.HasDepartmentCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   user.HasDepartmentTable,
+			Columns: []string{user.HasDepartmentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: department.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.HasDepartmentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   user.HasDepartmentTable,
+			Columns: []string{user.HasDepartmentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: department.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uu.mutation.FromHospitalCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   user.FromHospitalTable,
+			Columns: []string{user.FromHospitalColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: hospital.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.FromHospitalIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   user.FromHospitalTable,
+			Columns: []string{user.FromHospitalColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: hospital.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uu.mutation.UserHaveDiseaseCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   user.UserHaveDiseaseTable,
+			Columns: user.UserHaveDiseasePrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: disease.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RemovedUserHaveDiseaseIDs(); len(nodes) > 0 && !uu.mutation.UserHaveDiseaseCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   user.UserHaveDiseaseTable,
+			Columns: user.UserHaveDiseasePrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: disease.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.UserHaveDiseaseIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   user.UserHaveDiseaseTable,
+			Columns: user.UserHaveDiseasePrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: disease.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uu.mutation.UserHaveRoleCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   user.UserHaveRoleTable,
+			Columns: user.UserHaveRolePrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: role.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RemovedUserHaveRoleIDs(); len(nodes) > 0 && !uu.mutation.UserHaveRoleCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   user.UserHaveRoleTable,
+			Columns: user.UserHaveRolePrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: role.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.UserHaveRoleIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   user.UserHaveRoleTable,
+			Columns: user.UserHaveRolePrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: role.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, uu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{user.Label}
@@ -169,21 +1220,443 @@ type UserUpdateOne struct {
 	mutation *UserMutation
 }
 
-// SetUsername sets the "Username" field.
+// SetUsername sets the "username" field.
 func (uuo *UserUpdateOne) SetUsername(s string) *UserUpdateOne {
 	uuo.mutation.SetUsername(s)
 	return uuo
 }
 
-// SetPassword sets the "Password" field.
+// SetPassword sets the "password" field.
 func (uuo *UserUpdateOne) SetPassword(s string) *UserUpdateOne {
 	uuo.mutation.SetPassword(s)
 	return uuo
 }
 
+// SetEmail sets the "email" field.
+func (uuo *UserUpdateOne) SetEmail(s string) *UserUpdateOne {
+	uuo.mutation.SetEmail(s)
+	return uuo
+}
+
+// SetTelephone sets the "telephone" field.
+func (uuo *UserUpdateOne) SetTelephone(s string) *UserUpdateOne {
+	uuo.mutation.SetTelephone(s)
+	return uuo
+}
+
+// AddDoctorHasCertificationIDs adds the "doctor_has_certification" edge to the Certification entity by IDs.
+func (uuo *UserUpdateOne) AddDoctorHasCertificationIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.AddDoctorHasCertificationIDs(ids...)
+	return uuo
+}
+
+// AddDoctorHasCertification adds the "doctor_has_certification" edges to the Certification entity.
+func (uuo *UserUpdateOne) AddDoctorHasCertification(c ...*Certification) *UserUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return uuo.AddDoctorHasCertificationIDs(ids...)
+}
+
+// AddUserChattingWithWhomIDs adds the "user_chatting_with_whom" edge to the Chatting entity by IDs.
+func (uuo *UserUpdateOne) AddUserChattingWithWhomIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.AddUserChattingWithWhomIDs(ids...)
+	return uuo
+}
+
+// AddUserChattingWithWhom adds the "user_chatting_with_whom" edges to the Chatting entity.
+func (uuo *UserUpdateOne) AddUserChattingWithWhom(c ...*Chatting) *UserUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return uuo.AddUserChattingWithWhomIDs(ids...)
+}
+
+// AddWhoIsOwnerThisMsgIDs adds the "who_is_owner_this_msg" edge to the Chatting entity by IDs.
+func (uuo *UserUpdateOne) AddWhoIsOwnerThisMsgIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.AddWhoIsOwnerThisMsgIDs(ids...)
+	return uuo
+}
+
+// AddWhoIsOwnerThisMsg adds the "who_is_owner_this_msg" edges to the Chatting entity.
+func (uuo *UserUpdateOne) AddWhoIsOwnerThisMsg(c ...*Chatting) *UserUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return uuo.AddWhoIsOwnerThisMsgIDs(ids...)
+}
+
+// AddUserHasDatumIDs adds the "user_has_data" edge to the Data entity by IDs.
+func (uuo *UserUpdateOne) AddUserHasDatumIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.AddUserHasDatumIDs(ids...)
+	return uuo
+}
+
+// AddUserHasData adds the "user_has_data" edges to the Data entity.
+func (uuo *UserUpdateOne) AddUserHasData(d ...*Data) *UserUpdateOne {
+	ids := make([]int, len(d))
+	for i := range d {
+		ids[i] = d[i].ID
+	}
+	return uuo.AddUserHasDatumIDs(ids...)
+}
+
+// AddDoctorHasScheduleIDs adds the "doctor_has_schedule" edge to the Schedule entity by IDs.
+func (uuo *UserUpdateOne) AddDoctorHasScheduleIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.AddDoctorHasScheduleIDs(ids...)
+	return uuo
+}
+
+// AddDoctorHasSchedule adds the "doctor_has_schedule" edges to the Schedule entity.
+func (uuo *UserUpdateOne) AddDoctorHasSchedule(s ...*Schedule) *UserUpdateOne {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return uuo.AddDoctorHasScheduleIDs(ids...)
+}
+
+// AddUserHaveTelecomIDs adds the "user_have_telecoms" edge to the Telecom entity by IDs.
+func (uuo *UserUpdateOne) AddUserHaveTelecomIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.AddUserHaveTelecomIDs(ids...)
+	return uuo
+}
+
+// AddUserHaveTelecoms adds the "user_have_telecoms" edges to the Telecom entity.
+func (uuo *UserUpdateOne) AddUserHaveTelecoms(t ...*Telecom) *UserUpdateOne {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return uuo.AddUserHaveTelecomIDs(ids...)
+}
+
+// AddDoctorRecordTreatmentIDs adds the "doctor_record_treatment" edge to the Treatment entity by IDs.
+func (uuo *UserUpdateOne) AddDoctorRecordTreatmentIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.AddDoctorRecordTreatmentIDs(ids...)
+	return uuo
+}
+
+// AddDoctorRecordTreatment adds the "doctor_record_treatment" edges to the Treatment entity.
+func (uuo *UserUpdateOne) AddDoctorRecordTreatment(t ...*Treatment) *UserUpdateOne {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return uuo.AddDoctorRecordTreatmentIDs(ids...)
+}
+
+// AddUserHaveTreatmentIDs adds the "user_have_treatment" edge to the Treatment entity by IDs.
+func (uuo *UserUpdateOne) AddUserHaveTreatmentIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.AddUserHaveTreatmentIDs(ids...)
+	return uuo
+}
+
+// AddUserHaveTreatment adds the "user_have_treatment" edges to the Treatment entity.
+func (uuo *UserUpdateOne) AddUserHaveTreatment(t ...*Treatment) *UserUpdateOne {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return uuo.AddUserHaveTreatmentIDs(ids...)
+}
+
+// SetHasDepartmentID sets the "has_department" edge to the Department entity by ID.
+func (uuo *UserUpdateOne) SetHasDepartmentID(id int) *UserUpdateOne {
+	uuo.mutation.SetHasDepartmentID(id)
+	return uuo
+}
+
+// SetNillableHasDepartmentID sets the "has_department" edge to the Department entity by ID if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableHasDepartmentID(id *int) *UserUpdateOne {
+	if id != nil {
+		uuo = uuo.SetHasDepartmentID(*id)
+	}
+	return uuo
+}
+
+// SetHasDepartment sets the "has_department" edge to the Department entity.
+func (uuo *UserUpdateOne) SetHasDepartment(d *Department) *UserUpdateOne {
+	return uuo.SetHasDepartmentID(d.ID)
+}
+
+// SetFromHospitalID sets the "from_hospital" edge to the Hospital entity by ID.
+func (uuo *UserUpdateOne) SetFromHospitalID(id int) *UserUpdateOne {
+	uuo.mutation.SetFromHospitalID(id)
+	return uuo
+}
+
+// SetNillableFromHospitalID sets the "from_hospital" edge to the Hospital entity by ID if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableFromHospitalID(id *int) *UserUpdateOne {
+	if id != nil {
+		uuo = uuo.SetFromHospitalID(*id)
+	}
+	return uuo
+}
+
+// SetFromHospital sets the "from_hospital" edge to the Hospital entity.
+func (uuo *UserUpdateOne) SetFromHospital(h *Hospital) *UserUpdateOne {
+	return uuo.SetFromHospitalID(h.ID)
+}
+
+// AddUserHaveDiseaseIDs adds the "user_have_disease" edge to the Disease entity by IDs.
+func (uuo *UserUpdateOne) AddUserHaveDiseaseIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.AddUserHaveDiseaseIDs(ids...)
+	return uuo
+}
+
+// AddUserHaveDisease adds the "user_have_disease" edges to the Disease entity.
+func (uuo *UserUpdateOne) AddUserHaveDisease(d ...*Disease) *UserUpdateOne {
+	ids := make([]int, len(d))
+	for i := range d {
+		ids[i] = d[i].ID
+	}
+	return uuo.AddUserHaveDiseaseIDs(ids...)
+}
+
+// AddUserHaveRoleIDs adds the "user_have_role" edge to the Role entity by IDs.
+func (uuo *UserUpdateOne) AddUserHaveRoleIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.AddUserHaveRoleIDs(ids...)
+	return uuo
+}
+
+// AddUserHaveRole adds the "user_have_role" edges to the Role entity.
+func (uuo *UserUpdateOne) AddUserHaveRole(r ...*Role) *UserUpdateOne {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return uuo.AddUserHaveRoleIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uuo *UserUpdateOne) Mutation() *UserMutation {
 	return uuo.mutation
+}
+
+// ClearDoctorHasCertification clears all "doctor_has_certification" edges to the Certification entity.
+func (uuo *UserUpdateOne) ClearDoctorHasCertification() *UserUpdateOne {
+	uuo.mutation.ClearDoctorHasCertification()
+	return uuo
+}
+
+// RemoveDoctorHasCertificationIDs removes the "doctor_has_certification" edge to Certification entities by IDs.
+func (uuo *UserUpdateOne) RemoveDoctorHasCertificationIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.RemoveDoctorHasCertificationIDs(ids...)
+	return uuo
+}
+
+// RemoveDoctorHasCertification removes "doctor_has_certification" edges to Certification entities.
+func (uuo *UserUpdateOne) RemoveDoctorHasCertification(c ...*Certification) *UserUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return uuo.RemoveDoctorHasCertificationIDs(ids...)
+}
+
+// ClearUserChattingWithWhom clears all "user_chatting_with_whom" edges to the Chatting entity.
+func (uuo *UserUpdateOne) ClearUserChattingWithWhom() *UserUpdateOne {
+	uuo.mutation.ClearUserChattingWithWhom()
+	return uuo
+}
+
+// RemoveUserChattingWithWhomIDs removes the "user_chatting_with_whom" edge to Chatting entities by IDs.
+func (uuo *UserUpdateOne) RemoveUserChattingWithWhomIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.RemoveUserChattingWithWhomIDs(ids...)
+	return uuo
+}
+
+// RemoveUserChattingWithWhom removes "user_chatting_with_whom" edges to Chatting entities.
+func (uuo *UserUpdateOne) RemoveUserChattingWithWhom(c ...*Chatting) *UserUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return uuo.RemoveUserChattingWithWhomIDs(ids...)
+}
+
+// ClearWhoIsOwnerThisMsg clears all "who_is_owner_this_msg" edges to the Chatting entity.
+func (uuo *UserUpdateOne) ClearWhoIsOwnerThisMsg() *UserUpdateOne {
+	uuo.mutation.ClearWhoIsOwnerThisMsg()
+	return uuo
+}
+
+// RemoveWhoIsOwnerThisMsgIDs removes the "who_is_owner_this_msg" edge to Chatting entities by IDs.
+func (uuo *UserUpdateOne) RemoveWhoIsOwnerThisMsgIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.RemoveWhoIsOwnerThisMsgIDs(ids...)
+	return uuo
+}
+
+// RemoveWhoIsOwnerThisMsg removes "who_is_owner_this_msg" edges to Chatting entities.
+func (uuo *UserUpdateOne) RemoveWhoIsOwnerThisMsg(c ...*Chatting) *UserUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return uuo.RemoveWhoIsOwnerThisMsgIDs(ids...)
+}
+
+// ClearUserHasData clears all "user_has_data" edges to the Data entity.
+func (uuo *UserUpdateOne) ClearUserHasData() *UserUpdateOne {
+	uuo.mutation.ClearUserHasData()
+	return uuo
+}
+
+// RemoveUserHasDatumIDs removes the "user_has_data" edge to Data entities by IDs.
+func (uuo *UserUpdateOne) RemoveUserHasDatumIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.RemoveUserHasDatumIDs(ids...)
+	return uuo
+}
+
+// RemoveUserHasData removes "user_has_data" edges to Data entities.
+func (uuo *UserUpdateOne) RemoveUserHasData(d ...*Data) *UserUpdateOne {
+	ids := make([]int, len(d))
+	for i := range d {
+		ids[i] = d[i].ID
+	}
+	return uuo.RemoveUserHasDatumIDs(ids...)
+}
+
+// ClearDoctorHasSchedule clears all "doctor_has_schedule" edges to the Schedule entity.
+func (uuo *UserUpdateOne) ClearDoctorHasSchedule() *UserUpdateOne {
+	uuo.mutation.ClearDoctorHasSchedule()
+	return uuo
+}
+
+// RemoveDoctorHasScheduleIDs removes the "doctor_has_schedule" edge to Schedule entities by IDs.
+func (uuo *UserUpdateOne) RemoveDoctorHasScheduleIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.RemoveDoctorHasScheduleIDs(ids...)
+	return uuo
+}
+
+// RemoveDoctorHasSchedule removes "doctor_has_schedule" edges to Schedule entities.
+func (uuo *UserUpdateOne) RemoveDoctorHasSchedule(s ...*Schedule) *UserUpdateOne {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return uuo.RemoveDoctorHasScheduleIDs(ids...)
+}
+
+// ClearUserHaveTelecoms clears all "user_have_telecoms" edges to the Telecom entity.
+func (uuo *UserUpdateOne) ClearUserHaveTelecoms() *UserUpdateOne {
+	uuo.mutation.ClearUserHaveTelecoms()
+	return uuo
+}
+
+// RemoveUserHaveTelecomIDs removes the "user_have_telecoms" edge to Telecom entities by IDs.
+func (uuo *UserUpdateOne) RemoveUserHaveTelecomIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.RemoveUserHaveTelecomIDs(ids...)
+	return uuo
+}
+
+// RemoveUserHaveTelecoms removes "user_have_telecoms" edges to Telecom entities.
+func (uuo *UserUpdateOne) RemoveUserHaveTelecoms(t ...*Telecom) *UserUpdateOne {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return uuo.RemoveUserHaveTelecomIDs(ids...)
+}
+
+// ClearDoctorRecordTreatment clears all "doctor_record_treatment" edges to the Treatment entity.
+func (uuo *UserUpdateOne) ClearDoctorRecordTreatment() *UserUpdateOne {
+	uuo.mutation.ClearDoctorRecordTreatment()
+	return uuo
+}
+
+// RemoveDoctorRecordTreatmentIDs removes the "doctor_record_treatment" edge to Treatment entities by IDs.
+func (uuo *UserUpdateOne) RemoveDoctorRecordTreatmentIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.RemoveDoctorRecordTreatmentIDs(ids...)
+	return uuo
+}
+
+// RemoveDoctorRecordTreatment removes "doctor_record_treatment" edges to Treatment entities.
+func (uuo *UserUpdateOne) RemoveDoctorRecordTreatment(t ...*Treatment) *UserUpdateOne {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return uuo.RemoveDoctorRecordTreatmentIDs(ids...)
+}
+
+// ClearUserHaveTreatment clears all "user_have_treatment" edges to the Treatment entity.
+func (uuo *UserUpdateOne) ClearUserHaveTreatment() *UserUpdateOne {
+	uuo.mutation.ClearUserHaveTreatment()
+	return uuo
+}
+
+// RemoveUserHaveTreatmentIDs removes the "user_have_treatment" edge to Treatment entities by IDs.
+func (uuo *UserUpdateOne) RemoveUserHaveTreatmentIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.RemoveUserHaveTreatmentIDs(ids...)
+	return uuo
+}
+
+// RemoveUserHaveTreatment removes "user_have_treatment" edges to Treatment entities.
+func (uuo *UserUpdateOne) RemoveUserHaveTreatment(t ...*Treatment) *UserUpdateOne {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return uuo.RemoveUserHaveTreatmentIDs(ids...)
+}
+
+// ClearHasDepartment clears the "has_department" edge to the Department entity.
+func (uuo *UserUpdateOne) ClearHasDepartment() *UserUpdateOne {
+	uuo.mutation.ClearHasDepartment()
+	return uuo
+}
+
+// ClearFromHospital clears the "from_hospital" edge to the Hospital entity.
+func (uuo *UserUpdateOne) ClearFromHospital() *UserUpdateOne {
+	uuo.mutation.ClearFromHospital()
+	return uuo
+}
+
+// ClearUserHaveDisease clears all "user_have_disease" edges to the Disease entity.
+func (uuo *UserUpdateOne) ClearUserHaveDisease() *UserUpdateOne {
+	uuo.mutation.ClearUserHaveDisease()
+	return uuo
+}
+
+// RemoveUserHaveDiseaseIDs removes the "user_have_disease" edge to Disease entities by IDs.
+func (uuo *UserUpdateOne) RemoveUserHaveDiseaseIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.RemoveUserHaveDiseaseIDs(ids...)
+	return uuo
+}
+
+// RemoveUserHaveDisease removes "user_have_disease" edges to Disease entities.
+func (uuo *UserUpdateOne) RemoveUserHaveDisease(d ...*Disease) *UserUpdateOne {
+	ids := make([]int, len(d))
+	for i := range d {
+		ids[i] = d[i].ID
+	}
+	return uuo.RemoveUserHaveDiseaseIDs(ids...)
+}
+
+// ClearUserHaveRole clears all "user_have_role" edges to the Role entity.
+func (uuo *UserUpdateOne) ClearUserHaveRole() *UserUpdateOne {
+	uuo.mutation.ClearUserHaveRole()
+	return uuo
+}
+
+// RemoveUserHaveRoleIDs removes the "user_have_role" edge to Role entities by IDs.
+func (uuo *UserUpdateOne) RemoveUserHaveRoleIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.RemoveUserHaveRoleIDs(ids...)
+	return uuo
+}
+
+// RemoveUserHaveRole removes "user_have_role" edges to Role entities.
+func (uuo *UserUpdateOne) RemoveUserHaveRole(r ...*Role) *UserUpdateOne {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return uuo.RemoveUserHaveRoleIDs(ids...)
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
@@ -257,12 +1730,7 @@ func (uuo *UserUpdateOne) ExecX(ctx context.Context) {
 func (uuo *UserUpdateOne) check() error {
 	if v, ok := uuo.mutation.Username(); ok {
 		if err := user.UsernameValidator(v); err != nil {
-			return &ValidationError{Name: "Username", err: fmt.Errorf("ent: validator failed for field \"Username\": %w", err)}
-		}
-	}
-	if v, ok := uuo.mutation.Password(); ok {
-		if err := user.PasswordValidator(v); err != nil {
-			return &ValidationError{Name: "Password", err: fmt.Errorf("ent: validator failed for field \"Password\": %w", err)}
+			return &ValidationError{Name: "username", err: fmt.Errorf("ent: validator failed for field \"username\": %w", err)}
 		}
 	}
 	return nil
@@ -316,6 +1784,630 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Value:  value,
 			Column: user.FieldPassword,
 		})
+	}
+	if value, ok := uuo.mutation.Email(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: user.FieldEmail,
+		})
+	}
+	if value, ok := uuo.mutation.Telephone(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: user.FieldTelephone,
+		})
+	}
+	if uuo.mutation.DoctorHasCertificationCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DoctorHasCertificationTable,
+			Columns: []string{user.DoctorHasCertificationColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: certification.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RemovedDoctorHasCertificationIDs(); len(nodes) > 0 && !uuo.mutation.DoctorHasCertificationCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DoctorHasCertificationTable,
+			Columns: []string{user.DoctorHasCertificationColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: certification.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.DoctorHasCertificationIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DoctorHasCertificationTable,
+			Columns: []string{user.DoctorHasCertificationColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: certification.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uuo.mutation.UserChattingWithWhomCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserChattingWithWhomTable,
+			Columns: []string{user.UserChattingWithWhomColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: chatting.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RemovedUserChattingWithWhomIDs(); len(nodes) > 0 && !uuo.mutation.UserChattingWithWhomCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserChattingWithWhomTable,
+			Columns: []string{user.UserChattingWithWhomColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: chatting.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.UserChattingWithWhomIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserChattingWithWhomTable,
+			Columns: []string{user.UserChattingWithWhomColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: chatting.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uuo.mutation.WhoIsOwnerThisMsgCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.WhoIsOwnerThisMsgTable,
+			Columns: []string{user.WhoIsOwnerThisMsgColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: chatting.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RemovedWhoIsOwnerThisMsgIDs(); len(nodes) > 0 && !uuo.mutation.WhoIsOwnerThisMsgCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.WhoIsOwnerThisMsgTable,
+			Columns: []string{user.WhoIsOwnerThisMsgColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: chatting.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.WhoIsOwnerThisMsgIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.WhoIsOwnerThisMsgTable,
+			Columns: []string{user.WhoIsOwnerThisMsgColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: chatting.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uuo.mutation.UserHasDataCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserHasDataTable,
+			Columns: []string{user.UserHasDataColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: data.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RemovedUserHasDataIDs(); len(nodes) > 0 && !uuo.mutation.UserHasDataCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserHasDataTable,
+			Columns: []string{user.UserHasDataColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: data.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.UserHasDataIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserHasDataTable,
+			Columns: []string{user.UserHasDataColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: data.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uuo.mutation.DoctorHasScheduleCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DoctorHasScheduleTable,
+			Columns: []string{user.DoctorHasScheduleColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: schedule.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RemovedDoctorHasScheduleIDs(); len(nodes) > 0 && !uuo.mutation.DoctorHasScheduleCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DoctorHasScheduleTable,
+			Columns: []string{user.DoctorHasScheduleColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: schedule.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.DoctorHasScheduleIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DoctorHasScheduleTable,
+			Columns: []string{user.DoctorHasScheduleColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: schedule.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uuo.mutation.UserHaveTelecomsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserHaveTelecomsTable,
+			Columns: []string{user.UserHaveTelecomsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: telecom.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RemovedUserHaveTelecomsIDs(); len(nodes) > 0 && !uuo.mutation.UserHaveTelecomsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserHaveTelecomsTable,
+			Columns: []string{user.UserHaveTelecomsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: telecom.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.UserHaveTelecomsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserHaveTelecomsTable,
+			Columns: []string{user.UserHaveTelecomsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: telecom.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uuo.mutation.DoctorRecordTreatmentCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DoctorRecordTreatmentTable,
+			Columns: []string{user.DoctorRecordTreatmentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: treatment.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RemovedDoctorRecordTreatmentIDs(); len(nodes) > 0 && !uuo.mutation.DoctorRecordTreatmentCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DoctorRecordTreatmentTable,
+			Columns: []string{user.DoctorRecordTreatmentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: treatment.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.DoctorRecordTreatmentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DoctorRecordTreatmentTable,
+			Columns: []string{user.DoctorRecordTreatmentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: treatment.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uuo.mutation.UserHaveTreatmentCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserHaveTreatmentTable,
+			Columns: []string{user.UserHaveTreatmentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: treatment.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RemovedUserHaveTreatmentIDs(); len(nodes) > 0 && !uuo.mutation.UserHaveTreatmentCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserHaveTreatmentTable,
+			Columns: []string{user.UserHaveTreatmentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: treatment.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.UserHaveTreatmentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserHaveTreatmentTable,
+			Columns: []string{user.UserHaveTreatmentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: treatment.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uuo.mutation.HasDepartmentCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   user.HasDepartmentTable,
+			Columns: []string{user.HasDepartmentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: department.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.HasDepartmentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   user.HasDepartmentTable,
+			Columns: []string{user.HasDepartmentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: department.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uuo.mutation.FromHospitalCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   user.FromHospitalTable,
+			Columns: []string{user.FromHospitalColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: hospital.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.FromHospitalIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   user.FromHospitalTable,
+			Columns: []string{user.FromHospitalColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: hospital.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uuo.mutation.UserHaveDiseaseCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   user.UserHaveDiseaseTable,
+			Columns: user.UserHaveDiseasePrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: disease.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RemovedUserHaveDiseaseIDs(); len(nodes) > 0 && !uuo.mutation.UserHaveDiseaseCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   user.UserHaveDiseaseTable,
+			Columns: user.UserHaveDiseasePrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: disease.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.UserHaveDiseaseIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   user.UserHaveDiseaseTable,
+			Columns: user.UserHaveDiseasePrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: disease.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uuo.mutation.UserHaveRoleCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   user.UserHaveRoleTable,
+			Columns: user.UserHaveRolePrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: role.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RemovedUserHaveRoleIDs(); len(nodes) > 0 && !uuo.mutation.UserHaveRoleCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   user.UserHaveRoleTable,
+			Columns: user.UserHaveRolePrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: role.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.UserHaveRoleIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   user.UserHaveRoleTable,
+			Columns: user.UserHaveRolePrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: role.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &User{config: uuo.config}
 	_spec.Assign = _node.assignValues

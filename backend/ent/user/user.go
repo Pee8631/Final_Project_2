@@ -11,8 +11,116 @@ const (
 	FieldUsername = "username"
 	// FieldPassword holds the string denoting the password field in the database.
 	FieldPassword = "password"
+	// FieldEmail holds the string denoting the email field in the database.
+	FieldEmail = "email"
+	// FieldTelephone holds the string denoting the telephone field in the database.
+	FieldTelephone = "telephone"
+	// EdgeDoctorHasCertification holds the string denoting the doctor_has_certification edge name in mutations.
+	EdgeDoctorHasCertification = "doctor_has_certification"
+	// EdgeUserChattingWithWhom holds the string denoting the user_chatting_with_whom edge name in mutations.
+	EdgeUserChattingWithWhom = "user_chatting_with_whom"
+	// EdgeWhoIsOwnerThisMsg holds the string denoting the who_is_owner_this_msg edge name in mutations.
+	EdgeWhoIsOwnerThisMsg = "who_is_owner_this_msg"
+	// EdgeUserHasData holds the string denoting the user_has_data edge name in mutations.
+	EdgeUserHasData = "user_has_data"
+	// EdgeDoctorHasSchedule holds the string denoting the doctor_has_schedule edge name in mutations.
+	EdgeDoctorHasSchedule = "doctor_has_schedule"
+	// EdgeUserHaveTelecoms holds the string denoting the user_have_telecoms edge name in mutations.
+	EdgeUserHaveTelecoms = "user_have_telecoms"
+	// EdgeDoctorRecordTreatment holds the string denoting the doctor_record_treatment edge name in mutations.
+	EdgeDoctorRecordTreatment = "doctor_record_treatment"
+	// EdgeUserHaveTreatment holds the string denoting the user_have_treatment edge name in mutations.
+	EdgeUserHaveTreatment = "user_have_treatment"
+	// EdgeHasDepartment holds the string denoting the has_department edge name in mutations.
+	EdgeHasDepartment = "has_department"
+	// EdgeFromHospital holds the string denoting the from_hospital edge name in mutations.
+	EdgeFromHospital = "from_hospital"
+	// EdgeUserHaveDisease holds the string denoting the user_have_disease edge name in mutations.
+	EdgeUserHaveDisease = "user_have_disease"
+	// EdgeUserHaveRole holds the string denoting the user_have_role edge name in mutations.
+	EdgeUserHaveRole = "user_have_role"
 	// Table holds the table name of the user in the database.
 	Table = "users"
+	// DoctorHasCertificationTable is the table that holds the doctor_has_certification relation/edge.
+	DoctorHasCertificationTable = "certifications"
+	// DoctorHasCertificationInverseTable is the table name for the Certification entity.
+	// It exists in this package in order to avoid circular dependency with the "certification" package.
+	DoctorHasCertificationInverseTable = "certifications"
+	// DoctorHasCertificationColumn is the table column denoting the doctor_has_certification relation/edge.
+	DoctorHasCertificationColumn = "user_doctor_has_certification"
+	// UserChattingWithWhomTable is the table that holds the user_chatting_with_whom relation/edge.
+	UserChattingWithWhomTable = "chattings"
+	// UserChattingWithWhomInverseTable is the table name for the Chatting entity.
+	// It exists in this package in order to avoid circular dependency with the "chatting" package.
+	UserChattingWithWhomInverseTable = "chattings"
+	// UserChattingWithWhomColumn is the table column denoting the user_chatting_with_whom relation/edge.
+	UserChattingWithWhomColumn = "user_user_chatting_with_whom"
+	// WhoIsOwnerThisMsgTable is the table that holds the who_is_owner_this_msg relation/edge.
+	WhoIsOwnerThisMsgTable = "chattings"
+	// WhoIsOwnerThisMsgInverseTable is the table name for the Chatting entity.
+	// It exists in this package in order to avoid circular dependency with the "chatting" package.
+	WhoIsOwnerThisMsgInverseTable = "chattings"
+	// WhoIsOwnerThisMsgColumn is the table column denoting the who_is_owner_this_msg relation/edge.
+	WhoIsOwnerThisMsgColumn = "user_who_is_owner_this_msg"
+	// UserHasDataTable is the table that holds the user_has_data relation/edge.
+	UserHasDataTable = "data"
+	// UserHasDataInverseTable is the table name for the Data entity.
+	// It exists in this package in order to avoid circular dependency with the "data" package.
+	UserHasDataInverseTable = "data"
+	// UserHasDataColumn is the table column denoting the user_has_data relation/edge.
+	UserHasDataColumn = "user_user_has_data"
+	// DoctorHasScheduleTable is the table that holds the doctor_has_schedule relation/edge.
+	DoctorHasScheduleTable = "schedules"
+	// DoctorHasScheduleInverseTable is the table name for the Schedule entity.
+	// It exists in this package in order to avoid circular dependency with the "schedule" package.
+	DoctorHasScheduleInverseTable = "schedules"
+	// DoctorHasScheduleColumn is the table column denoting the doctor_has_schedule relation/edge.
+	DoctorHasScheduleColumn = "user_doctor_has_schedule"
+	// UserHaveTelecomsTable is the table that holds the user_have_telecoms relation/edge.
+	UserHaveTelecomsTable = "telecoms"
+	// UserHaveTelecomsInverseTable is the table name for the Telecom entity.
+	// It exists in this package in order to avoid circular dependency with the "telecom" package.
+	UserHaveTelecomsInverseTable = "telecoms"
+	// UserHaveTelecomsColumn is the table column denoting the user_have_telecoms relation/edge.
+	UserHaveTelecomsColumn = "user_user_have_telecoms"
+	// DoctorRecordTreatmentTable is the table that holds the doctor_record_treatment relation/edge.
+	DoctorRecordTreatmentTable = "treatments"
+	// DoctorRecordTreatmentInverseTable is the table name for the Treatment entity.
+	// It exists in this package in order to avoid circular dependency with the "treatment" package.
+	DoctorRecordTreatmentInverseTable = "treatments"
+	// DoctorRecordTreatmentColumn is the table column denoting the doctor_record_treatment relation/edge.
+	DoctorRecordTreatmentColumn = "user_doctor_record_treatment"
+	// UserHaveTreatmentTable is the table that holds the user_have_treatment relation/edge.
+	UserHaveTreatmentTable = "treatments"
+	// UserHaveTreatmentInverseTable is the table name for the Treatment entity.
+	// It exists in this package in order to avoid circular dependency with the "treatment" package.
+	UserHaveTreatmentInverseTable = "treatments"
+	// UserHaveTreatmentColumn is the table column denoting the user_have_treatment relation/edge.
+	UserHaveTreatmentColumn = "user_user_have_treatment"
+	// HasDepartmentTable is the table that holds the has_department relation/edge.
+	HasDepartmentTable = "users"
+	// HasDepartmentInverseTable is the table name for the Department entity.
+	// It exists in this package in order to avoid circular dependency with the "department" package.
+	HasDepartmentInverseTable = "departments"
+	// HasDepartmentColumn is the table column denoting the has_department relation/edge.
+	HasDepartmentColumn = "department_department_has_doctor"
+	// FromHospitalTable is the table that holds the from_hospital relation/edge.
+	FromHospitalTable = "users"
+	// FromHospitalInverseTable is the table name for the Hospital entity.
+	// It exists in this package in order to avoid circular dependency with the "hospital" package.
+	FromHospitalInverseTable = "hospitals"
+	// FromHospitalColumn is the table column denoting the from_hospital relation/edge.
+	FromHospitalColumn = "hospital_hospital_has_doctor"
+	// UserHaveDiseaseTable is the table that holds the user_have_disease relation/edge. The primary key declared below.
+	UserHaveDiseaseTable = "disease_disease_user"
+	// UserHaveDiseaseInverseTable is the table name for the Disease entity.
+	// It exists in this package in order to avoid circular dependency with the "disease" package.
+	UserHaveDiseaseInverseTable = "diseases"
+	// UserHaveRoleTable is the table that holds the user_have_role relation/edge. The primary key declared below.
+	UserHaveRoleTable = "role_role_user"
+	// UserHaveRoleInverseTable is the table name for the Role entity.
+	// It exists in this package in order to avoid circular dependency with the "role" package.
+	UserHaveRoleInverseTable = "roles"
 )
 
 // Columns holds all SQL columns for user fields.
@@ -20,7 +128,25 @@ var Columns = []string{
 	FieldID,
 	FieldUsername,
 	FieldPassword,
+	FieldEmail,
+	FieldTelephone,
 }
+
+// ForeignKeys holds the SQL foreign-keys that are owned by the "users"
+// table and are not defined as standalone fields in the schema.
+var ForeignKeys = []string{
+	"department_department_has_doctor",
+	"hospital_hospital_has_doctor",
+}
+
+var (
+	// UserHaveDiseasePrimaryKey and UserHaveDiseaseColumn2 are the table columns denoting the
+	// primary key for the user_have_disease relation (M2M).
+	UserHaveDiseasePrimaryKey = []string{"disease_id", "user_id"}
+	// UserHaveRolePrimaryKey and UserHaveRoleColumn2 are the table columns denoting the
+	// primary key for the user_have_role relation (M2M).
+	UserHaveRolePrimaryKey = []string{"role_id", "user_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -29,12 +155,15 @@ func ValidColumn(column string) bool {
 			return true
 		}
 	}
+	for i := range ForeignKeys {
+		if column == ForeignKeys[i] {
+			return true
+		}
+	}
 	return false
 }
 
 var (
-	// UsernameValidator is a validator for the "Username" field. It is called by the builders before save.
+	// UsernameValidator is a validator for the "username" field. It is called by the builders before save.
 	UsernameValidator func(string) error
-	// PasswordValidator is a validator for the "Password" field. It is called by the builders before save.
-	PasswordValidator func(string) error
 )

@@ -1,28 +1,19 @@
 package main
 
 import (
+	"FinalProject/controllers"
 	"FinalProject/ent"
-	"FinalProject/ent/controllers"
 	"context"
 	"log"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/go-sql-driver/mysql"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/swaggo/gin-swagger/swaggerFiles"
-	"github.com/swaggo/gin-swagger"
 )
 
-type User struct {
-	Username	string	
-	Password	string	 
-}
-
-type UserList struct {
-	User []User
-}
-
-// @title SUT SA Example API
+// @title SUT FINAL PROJECT Example API
 // @version 1.0
 // @description This is a sample server for SUT SE 2563
 // @termsOfService http://swagger.io/terms/
@@ -57,33 +48,30 @@ type UserList struct {
 func main() {
 	router := gin.Default()
 	router.Use(cors.Default())
-	client, err := ent.Open("sqlite3", "file:ent?mode=memory&cache=shared&_fk=1")
+	client, err := ent.Open("mysql", "root:@tcp(127.0.0.1:3306)/test?parseTime=True")
+
 	if err != nil {
-		log.Fatalf("fail to open sqlite3: %v", err)
+		log.Fatalf("fail to open MySQL Database: %v", err)
 	}
 	defer client.Close()
+
 	if err := client.Schema.Create(context.Background()); err != nil {
 		log.Fatalf("failed creating schema resources: %v", err)
 	}
+
 	v1 := router.Group("/api/v1")
+	controllers.NewCertificationController(v1, client)
+	controllers.NewDepartmentController(v1, client)
+	controllers.NewHospitalController(v1, client)
 	controllers.NewUserController(v1, client)
-
-	userList := UserList{
-		User: []User{
-			{"Dang Yunan","12345678"},
-			{"Tang Kwa", "abcdefg"},
-			{"Thanabodee Petchrey", "Thanabodee@"},
-			{"admin","123456"},
-		},
-	}
-
-	for _, u := range userList.User {
-		client.User.
-			Create().
-			SetUsername(u.Username).
-			SetPassword(u.Password).
-			Save(context.Background())
-	}
+	controllers.NewChattingController(v1, client)
+	controllers.NewDataController(v1, client)
+	controllers.NewDiseaseController(v1, client)
+	controllers.NewRoleController(v1, client)
+	controllers.NewScheduleController(v1, client)
+	controllers.NewScheduleTimeController(v1, client)
+	controllers.NewTelecomController(v1, client)
+	controllers.NewTreatmentController(v1, client)
 
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	router.Run()

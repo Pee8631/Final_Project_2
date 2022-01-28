@@ -2,9 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend_flutter/screen/home.dart';
 import 'package:frontend_flutter/util/user_references.dart';
-import 'package:frontend_flutter/widget/profile_widget.dart';
+import 'package:frontend_flutter/widget/small_profile_widget.dart';
 
-AppBar buildAppBar(BuildContext context) {
+AppBar buildAppBarMain(BuildContext context) {
   final myprofile = UserReferences.myProfile;
   return AppBar(
     leading: BackButton(),
@@ -14,7 +14,7 @@ AppBar buildAppBar(BuildContext context) {
       Row(
         children: [
           Text(myprofile.name, style: TextStyle(fontSize: 10)),
-          ProfileWidget(
+          SmallProfileWidget(
             imagePath: myprofile.imagePath,
             onClicked: () async {
               Navigator.pushReplacement(context,

@@ -8,23 +8,335 @@ import (
 )
 
 var (
+	// CertificationsColumns holds the columns for the "certifications" table.
+	CertificationsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "code", Type: field.TypeString},
+		{Name: "diloma", Type: field.TypeString},
+		{Name: "date_of_issuing", Type: field.TypeTime},
+		{Name: "date_of_exp", Type: field.TypeTime},
+		{Name: "issuer", Type: field.TypeString},
+		{Name: "user_doctor_has_certification", Type: field.TypeInt, Nullable: true},
+	}
+	// CertificationsTable holds the schema information for the "certifications" table.
+	CertificationsTable = &schema.Table{
+		Name:       "certifications",
+		Columns:    CertificationsColumns,
+		PrimaryKey: []*schema.Column{CertificationsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "certifications_users_doctor_has_certification",
+				Columns:    []*schema.Column{CertificationsColumns[6]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// ChattingsColumns holds the columns for the "chattings" table.
+	ChattingsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "message", Type: field.TypeString},
+		{Name: "date_time", Type: field.TypeTime},
+		{Name: "user_user_chatting_with_whom", Type: field.TypeInt, Nullable: true},
+		{Name: "user_who_is_owner_this_msg", Type: field.TypeInt, Nullable: true},
+	}
+	// ChattingsTable holds the schema information for the "chattings" table.
+	ChattingsTable = &schema.Table{
+		Name:       "chattings",
+		Columns:    ChattingsColumns,
+		PrimaryKey: []*schema.Column{ChattingsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "chattings_users_user_chatting_with_whom",
+				Columns:    []*schema.Column{ChattingsColumns[3]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "chattings_users_who_is_owner_this_msg",
+				Columns:    []*schema.Column{ChattingsColumns[4]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// DataColumns holds the columns for the "data" table.
+	DataColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "id_card_number", Type: field.TypeString, Unique: true},
+		{Name: "first_name", Type: field.TypeString},
+		{Name: "last_name", Type: field.TypeString},
+		{Name: "gender", Type: field.TypeInt},
+		{Name: "brith_date", Type: field.TypeTime},
+		{Name: "blood_group", Type: field.TypeString},
+		{Name: "address", Type: field.TypeString, Size: 2147483647},
+		{Name: "user_user_has_data", Type: field.TypeInt, Nullable: true},
+	}
+	// DataTable holds the schema information for the "data" table.
+	DataTable = &schema.Table{
+		Name:       "data",
+		Columns:    DataColumns,
+		PrimaryKey: []*schema.Column{DataColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "data_users_user_has_data",
+				Columns:    []*schema.Column{DataColumns[8]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// DepartmentsColumns holds the columns for the "departments" table.
+	DepartmentsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "name", Type: field.TypeString},
+	}
+	// DepartmentsTable holds the schema information for the "departments" table.
+	DepartmentsTable = &schema.Table{
+		Name:       "departments",
+		Columns:    DepartmentsColumns,
+		PrimaryKey: []*schema.Column{DepartmentsColumns[0]},
+	}
+	// DiseasesColumns holds the columns for the "diseases" table.
+	DiseasesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "symtoms", Type: field.TypeString, Size: 2147483647},
+	}
+	// DiseasesTable holds the schema information for the "diseases" table.
+	DiseasesTable = &schema.Table{
+		Name:       "diseases",
+		Columns:    DiseasesColumns,
+		PrimaryKey: []*schema.Column{DiseasesColumns[0]},
+	}
+	// HospitalsColumns holds the columns for the "hospitals" table.
+	HospitalsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "name", Type: field.TypeString, Unique: true},
+	}
+	// HospitalsTable holds the schema information for the "hospitals" table.
+	HospitalsTable = &schema.Table{
+		Name:       "hospitals",
+		Columns:    HospitalsColumns,
+		PrimaryKey: []*schema.Column{HospitalsColumns[0]},
+	}
+	// RolesColumns holds the columns for the "roles" table.
+	RolesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "name", Type: field.TypeString},
+	}
+	// RolesTable holds the schema information for the "roles" table.
+	RolesTable = &schema.Table{
+		Name:       "roles",
+		Columns:    RolesColumns,
+		PrimaryKey: []*schema.Column{RolesColumns[0]},
+	}
+	// SchedulesColumns holds the columns for the "schedules" table.
+	SchedulesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "activity", Type: field.TypeString},
+		{Name: "detail", Type: field.TypeString, Size: 2147483647},
+		{Name: "status", Type: field.TypeString},
+		{Name: "user_doctor_has_schedule", Type: field.TypeInt, Nullable: true},
+	}
+	// SchedulesTable holds the schema information for the "schedules" table.
+	SchedulesTable = &schema.Table{
+		Name:       "schedules",
+		Columns:    SchedulesColumns,
+		PrimaryKey: []*schema.Column{SchedulesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "schedules_users_doctor_has_schedule",
+				Columns:    []*schema.Column{SchedulesColumns[4]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// ScheduleTimesColumns holds the columns for the "schedule_times" table.
+	ScheduleTimesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "start_time", Type: field.TypeTime},
+		{Name: "stop_time", Type: field.TypeTime},
+		{Name: "schedule_time_schedule", Type: field.TypeInt, Nullable: true},
+	}
+	// ScheduleTimesTable holds the schema information for the "schedule_times" table.
+	ScheduleTimesTable = &schema.Table{
+		Name:       "schedule_times",
+		Columns:    ScheduleTimesColumns,
+		PrimaryKey: []*schema.Column{ScheduleTimesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "schedule_times_schedules_time_schedule",
+				Columns:    []*schema.Column{ScheduleTimesColumns[3]},
+				RefColumns: []*schema.Column{SchedulesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// TelecomsColumns holds the columns for the "telecoms" table.
+	TelecomsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "username", Type: field.TypeString},
+		{Name: "platform", Type: field.TypeString},
+		{Name: "user_user_have_telecoms", Type: field.TypeInt, Nullable: true},
+	}
+	// TelecomsTable holds the schema information for the "telecoms" table.
+	TelecomsTable = &schema.Table{
+		Name:       "telecoms",
+		Columns:    TelecomsColumns,
+		PrimaryKey: []*schema.Column{TelecomsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "telecoms_users_user_have_telecoms",
+				Columns:    []*schema.Column{TelecomsColumns[3]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// TreatmentsColumns holds the columns for the "treatments" table.
+	TreatmentsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "treatment_record", Type: field.TypeString, Size: 2147483647},
+		{Name: "date_time", Type: field.TypeTime},
+		{Name: "take_time", Type: field.TypeFloat64},
+		{Name: "user_doctor_record_treatment", Type: field.TypeInt, Nullable: true},
+		{Name: "user_user_have_treatment", Type: field.TypeInt, Nullable: true},
+	}
+	// TreatmentsTable holds the schema information for the "treatments" table.
+	TreatmentsTable = &schema.Table{
+		Name:       "treatments",
+		Columns:    TreatmentsColumns,
+		PrimaryKey: []*schema.Column{TreatmentsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "treatments_users_doctor_record_treatment",
+				Columns:    []*schema.Column{TreatmentsColumns[4]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "treatments_users_user_have_treatment",
+				Columns:    []*schema.Column{TreatmentsColumns[5]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "username", Type: field.TypeString, Unique: true},
 		{Name: "password", Type: field.TypeString},
+		{Name: "email", Type: field.TypeString},
+		{Name: "telephone", Type: field.TypeString},
+		{Name: "department_department_has_doctor", Type: field.TypeInt, Nullable: true},
+		{Name: "hospital_hospital_has_doctor", Type: field.TypeInt, Nullable: true},
 	}
 	// UsersTable holds the schema information for the "users" table.
 	UsersTable = &schema.Table{
 		Name:       "users",
 		Columns:    UsersColumns,
 		PrimaryKey: []*schema.Column{UsersColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "users_departments_department_has_doctor",
+				Columns:    []*schema.Column{UsersColumns[5]},
+				RefColumns: []*schema.Column{DepartmentsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "users_hospitals_hospital_has_doctor",
+				Columns:    []*schema.Column{UsersColumns[6]},
+				RefColumns: []*schema.Column{HospitalsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// DiseaseDiseaseUserColumns holds the columns for the "disease_disease_user" table.
+	DiseaseDiseaseUserColumns = []*schema.Column{
+		{Name: "disease_id", Type: field.TypeInt},
+		{Name: "user_id", Type: field.TypeInt},
+	}
+	// DiseaseDiseaseUserTable holds the schema information for the "disease_disease_user" table.
+	DiseaseDiseaseUserTable = &schema.Table{
+		Name:       "disease_disease_user",
+		Columns:    DiseaseDiseaseUserColumns,
+		PrimaryKey: []*schema.Column{DiseaseDiseaseUserColumns[0], DiseaseDiseaseUserColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "disease_disease_user_disease_id",
+				Columns:    []*schema.Column{DiseaseDiseaseUserColumns[0]},
+				RefColumns: []*schema.Column{DiseasesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "disease_disease_user_user_id",
+				Columns:    []*schema.Column{DiseaseDiseaseUserColumns[1]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
+	// RoleRoleUserColumns holds the columns for the "role_role_user" table.
+	RoleRoleUserColumns = []*schema.Column{
+		{Name: "role_id", Type: field.TypeInt},
+		{Name: "user_id", Type: field.TypeInt},
+	}
+	// RoleRoleUserTable holds the schema information for the "role_role_user" table.
+	RoleRoleUserTable = &schema.Table{
+		Name:       "role_role_user",
+		Columns:    RoleRoleUserColumns,
+		PrimaryKey: []*schema.Column{RoleRoleUserColumns[0], RoleRoleUserColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "role_role_user_role_id",
+				Columns:    []*schema.Column{RoleRoleUserColumns[0]},
+				RefColumns: []*schema.Column{RolesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "role_role_user_user_id",
+				Columns:    []*schema.Column{RoleRoleUserColumns[1]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		CertificationsTable,
+		ChattingsTable,
+		DataTable,
+		DepartmentsTable,
+		DiseasesTable,
+		HospitalsTable,
+		RolesTable,
+		SchedulesTable,
+		ScheduleTimesTable,
+		TelecomsTable,
+		TreatmentsTable,
 		UsersTable,
+		DiseaseDiseaseUserTable,
+		RoleRoleUserTable,
 	}
 )
 
 func init() {
+	CertificationsTable.ForeignKeys[0].RefTable = UsersTable
+	ChattingsTable.ForeignKeys[0].RefTable = UsersTable
+	ChattingsTable.ForeignKeys[1].RefTable = UsersTable
+	DataTable.ForeignKeys[0].RefTable = UsersTable
+	SchedulesTable.ForeignKeys[0].RefTable = UsersTable
+	ScheduleTimesTable.ForeignKeys[0].RefTable = SchedulesTable
+	TelecomsTable.ForeignKeys[0].RefTable = UsersTable
+	TreatmentsTable.ForeignKeys[0].RefTable = UsersTable
+	TreatmentsTable.ForeignKeys[1].RefTable = UsersTable
+	UsersTable.ForeignKeys[0].RefTable = DepartmentsTable
+	UsersTable.ForeignKeys[1].RefTable = HospitalsTable
+	DiseaseDiseaseUserTable.ForeignKeys[0].RefTable = DiseasesTable
+	DiseaseDiseaseUserTable.ForeignKeys[1].RefTable = UsersTable
+	RoleRoleUserTable.ForeignKeys[0].RefTable = RolesTable
+	RoleRoleUserTable.ForeignKeys[1].RefTable = UsersTable
 }

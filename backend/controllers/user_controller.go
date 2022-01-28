@@ -4,6 +4,7 @@ import (
 	"FinalProject/ent"
 	"FinalProject/ent/user"
 	"context"
+	"database/sql"
 	"fmt"
 	"os"
 	"strconv"
@@ -13,10 +14,37 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+//Function determine database connection
+func databaseConnection() (db *sql.DB) {
+	dbDriver := "mysql"
+	dbUser := "root"
+	dbPass := ""
+	dbName := "project"
+	db, err := sql.Open(dbDriver, dbUser+":"+dbPass+"@/"+dbName+"?parseTime=True")
+	if err != nil {
+		panic(err.Error())
+	}
+	return db
+}
+
+// User defines the struct for the user
+type User struct {
+	Username   	string
+	Password   	string
+	Email      	string
+	Telephone  	string
+	Department 	int
+	Hospital	int
+}
+
 // UserController defines the struct for the user controller
 type UserController struct {
 	client *ent.Client
 	router gin.IRouter
+}
+
+func (p User) GetIDDepartmentAsString() string {
+	return strconv.Itoa(p.Department)
 }
 
 // CreateUser handles POST requests for adding user entities
@@ -31,26 +59,44 @@ type UserController struct {
 // @Failure 500 {object} gin.H
 // @Router /users [post]
 func (ctl *UserController) CreateUser(c *gin.Context) {
-	obj := ent.User{}
+	db := databaseConnection()
+	obj := User{}
+
 	if err := c.ShouldBind(&obj); err != nil {
 		c.JSON(400, gin.H{
 			"error": "user binding failed",
 		})
 		return
 	}
-	u, err := ctl.client.User.
-		Create().
-		SetUsername(obj.Username).
-		SetPassword(obj.Password).
-		Save(context.Background())
+
+	insertUser, err := db.Prepare("INSERT INTO user(username, password, email, telephone, id_department, id_hospital) VALUES (?, ?, ?, ?, ?)")
 	if err != nil {
-		fmt.Println(err.Error())
+		fmt.Println(err)
 		c.JSON(400, gin.H{
-			"error": "saving failed",
+			"status" : false,
+			"error": err,
 		})
 		return
 	}
-	c.JSON(200, u)
+	insertUser.Exec(obj.Username, obj.Password, obj.Email, obj.Telephone, obj.Department, obj.Hospital)
+	if err != nil {
+		fmt.Println(err)
+		c.JSON(400, gin.H{
+			"status" : false,
+			"error": err,
+		})
+		return
+	}
+
+	defer db.Close()
+
+	println("Username: " + obj.Username + ", Password: " + obj.Password + ", Email: " + obj.Telephone)
+
+	
+	c.JSON(200, gin.H{
+		"status" : true,
+		"data": insertUser,
+	})
 }
 
 // GetUser handles GET requests to retrieve a user entity
@@ -65,6 +111,8 @@ func (ctl *UserController) CreateUser(c *gin.Context) {
 // @Failure 500 {object} gin.H
 // @Router /users/{id} [get]
 func (ctl *UserController) GetUser(c *gin.Context) {
+	db := databaseConnection()
+
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		c.JSON(400, gin.H{
@@ -72,17 +120,30 @@ func (ctl *UserController) GetUser(c *gin.Context) {
 		})
 		return
 	}
-	u, err := ctl.client.User.
-		Query().
-		Where(user.IDEQ(int(id))).
-		Only(context.Background())
+	resultsGetUser, err := db.Query("SELECT username, password, email, telephone, id_department, id_hospital FROM user WHERE id_user=?", id)
 	if err != nil {
-		c.JSON(404, gin.H{
+		c.JSON(400, gin.H{
 			"error": err.Error(),
 		})
-		return
+		return // proper error handling instead of panic in your app
 	}
-	c.JSON(200, u)
+
+	for resultsGetUser.Next() {
+		var user User
+		// for each row, scan the result into our tag composite object
+		err = resultsGetUser.Scan(&user.Username, &user.Password, &user.Email, &user.Telephone, &user.Department, &user.Hospital)
+		if err != nil {
+			c.JSON(404, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		defer db.Close()
+
+		c.JSON(200, user)
+
+	}
 }
 
 // FindUser handles POST requests to retrieve a user entity
@@ -160,6 +221,7 @@ func CreateToken(username string) (string, error) {
 // @Failure 500 {object} gin.H
 // @Router /users [get]
 func (ctl *UserController) ListUser(c *gin.Context) {
+	db := databaseConnection()
 	limitQuery := c.Query("limit")
 	limit := 10
 	if limitQuery != "" {
@@ -176,16 +238,28 @@ func (ctl *UserController) ListUser(c *gin.Context) {
 			offset = int(offset64)
 		}
 	}
-	users, err := ctl.client.User.
-		Query().
-		Limit(limit).
-		Offset(offset).
-		All(context.Background())
+	resultsListUser, err := db.Query("SELECT username, password, email, telephone, id_department, id_hospital FROM user limit ? offset ?", limit, offset)
 	if err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
-		return
+		return // proper error handling instead of panic in your app
 	}
-	c.JSON(200, users)
+
+	for resultsListUser.Next() {
+		var user User
+		// for each row, scan the result into our tag composite object
+		err = resultsListUser.Scan(&user.Username, &user.Password, &user.Email, &user.Telephone, &user.Department, &user.Hospital)
+		if err != nil {
+			c.JSON(400, gin.H{"error": err.Error()})
+			return // proper error handling instead of panic in your app
+		}
+		// and then print out the tag's Name attribute
+
+		defer db.Close()
+
+		c.JSON(200, user)
+	}
+
+	
 }
 
 // DeleteUser handles DELETE requests to delete a user entity
@@ -200,6 +274,7 @@ func (ctl *UserController) ListUser(c *gin.Context) {
 // @Failure 500 {object} gin.H
 // @Router /users/{id} [delete]
 func (ctl *UserController) DeleteUser(c *gin.Context) {
+	db := databaseConnection()
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		c.JSON(400, gin.H{
@@ -207,15 +282,18 @@ func (ctl *UserController) DeleteUser(c *gin.Context) {
 		})
 		return
 	}
-	err = ctl.client.User.
-		DeleteOneID(int(id)).
-		Exec(context.Background())
-	if err != nil {
+
+	deleteUser, err := db.Prepare("DELETE FROM user WHERE id_user=?")
+    if err != nil {
 		c.JSON(404, gin.H{
 			"error": err.Error(),
 		})
 		return
-	}
+    }
+    deleteUser.Exec(id)
+
+    defer db.Close()
+
 	c.JSON(200, gin.H{"result": fmt.Sprintf("ok deleted %v", id)})
 }
 
@@ -232,6 +310,7 @@ func (ctl *UserController) DeleteUser(c *gin.Context) {
 // @Failure 500 {object} gin.H
 // @Router /users/{id} [put]
 func (ctl *UserController) UpdateUser(c *gin.Context) {
+	db := databaseConnection()
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		c.JSON(400, gin.H{
@@ -239,22 +318,28 @@ func (ctl *UserController) UpdateUser(c *gin.Context) {
 		})
 		return
 	}
-	obj := ent.User{}
+	obj := User{}
 	if err := c.ShouldBind(&obj); err != nil {
 		c.JSON(400, gin.H{
 			"error": "user binding failed",
 		})
 		return
 	}
-	obj.ID = int(id)
-	u, err := ctl.client.User.
-		UpdateOne(&obj).
-		Save(context.Background())
+
+	UpdateUser, err := db.Prepare("UPDATE user SET username=?,password=?,email=?,telephone=?,id_department=?,id_hospital=? WHERE id_user=?")
 	if err != nil {
-		c.JSON(400, gin.H{"error": "update failed"})
+		c.JSON(400, gin.H{"error": "update1 failed"})
 		return
 	}
-	c.JSON(200, u)
+
+	UpdateUser.Exec(obj.Username, obj.Password, obj.Email, obj.Telephone, obj.Department, obj.Hospital, int(id))
+
+	defer db.Close()
+
+	c.JSON(200, gin.H{
+		"status" : true,
+		"data": UpdateUser,
+	})
 }
 
 // NewUserController creates and registers handles for the user controller

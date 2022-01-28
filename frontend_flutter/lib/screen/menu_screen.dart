@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:frontend_flutter/util/user_references.dart';
+import 'package:frontend_flutter/widget/menu_button.dart';
+
+import 'home.dart';
 
 class MenuScreen extends StatelessWidget {
   MenuScreen({Key? key}) : super(key: key);
@@ -9,7 +12,7 @@ class MenuScreen extends StatelessWidget {
     "Heed not the rabble",
     "Sound of screams",
     "Who scream",
-    "Revolution is coming...",
+    "Revolution is",
     "Revolution, they..."
   ];
 
@@ -22,6 +25,7 @@ class MenuScreen extends StatelessWidget {
           slivers: <Widget>[
             const SliverAppBar(
               pinned: true,
+              elevation: 0,
               expandedHeight: 50.0,
               backgroundColor: Colors.transparent,
               title: Center(
@@ -47,10 +51,13 @@ class MenuScreen extends StatelessWidget {
                   var b = textList[index];
                   return Container(
                     alignment: Alignment.center,
-                    color: Colors.transparent,
                     child: Column(
                       children: [
-                        Image.asset("assets/images/Default.png"),
+                        MenuButtonWidget(
+                          imagePath:
+                              'https://png.pngtree.com/png-clipart/20190705/original/pngtree-vector-cancel-icon-png-image_4254546.jpg',
+                          onClicked: () async {},
+                        ),
                         Text(
                           b,
                           style:

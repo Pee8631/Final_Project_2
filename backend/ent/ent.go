@@ -3,6 +3,17 @@
 package ent
 
 import (
+	"FinalProject/ent/certification"
+	"FinalProject/ent/chatting"
+	"FinalProject/ent/data"
+	"FinalProject/ent/department"
+	"FinalProject/ent/disease"
+	"FinalProject/ent/hospital"
+	"FinalProject/ent/role"
+	"FinalProject/ent/schedule"
+	"FinalProject/ent/scheduletime"
+	"FinalProject/ent/telecom"
+	"FinalProject/ent/treatment"
 	"FinalProject/ent/user"
 	"errors"
 	"fmt"
@@ -29,7 +40,18 @@ type OrderFunc func(*sql.Selector)
 // columnChecker returns a function indicates if the column exists in the given column.
 func columnChecker(table string) func(string) error {
 	checks := map[string]func(string) bool{
-		user.Table: user.ValidColumn,
+		certification.Table: certification.ValidColumn,
+		chatting.Table:      chatting.ValidColumn,
+		data.Table:          data.ValidColumn,
+		department.Table:    department.ValidColumn,
+		disease.Table:       disease.ValidColumn,
+		hospital.Table:      hospital.ValidColumn,
+		role.Table:          role.ValidColumn,
+		schedule.Table:      schedule.ValidColumn,
+		scheduletime.Table:  scheduletime.ValidColumn,
+		telecom.Table:       telecom.ValidColumn,
+		treatment.Table:     treatment.ValidColumn,
+		user.Table:          user.ValidColumn,
 	}
 	check, ok := checks[table]
 	if !ok {

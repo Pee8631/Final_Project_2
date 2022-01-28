@@ -3,6 +3,8 @@
 package ent
 
 import (
+	"FinalProject/ent/department"
+	"FinalProject/ent/hospital"
 	"FinalProject/ent/user"
 	"fmt"
 	"strings"
@@ -15,10 +17,168 @@ type User struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
-	// Username holds the value of the "Username" field.
-	Username string `json:"Username,omitempty"`
-	// Password holds the value of the "Password" field.
-	Password string `json:"Password,omitempty"`
+	// Username holds the value of the "username" field.
+	Username string `json:"username,omitempty"`
+	// Password holds the value of the "password" field.
+	Password string `json:"password,omitempty"`
+	// Email holds the value of the "email" field.
+	Email string `json:"email,omitempty"`
+	// Telephone holds the value of the "telephone" field.
+	Telephone string `json:"telephone,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the UserQuery when eager-loading is set.
+	Edges                            UserEdges `json:"edges"`
+	department_department_has_doctor *int
+	hospital_hospital_has_doctor     *int
+}
+
+// UserEdges holds the relations/edges for other nodes in the graph.
+type UserEdges struct {
+	// DoctorHasCertification holds the value of the doctor_has_certification edge.
+	DoctorHasCertification []*Certification `json:"doctor_has_certification,omitempty"`
+	// UserChattingWithWhom holds the value of the user_chatting_with_whom edge.
+	UserChattingWithWhom []*Chatting `json:"user_chatting_with_whom,omitempty"`
+	// WhoIsOwnerThisMsg holds the value of the who_is_owner_this_msg edge.
+	WhoIsOwnerThisMsg []*Chatting `json:"who_is_owner_this_msg,omitempty"`
+	// UserHasData holds the value of the user_has_data edge.
+	UserHasData []*Data `json:"user_has_data,omitempty"`
+	// DoctorHasSchedule holds the value of the doctor_has_schedule edge.
+	DoctorHasSchedule []*Schedule `json:"doctor_has_schedule,omitempty"`
+	// UserHaveTelecoms holds the value of the user_have_telecoms edge.
+	UserHaveTelecoms []*Telecom `json:"user_have_telecoms,omitempty"`
+	// DoctorRecordTreatment holds the value of the doctor_record_treatment edge.
+	DoctorRecordTreatment []*Treatment `json:"doctor_record_treatment,omitempty"`
+	// UserHaveTreatment holds the value of the user_have_treatment edge.
+	UserHaveTreatment []*Treatment `json:"user_have_treatment,omitempty"`
+	// HasDepartment holds the value of the has_department edge.
+	HasDepartment *Department `json:"has_department,omitempty"`
+	// FromHospital holds the value of the from_hospital edge.
+	FromHospital *Hospital `json:"from_hospital,omitempty"`
+	// UserHaveDisease holds the value of the user_have_disease edge.
+	UserHaveDisease []*Disease `json:"user_have_disease,omitempty"`
+	// UserHaveRole holds the value of the user_have_role edge.
+	UserHaveRole []*Role `json:"user_have_role,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [12]bool
+}
+
+// DoctorHasCertificationOrErr returns the DoctorHasCertification value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) DoctorHasCertificationOrErr() ([]*Certification, error) {
+	if e.loadedTypes[0] {
+		return e.DoctorHasCertification, nil
+	}
+	return nil, &NotLoadedError{edge: "doctor_has_certification"}
+}
+
+// UserChattingWithWhomOrErr returns the UserChattingWithWhom value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) UserChattingWithWhomOrErr() ([]*Chatting, error) {
+	if e.loadedTypes[1] {
+		return e.UserChattingWithWhom, nil
+	}
+	return nil, &NotLoadedError{edge: "user_chatting_with_whom"}
+}
+
+// WhoIsOwnerThisMsgOrErr returns the WhoIsOwnerThisMsg value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) WhoIsOwnerThisMsgOrErr() ([]*Chatting, error) {
+	if e.loadedTypes[2] {
+		return e.WhoIsOwnerThisMsg, nil
+	}
+	return nil, &NotLoadedError{edge: "who_is_owner_this_msg"}
+}
+
+// UserHasDataOrErr returns the UserHasData value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) UserHasDataOrErr() ([]*Data, error) {
+	if e.loadedTypes[3] {
+		return e.UserHasData, nil
+	}
+	return nil, &NotLoadedError{edge: "user_has_data"}
+}
+
+// DoctorHasScheduleOrErr returns the DoctorHasSchedule value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) DoctorHasScheduleOrErr() ([]*Schedule, error) {
+	if e.loadedTypes[4] {
+		return e.DoctorHasSchedule, nil
+	}
+	return nil, &NotLoadedError{edge: "doctor_has_schedule"}
+}
+
+// UserHaveTelecomsOrErr returns the UserHaveTelecoms value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) UserHaveTelecomsOrErr() ([]*Telecom, error) {
+	if e.loadedTypes[5] {
+		return e.UserHaveTelecoms, nil
+	}
+	return nil, &NotLoadedError{edge: "user_have_telecoms"}
+}
+
+// DoctorRecordTreatmentOrErr returns the DoctorRecordTreatment value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) DoctorRecordTreatmentOrErr() ([]*Treatment, error) {
+	if e.loadedTypes[6] {
+		return e.DoctorRecordTreatment, nil
+	}
+	return nil, &NotLoadedError{edge: "doctor_record_treatment"}
+}
+
+// UserHaveTreatmentOrErr returns the UserHaveTreatment value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) UserHaveTreatmentOrErr() ([]*Treatment, error) {
+	if e.loadedTypes[7] {
+		return e.UserHaveTreatment, nil
+	}
+	return nil, &NotLoadedError{edge: "user_have_treatment"}
+}
+
+// HasDepartmentOrErr returns the HasDepartment value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e UserEdges) HasDepartmentOrErr() (*Department, error) {
+	if e.loadedTypes[8] {
+		if e.HasDepartment == nil {
+			// The edge has_department was loaded in eager-loading,
+			// but was not found.
+			return nil, &NotFoundError{label: department.Label}
+		}
+		return e.HasDepartment, nil
+	}
+	return nil, &NotLoadedError{edge: "has_department"}
+}
+
+// FromHospitalOrErr returns the FromHospital value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e UserEdges) FromHospitalOrErr() (*Hospital, error) {
+	if e.loadedTypes[9] {
+		if e.FromHospital == nil {
+			// The edge from_hospital was loaded in eager-loading,
+			// but was not found.
+			return nil, &NotFoundError{label: hospital.Label}
+		}
+		return e.FromHospital, nil
+	}
+	return nil, &NotLoadedError{edge: "from_hospital"}
+}
+
+// UserHaveDiseaseOrErr returns the UserHaveDisease value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) UserHaveDiseaseOrErr() ([]*Disease, error) {
+	if e.loadedTypes[10] {
+		return e.UserHaveDisease, nil
+	}
+	return nil, &NotLoadedError{edge: "user_have_disease"}
+}
+
+// UserHaveRoleOrErr returns the UserHaveRole value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) UserHaveRoleOrErr() ([]*Role, error) {
+	if e.loadedTypes[11] {
+		return e.UserHaveRole, nil
+	}
+	return nil, &NotLoadedError{edge: "user_have_role"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -28,8 +188,12 @@ func (*User) scanValues(columns []string) ([]interface{}, error) {
 		switch columns[i] {
 		case user.FieldID:
 			values[i] = new(sql.NullInt64)
-		case user.FieldUsername, user.FieldPassword:
+		case user.FieldUsername, user.FieldPassword, user.FieldEmail, user.FieldTelephone:
 			values[i] = new(sql.NullString)
+		case user.ForeignKeys[0]: // department_department_has_doctor
+			values[i] = new(sql.NullInt64)
+		case user.ForeignKeys[1]: // hospital_hospital_has_doctor
+			values[i] = new(sql.NullInt64)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type User", columns[i])
 		}
@@ -53,19 +217,105 @@ func (u *User) assignValues(columns []string, values []interface{}) error {
 			u.ID = int(value.Int64)
 		case user.FieldUsername:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field Username", values[i])
+				return fmt.Errorf("unexpected type %T for field username", values[i])
 			} else if value.Valid {
 				u.Username = value.String
 			}
 		case user.FieldPassword:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field Password", values[i])
+				return fmt.Errorf("unexpected type %T for field password", values[i])
 			} else if value.Valid {
 				u.Password = value.String
+			}
+		case user.FieldEmail:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field email", values[i])
+			} else if value.Valid {
+				u.Email = value.String
+			}
+		case user.FieldTelephone:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field telephone", values[i])
+			} else if value.Valid {
+				u.Telephone = value.String
+			}
+		case user.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field department_department_has_doctor", value)
+			} else if value.Valid {
+				u.department_department_has_doctor = new(int)
+				*u.department_department_has_doctor = int(value.Int64)
+			}
+		case user.ForeignKeys[1]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field hospital_hospital_has_doctor", value)
+			} else if value.Valid {
+				u.hospital_hospital_has_doctor = new(int)
+				*u.hospital_hospital_has_doctor = int(value.Int64)
 			}
 		}
 	}
 	return nil
+}
+
+// QueryDoctorHasCertification queries the "doctor_has_certification" edge of the User entity.
+func (u *User) QueryDoctorHasCertification() *CertificationQuery {
+	return (&UserClient{config: u.config}).QueryDoctorHasCertification(u)
+}
+
+// QueryUserChattingWithWhom queries the "user_chatting_with_whom" edge of the User entity.
+func (u *User) QueryUserChattingWithWhom() *ChattingQuery {
+	return (&UserClient{config: u.config}).QueryUserChattingWithWhom(u)
+}
+
+// QueryWhoIsOwnerThisMsg queries the "who_is_owner_this_msg" edge of the User entity.
+func (u *User) QueryWhoIsOwnerThisMsg() *ChattingQuery {
+	return (&UserClient{config: u.config}).QueryWhoIsOwnerThisMsg(u)
+}
+
+// QueryUserHasData queries the "user_has_data" edge of the User entity.
+func (u *User) QueryUserHasData() *DataQuery {
+	return (&UserClient{config: u.config}).QueryUserHasData(u)
+}
+
+// QueryDoctorHasSchedule queries the "doctor_has_schedule" edge of the User entity.
+func (u *User) QueryDoctorHasSchedule() *ScheduleQuery {
+	return (&UserClient{config: u.config}).QueryDoctorHasSchedule(u)
+}
+
+// QueryUserHaveTelecoms queries the "user_have_telecoms" edge of the User entity.
+func (u *User) QueryUserHaveTelecoms() *TelecomQuery {
+	return (&UserClient{config: u.config}).QueryUserHaveTelecoms(u)
+}
+
+// QueryDoctorRecordTreatment queries the "doctor_record_treatment" edge of the User entity.
+func (u *User) QueryDoctorRecordTreatment() *TreatmentQuery {
+	return (&UserClient{config: u.config}).QueryDoctorRecordTreatment(u)
+}
+
+// QueryUserHaveTreatment queries the "user_have_treatment" edge of the User entity.
+func (u *User) QueryUserHaveTreatment() *TreatmentQuery {
+	return (&UserClient{config: u.config}).QueryUserHaveTreatment(u)
+}
+
+// QueryHasDepartment queries the "has_department" edge of the User entity.
+func (u *User) QueryHasDepartment() *DepartmentQuery {
+	return (&UserClient{config: u.config}).QueryHasDepartment(u)
+}
+
+// QueryFromHospital queries the "from_hospital" edge of the User entity.
+func (u *User) QueryFromHospital() *HospitalQuery {
+	return (&UserClient{config: u.config}).QueryFromHospital(u)
+}
+
+// QueryUserHaveDisease queries the "user_have_disease" edge of the User entity.
+func (u *User) QueryUserHaveDisease() *DiseaseQuery {
+	return (&UserClient{config: u.config}).QueryUserHaveDisease(u)
+}
+
+// QueryUserHaveRole queries the "user_have_role" edge of the User entity.
+func (u *User) QueryUserHaveRole() *RoleQuery {
+	return (&UserClient{config: u.config}).QueryUserHaveRole(u)
 }
 
 // Update returns a builder for updating this User.
@@ -91,10 +341,14 @@ func (u *User) String() string {
 	var builder strings.Builder
 	builder.WriteString("User(")
 	builder.WriteString(fmt.Sprintf("id=%v", u.ID))
-	builder.WriteString(", Username=")
+	builder.WriteString(", username=")
 	builder.WriteString(u.Username)
-	builder.WriteString(", Password=")
+	builder.WriteString(", password=")
 	builder.WriteString(u.Password)
+	builder.WriteString(", email=")
+	builder.WriteString(u.Email)
+	builder.WriteString(", telephone=")
+	builder.WriteString(u.Telephone)
 	builder.WriteByte(')')
 	return builder.String()
 }

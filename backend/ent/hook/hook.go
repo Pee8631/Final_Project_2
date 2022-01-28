@@ -8,6 +8,149 @@ import (
 	"fmt"
 )
 
+// The CertificationFunc type is an adapter to allow the use of ordinary
+// function as Certification mutator.
+type CertificationFunc func(context.Context, *ent.CertificationMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f CertificationFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.CertificationMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CertificationMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The ChattingFunc type is an adapter to allow the use of ordinary
+// function as Chatting mutator.
+type ChattingFunc func(context.Context, *ent.ChattingMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ChattingFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.ChattingMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ChattingMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The DataFunc type is an adapter to allow the use of ordinary
+// function as Data mutator.
+type DataFunc func(context.Context, *ent.DataMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f DataFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.DataMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.DataMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The DepartmentFunc type is an adapter to allow the use of ordinary
+// function as Department mutator.
+type DepartmentFunc func(context.Context, *ent.DepartmentMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f DepartmentFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.DepartmentMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.DepartmentMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The DiseaseFunc type is an adapter to allow the use of ordinary
+// function as Disease mutator.
+type DiseaseFunc func(context.Context, *ent.DiseaseMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f DiseaseFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.DiseaseMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.DiseaseMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The HospitalFunc type is an adapter to allow the use of ordinary
+// function as Hospital mutator.
+type HospitalFunc func(context.Context, *ent.HospitalMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f HospitalFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.HospitalMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.HospitalMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The RoleFunc type is an adapter to allow the use of ordinary
+// function as Role mutator.
+type RoleFunc func(context.Context, *ent.RoleMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f RoleFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.RoleMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.RoleMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The ScheduleFunc type is an adapter to allow the use of ordinary
+// function as Schedule mutator.
+type ScheduleFunc func(context.Context, *ent.ScheduleMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ScheduleFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.ScheduleMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ScheduleMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The ScheduleTimeFunc type is an adapter to allow the use of ordinary
+// function as ScheduleTime mutator.
+type ScheduleTimeFunc func(context.Context, *ent.ScheduleTimeMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ScheduleTimeFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.ScheduleTimeMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ScheduleTimeMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The TelecomFunc type is an adapter to allow the use of ordinary
+// function as Telecom mutator.
+type TelecomFunc func(context.Context, *ent.TelecomMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f TelecomFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.TelecomMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TelecomMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The TreatmentFunc type is an adapter to allow the use of ordinary
+// function as Treatment mutator.
+type TreatmentFunc func(context.Context, *ent.TreatmentMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f TreatmentFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.TreatmentMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TreatmentMutation", m)
+	}
+	return f(ctx, mv)
+}
+
 // The UserFunc type is an adapter to allow the use of ordinary
 // function as User mutator.
 type UserFunc func(context.Context, *ent.UserMutation) (ent.Value, error)

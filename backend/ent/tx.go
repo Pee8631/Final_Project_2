@@ -12,6 +12,28 @@ import (
 // Tx is a transactional client that is created by calling Client.Tx().
 type Tx struct {
 	config
+	// Certification is the client for interacting with the Certification builders.
+	Certification *CertificationClient
+	// Chatting is the client for interacting with the Chatting builders.
+	Chatting *ChattingClient
+	// Data is the client for interacting with the Data builders.
+	Data *DataClient
+	// Department is the client for interacting with the Department builders.
+	Department *DepartmentClient
+	// Disease is the client for interacting with the Disease builders.
+	Disease *DiseaseClient
+	// Hospital is the client for interacting with the Hospital builders.
+	Hospital *HospitalClient
+	// Role is the client for interacting with the Role builders.
+	Role *RoleClient
+	// Schedule is the client for interacting with the Schedule builders.
+	Schedule *ScheduleClient
+	// ScheduleTime is the client for interacting with the ScheduleTime builders.
+	ScheduleTime *ScheduleTimeClient
+	// Telecom is the client for interacting with the Telecom builders.
+	Telecom *TelecomClient
+	// Treatment is the client for interacting with the Treatment builders.
+	Treatment *TreatmentClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 
@@ -149,6 +171,17 @@ func (tx *Tx) Client() *Client {
 }
 
 func (tx *Tx) init() {
+	tx.Certification = NewCertificationClient(tx.config)
+	tx.Chatting = NewChattingClient(tx.config)
+	tx.Data = NewDataClient(tx.config)
+	tx.Department = NewDepartmentClient(tx.config)
+	tx.Disease = NewDiseaseClient(tx.config)
+	tx.Hospital = NewHospitalClient(tx.config)
+	tx.Role = NewRoleClient(tx.config)
+	tx.Schedule = NewScheduleClient(tx.config)
+	tx.ScheduleTime = NewScheduleTimeClient(tx.config)
+	tx.Telecom = NewTelecomClient(tx.config)
+	tx.Treatment = NewTreatmentClient(tx.config)
 	tx.User = NewUserClient(tx.config)
 }
 
@@ -159,7 +192,7 @@ func (tx *Tx) init() {
 // of them in order to commit or rollback the transaction.
 //
 // If a closed transaction is embedded in one of the generated entities, and the entity
-// applies a query, for example: User.QueryXXX(), the query will be executed
+// applies a query, for example: Certification.QueryXXX(), the query will be executed
 // through the driver which created this transaction.
 //
 // Note that txDriver is not goroutine safe.
