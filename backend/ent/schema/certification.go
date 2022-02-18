@@ -2,6 +2,7 @@ package schema
 
 import (
 	"entgo.io/ent"
+	"entgo.io/ent/dialect"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
@@ -17,8 +18,16 @@ func (Certification) Fields() []ent.Field {
 		//field.Int("id").Unique(),
 		field.String("code").NotEmpty(),
 		field.String("diloma").NotEmpty(),
-		field.Time("dateOfIssuing"),
-		field.Time("dateOfExp"),
+		field.Time("dateOfIssuing").
+		Optional().
+		SchemaType(map[string]string{
+			dialect.MySQL: "datetime",
+		}),
+		field.Time("dateOfExp").
+		Optional().
+		SchemaType(map[string]string{
+			dialect.MySQL: "datetime",
+		}),
 		field.String("Issuer"),
 
 	}

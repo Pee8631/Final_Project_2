@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend_flutter/model/profile.dart';
-import 'package:frontend_flutter/screen/edit_personal_screen.dart';
+import 'package:frontend_flutter/screens/edit_personal_screen.dart';
 import 'package:frontend_flutter/util/user_references.dart';
 import 'package:frontend_flutter/widget/button_widget.dart';
 import 'package:frontend_flutter/widget/large_profile_widget.dart';

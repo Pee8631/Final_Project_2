@@ -12,6 +12,7 @@ import (
 	"FinalProject/ent/role"
 	"FinalProject/ent/schedule"
 	"FinalProject/ent/telecom"
+	"FinalProject/ent/token"
 	"FinalProject/ent/treatment"
 	"FinalProject/ent/user"
 	"context"
@@ -38,18 +39,6 @@ func (uc *UserCreate) SetUsername(s string) *UserCreate {
 // SetPassword sets the "password" field.
 func (uc *UserCreate) SetPassword(s string) *UserCreate {
 	uc.mutation.SetPassword(s)
-	return uc
-}
-
-// SetEmail sets the "email" field.
-func (uc *UserCreate) SetEmail(s string) *UserCreate {
-	uc.mutation.SetEmail(s)
-	return uc
-}
-
-// SetTelephone sets the "telephone" field.
-func (uc *UserCreate) SetTelephone(s string) *UserCreate {
-	uc.mutation.SetTelephone(s)
 	return uc
 }
 
@@ -171,6 +160,21 @@ func (uc *UserCreate) AddUserHaveTreatment(t ...*Treatment) *UserCreate {
 		ids[i] = t[i].ID
 	}
 	return uc.AddUserHaveTreatmentIDs(ids...)
+}
+
+// AddUserHaveTokenIDs adds the "user_have_token" edge to the Token entity by IDs.
+func (uc *UserCreate) AddUserHaveTokenIDs(ids ...int) *UserCreate {
+	uc.mutation.AddUserHaveTokenIDs(ids...)
+	return uc
+}
+
+// AddUserHaveToken adds the "user_have_token" edges to the Token entity.
+func (uc *UserCreate) AddUserHaveToken(t ...*Token) *UserCreate {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return uc.AddUserHaveTokenIDs(ids...)
 }
 
 // SetHasDepartmentID sets the "has_department" edge to the Department entity by ID.
@@ -322,12 +326,6 @@ func (uc *UserCreate) check() error {
 	if _, ok := uc.mutation.Password(); !ok {
 		return &ValidationError{Name: "password", err: errors.New(`ent: missing required field "password"`)}
 	}
-	if _, ok := uc.mutation.Email(); !ok {
-		return &ValidationError{Name: "email", err: errors.New(`ent: missing required field "email"`)}
-	}
-	if _, ok := uc.mutation.Telephone(); !ok {
-		return &ValidationError{Name: "telephone", err: errors.New(`ent: missing required field "telephone"`)}
-	}
 	return nil
 }
 
@@ -370,22 +368,6 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Column: user.FieldPassword,
 		})
 		_node.Password = value
-	}
-	if value, ok := uc.mutation.Email(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: user.FieldEmail,
-		})
-		_node.Email = value
-	}
-	if value, ok := uc.mutation.Telephone(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: user.FieldTelephone,
-		})
-		_node.Telephone = value
 	}
 	if nodes := uc.mutation.DoctorHasCertificationIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -531,6 +513,25 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
 					Column: treatment.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := uc.mutation.UserHaveTokenIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserHaveTokenTable,
+			Columns: []string{user.UserHaveTokenColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: token.FieldID,
 				},
 			},
 		}

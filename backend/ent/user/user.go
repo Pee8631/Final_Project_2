@@ -11,10 +11,6 @@ const (
 	FieldUsername = "username"
 	// FieldPassword holds the string denoting the password field in the database.
 	FieldPassword = "password"
-	// FieldEmail holds the string denoting the email field in the database.
-	FieldEmail = "email"
-	// FieldTelephone holds the string denoting the telephone field in the database.
-	FieldTelephone = "telephone"
 	// EdgeDoctorHasCertification holds the string denoting the doctor_has_certification edge name in mutations.
 	EdgeDoctorHasCertification = "doctor_has_certification"
 	// EdgeUserChattingWithWhom holds the string denoting the user_chatting_with_whom edge name in mutations.
@@ -31,6 +27,8 @@ const (
 	EdgeDoctorRecordTreatment = "doctor_record_treatment"
 	// EdgeUserHaveTreatment holds the string denoting the user_have_treatment edge name in mutations.
 	EdgeUserHaveTreatment = "user_have_treatment"
+	// EdgeUserHaveToken holds the string denoting the user_have_token edge name in mutations.
+	EdgeUserHaveToken = "user_have_token"
 	// EdgeHasDepartment holds the string denoting the has_department edge name in mutations.
 	EdgeHasDepartment = "has_department"
 	// EdgeFromHospital holds the string denoting the from_hospital edge name in mutations.
@@ -97,6 +95,13 @@ const (
 	UserHaveTreatmentInverseTable = "treatments"
 	// UserHaveTreatmentColumn is the table column denoting the user_have_treatment relation/edge.
 	UserHaveTreatmentColumn = "user_user_have_treatment"
+	// UserHaveTokenTable is the table that holds the user_have_token relation/edge.
+	UserHaveTokenTable = "tokens"
+	// UserHaveTokenInverseTable is the table name for the Token entity.
+	// It exists in this package in order to avoid circular dependency with the "token" package.
+	UserHaveTokenInverseTable = "tokens"
+	// UserHaveTokenColumn is the table column denoting the user_have_token relation/edge.
+	UserHaveTokenColumn = "user_user_have_token"
 	// HasDepartmentTable is the table that holds the has_department relation/edge.
 	HasDepartmentTable = "users"
 	// HasDepartmentInverseTable is the table name for the Department entity.
@@ -128,8 +133,6 @@ var Columns = []string{
 	FieldID,
 	FieldUsername,
 	FieldPassword,
-	FieldEmail,
-	FieldTelephone,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "users"

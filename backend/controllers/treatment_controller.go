@@ -2,6 +2,8 @@ package controllers
 
 import (
 	"FinalProject/ent"
+	"FinalProject/ent/treatment"
+	"context"
 	"time"
 
 	"fmt"
@@ -12,11 +14,11 @@ import (
 
 // Treatment defines the struct for the treatment
 type Treatment struct {
-	TreatmentRecord		string
-	DateTime			string
-	TakeTime			float64
-	Physician			int
-	Patient				int
+	TreatmentRecord string
+	DateTime        string
+	TakeTime        float64
+	Physician       int
+	Patient         int
 }
 
 // TreatmentController defines the struct for the treatment controller
@@ -37,7 +39,6 @@ type TreatmentController struct {
 // @Failure 500 {object} gin.H
 // @Router /treatments [post]
 func (ctl *TreatmentController) CreateTreatment(c *gin.Context) {
-	db := databaseConnection()
 	obj := Treatment{}
 
 	if err := c.ShouldBind(&obj); err != nil {
@@ -51,37 +52,33 @@ func (ctl *TreatmentController) CreateTreatment(c *gin.Context) {
 	if err != nil {
 		fmt.Println(err)
 		c.JSON(400, gin.H{
-			"status" : false,
-			"error": err,
+			"status": false,
+			"error":  err,
 		})
 		return
 	}
 
-	insertTreatment, err := db.Prepare("INSERT INTO treatment(treatmentrecord, datetime, taketime, physician, patient) VALUES (?, ?, ?, ?, ?)")
+	insertTreatment, err := ctl.client.Treatment.
+		Create().
+		SetTreatmentRecord(obj.TreatmentRecord).
+		SetDateTime(dateTime).
+		SetTakeTime(obj.TakeTime).
+		SetTreatmentWasRecordedByDoctorID(obj.Physician).
+		SetUserIsTheTreatmentOfRecordID(obj.Patient).
+		Save(context.Background())
+
 	if err != nil {
 		fmt.Println(err)
 		c.JSON(400, gin.H{
-			"status" : false,
-			"error": err,
-		})
-		return
-	}
-	insertTreatment.Exec(obj.TreatmentRecord, dateTime, obj.TakeTime, obj.Physician, obj.Patient)
-	if err != nil {
-		fmt.Println(err)
-		c.JSON(400, gin.H{
-			"status" : false,
-			"error": err,
+			"status": false,
+			"error":  err,
 		})
 		return
 	}
 
-	defer db.Close()
-
-	
 	c.JSON(200, gin.H{
-		"status" : true,
-		"data": insertTreatment,
+		"status": true,
+		"data":   insertTreatment,
 	})
 }
 
@@ -97,8 +94,6 @@ func (ctl *TreatmentController) CreateTreatment(c *gin.Context) {
 // @Failure 500 {object} gin.H
 // @Router /treatments/{id} [get]
 func (ctl *TreatmentController) GetTreatment(c *gin.Context) {
-	db := databaseConnection()
-
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		c.JSON(400, gin.H{
@@ -106,7 +101,12 @@ func (ctl *TreatmentController) GetTreatment(c *gin.Context) {
 		})
 		return
 	}
-	resultsGetTreatment, err := db.Query("SELECT treatmentrecord, datetime, taketime, physician, patient FROM treatment WHERE id_treatment=?", id)
+
+	getTreatment, err := ctl.client.Treatment.
+		Query().
+		Where(treatment.IDEQ(int(id))).
+		Only(context.Background())
+
 	if err != nil {
 		c.JSON(400, gin.H{
 			"error": err.Error(),
@@ -114,22 +114,7 @@ func (ctl *TreatmentController) GetTreatment(c *gin.Context) {
 		return // proper error handling instead of panic in your app
 	}
 
-	for resultsGetTreatment.Next() {
-		var treatment Treatment
-		// for each row, scan the result into our tag composite object
-		err = resultsGetTreatment.Scan(&treatment.TreatmentRecord, &treatment.DateTime, &treatment.TakeTime, &treatment.Physician, &treatment.Patient)
-		if err != nil {
-			c.JSON(404, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
-
-		defer db.Close()
-
-		c.JSON(200, treatment)
-
-	}
+	c.JSON(200, getTreatment)
 }
 
 // ListTreatment handles request to get a list of treatment entities
@@ -144,7 +129,6 @@ func (ctl *TreatmentController) GetTreatment(c *gin.Context) {
 // @Failure 500 {object} gin.H
 // @Router /treatments [get]
 func (ctl *TreatmentController) ListTreatment(c *gin.Context) {
-	db := databaseConnection()
 	limitQuery := c.Query("limit")
 	limit := 10
 	if limitQuery != "" {
@@ -161,28 +145,19 @@ func (ctl *TreatmentController) ListTreatment(c *gin.Context) {
 			offset = int(offset64)
 		}
 	}
-	resultsListTreatment, err := db.Query("SELECT treatmentrecord, datetime, taketime, physician, patient FROM treatment limit ? offset ?", limit, offset)
+
+	listTreatment, err := ctl.client.Treatment.
+		Query().
+		Limit(limit).
+		Offset(offset).
+		All(context.Background())
 	if err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return // proper error handling instead of panic in your app
 	}
 
-	for resultsListTreatment.Next() {
-		var treatment Treatment
-		// for each row, scan the result into our tag composite object
-		err = resultsListTreatment.Scan(&treatment.TreatmentRecord, &treatment.DateTime, &treatment.TakeTime, &treatment.Physician, &treatment.Patient)
-		if err != nil {
-			c.JSON(400, gin.H{"error": err.Error()})
-			return // proper error handling instead of panic in your app
-		}
-		// and then print out the tag's Name attribute
+	c.JSON(200, listTreatment)
 
-		defer db.Close()
-
-		c.JSON(200, treatment)
-	}
-
-	
 }
 
 // DeleteTreatment handles DELETE requests to delete a treatment entity
@@ -197,7 +172,6 @@ func (ctl *TreatmentController) ListTreatment(c *gin.Context) {
 // @Failure 500 {object} gin.H
 // @Router /treatments/{id} [delete]
 func (ctl *TreatmentController) DeleteTreatment(c *gin.Context) {
-	db := databaseConnection()
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		c.JSON(400, gin.H{
@@ -206,16 +180,13 @@ func (ctl *TreatmentController) DeleteTreatment(c *gin.Context) {
 		return
 	}
 
-	deleteTreatment, err := db.Prepare("DELETE FROM treatment WHERE id_treatment=?")
-    if err != nil {
+	err = ctl.client.Treatment.DeleteOneID(int(id)).Exec(context.Background())
+	if err != nil {
 		c.JSON(404, gin.H{
 			"error": err.Error(),
 		})
 		return
-    }
-    deleteTreatment.Exec(id)
-
-    defer db.Close()
+	}
 
 	c.JSON(200, gin.H{"result": fmt.Sprintf("ok deleted %v", id)})
 }
@@ -233,7 +204,6 @@ func (ctl *TreatmentController) DeleteTreatment(c *gin.Context) {
 // @Failure 500 {object} gin.H
 // @Router /treatments/{id} [put]
 func (ctl *TreatmentController) UpdateTreatment(c *gin.Context) {
-	db := databaseConnection()
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		c.JSON(400, gin.H{
@@ -241,6 +211,7 @@ func (ctl *TreatmentController) UpdateTreatment(c *gin.Context) {
 		})
 		return
 	}
+
 	obj := Treatment{}
 	if err := c.ShouldBind(&obj); err != nil {
 		c.JSON(400, gin.H{
@@ -253,34 +224,32 @@ func (ctl *TreatmentController) UpdateTreatment(c *gin.Context) {
 	if err != nil {
 		fmt.Println(err)
 		c.JSON(400, gin.H{
-			"status" : false,
-			"error": err,
+			"status": false,
+			"error":  err,
 		})
 		return
 	}
-
-	UpdateTreatment, err := db.Prepare("UPDATE treatment SET treatmentrecord=?, datetime=?, taketime=?, physician=?, patient=? WHERE id_treatment=?")
+	
+	updateTreatment, err := ctl.client.Treatment.
+		UpdateOneID(int(id)).
+		SetTreatmentRecord(obj.TreatmentRecord).
+		SetDateTime(dateTime).
+		SetTakeTime(obj.TakeTime).
+		SetTreatmentWasRecordedByDoctorID(obj.Physician).
+		SetUserIsTheTreatmentOfRecordID(obj.Patient).
+		Save(context.Background())
 	if err != nil {
 		fmt.Println(err)
 		c.JSON(400, gin.H{
-			"status" : false,
-			"error": err,
+			"status": false,
+			"error":  err,
 		})
 		return
 	}
-	/*
-	if err != nil {
-		c.JSON(400, gin.H{"error": "update failed"})
-		return
-	}*/
-
-	UpdateTreatment.Exec(obj.TreatmentRecord, dateTime, obj.TakeTime, obj.Physician, obj.Patient, int(id))
-
-	defer db.Close()
 
 	c.JSON(200, gin.H{
-		"status" : true,
-		"data": UpdateTreatment,
+		"status": true,
+		"data":   updateTreatment,
 	})
 }
 

@@ -17,8 +17,6 @@ func (User) Fields() []ent.Field {
 		//field.Int("id").Unique(),
 		field.String("username").Unique().NotEmpty(),
 		field.String("password"),
-		field.String("email"),
-		field.String("telephone"),
 	}
 }
 
@@ -33,6 +31,7 @@ func (User) Edges() []ent.Edge {
 		edge.To("user_have_telecoms", Telecom.Type),
 		edge.To("doctor_record_treatment", Treatment.Type),
 		edge.To("user_have_treatment", Treatment.Type),
+		edge.To("user_have_token", Token.Type),
 		edge.From("has_department", Department.Type).
 			Ref("department_has_doctor").
 			Unique(),

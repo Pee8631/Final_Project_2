@@ -2,18 +2,21 @@ package controllers
 
 import (
 	"FinalProject/ent"
+	"FinalProject/ent/schedule"
+	"context"
 
 	"fmt"
 	"strconv"
+
 	"github.com/gin-gonic/gin"
 )
 
 // Schedule defines the struct for the schedule
 type Schedule struct {
-	Activity   	string
-	Detail		string
-	Status		string
-	User		int
+	Activity string
+	Detail   string
+	Status   string
+	User     int
 }
 
 // ScheduleController defines the struct for the schedule controller
@@ -34,7 +37,6 @@ type ScheduleController struct {
 // @Failure 500 {object} gin.H
 // @Router /schedules [post]
 func (ctl *ScheduleController) CreateSchedule(c *gin.Context) {
-	db := databaseConnection()
 	obj := Schedule{}
 
 	if err := c.ShouldBind(&obj); err != nil {
@@ -44,31 +46,25 @@ func (ctl *ScheduleController) CreateSchedule(c *gin.Context) {
 		return
 	}
 
-	insertSchedule, err := db.Prepare("INSERT INTO schedule(activity, detail, status, id_user) VALUES (?, ?, ?, ?)")
+	insertSchedule, err := ctl.client.Schedule.
+		Create().
+		SetActivity(obj.Activity).
+		SetDetail(obj.Detail).
+		SetStatus(obj.Status).
+		SetWhoIsTheOwnerOfThisScheduleID(obj.User).
+		Save(context.Background())
 	if err != nil {
 		fmt.Println(err)
 		c.JSON(400, gin.H{
-			"status" : false,
-			"error": err,
-		})
-		return
-	}
-	insertSchedule.Exec(obj.Activity, obj.Detail, obj.Status, obj.User)
-	if err != nil {
-		fmt.Println(err)
-		c.JSON(400, gin.H{
-			"status" : false,
-			"error": err,
+			"status": false,
+			"error":  err,
 		})
 		return
 	}
 
-	defer db.Close()
-
-	
 	c.JSON(200, gin.H{
-		"status" : true,
-		"data": insertSchedule,
+		"status": true,
+		"data":   insertSchedule,
 	})
 }
 
@@ -84,7 +80,6 @@ func (ctl *ScheduleController) CreateSchedule(c *gin.Context) {
 // @Failure 500 {object} gin.H
 // @Router /schedules/{id} [get]
 func (ctl *ScheduleController) GetSchedule(c *gin.Context) {
-	db := databaseConnection()
 
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
@@ -93,7 +88,12 @@ func (ctl *ScheduleController) GetSchedule(c *gin.Context) {
 		})
 		return
 	}
-	resultsGetSchedule, err := db.Query("SELECT activity, detail, status, id_user FROM schedule WHERE id_schedule=?", id)
+
+	getSchedule, err := ctl.client.Schedule.
+		Query().
+		Where(schedule.IDEQ(int(id))).
+		Only(context.Background())
+
 	if err != nil {
 		c.JSON(400, gin.H{
 			"error": err.Error(),
@@ -101,22 +101,7 @@ func (ctl *ScheduleController) GetSchedule(c *gin.Context) {
 		return // proper error handling instead of panic in your app
 	}
 
-	for resultsGetSchedule.Next() {
-		var schedule Schedule
-		// for each row, scan the result into our tag composite object
-		err = resultsGetSchedule.Scan(&schedule.Activity, &schedule.Detail, &schedule.Status, &schedule.User)
-		if err != nil {
-			c.JSON(404, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
-
-		defer db.Close()
-
-		c.JSON(200, schedule)
-
-	}
+	c.JSON(200, getSchedule)
 }
 
 // ListSchedule handles request to get a list of schedule entities
@@ -131,7 +116,6 @@ func (ctl *ScheduleController) GetSchedule(c *gin.Context) {
 // @Failure 500 {object} gin.H
 // @Router /schedules [get]
 func (ctl *ScheduleController) ListSchedule(c *gin.Context) {
-	db := databaseConnection()
 	limitQuery := c.Query("limit")
 	limit := 10
 	if limitQuery != "" {
@@ -148,28 +132,15 @@ func (ctl *ScheduleController) ListSchedule(c *gin.Context) {
 			offset = int(offset64)
 		}
 	}
-	resultsListSchedule, err := db.Query("SELECT activity, detail, status, id_user FROM schedule limit ? offset ?", limit, offset)
+
+	listSchedule, err := ctl.client.Schedule.Query().Limit(limit).Offset(offset).All(context.Background())
 	if err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return // proper error handling instead of panic in your app
 	}
 
-	for resultsListSchedule.Next() {
-		var schedule Schedule
-		// for each row, scan the result into our tag composite object
-		err = resultsListSchedule.Scan(&schedule.Activity, &schedule.Detail, &schedule.Status, &schedule.User)
-		if err != nil {
-			c.JSON(400, gin.H{"error": err.Error()})
-			return // proper error handling instead of panic in your app
-		}
-		// and then print out the tag's Name attribute
+	c.JSON(200, listSchedule)
 
-		defer db.Close()
-
-		c.JSON(200, schedule)
-	}
-
-	
 }
 
 // DeleteSchedule handles DELETE requests to delete a schedule entity
@@ -184,7 +155,6 @@ func (ctl *ScheduleController) ListSchedule(c *gin.Context) {
 // @Failure 500 {object} gin.H
 // @Router /schedules/{id} [delete]
 func (ctl *ScheduleController) DeleteSchedule(c *gin.Context) {
-	db := databaseConnection()
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		c.JSON(400, gin.H{
@@ -193,16 +163,13 @@ func (ctl *ScheduleController) DeleteSchedule(c *gin.Context) {
 		return
 	}
 
-	deleteSchedule, err := db.Prepare("DELETE FROM schedule WHERE id_schedule=?")
-    if err != nil {
+	err = ctl.client.Schedule.DeleteOneID(int(id)).Exec(context.Background())
+	if err != nil {
 		c.JSON(404, gin.H{
 			"error": err.Error(),
 		})
 		return
-    }
-    deleteSchedule.Exec(id)
-
-    defer db.Close()
+	}
 
 	c.JSON(200, gin.H{"result": fmt.Sprintf("ok deleted %v", id)})
 }
@@ -220,7 +187,6 @@ func (ctl *ScheduleController) DeleteSchedule(c *gin.Context) {
 // @Failure 500 {object} gin.H
 // @Router /schedules/{id} [put]
 func (ctl *ScheduleController) UpdateSchedule(c *gin.Context) {
-	db := databaseConnection()
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		c.JSON(400, gin.H{
@@ -236,19 +202,22 @@ func (ctl *ScheduleController) UpdateSchedule(c *gin.Context) {
 		return
 	}
 
-	UpdateSchedule, err := db.Prepare("UPDATE schedule SET activity=?, detail=?, status=?, id_user=? WHERE id_schedule=?")
+	updateSchedule, err := ctl.client.Schedule.
+		UpdateOneID(int(id)).
+		SetActivity(obj.Activity).
+		SetDetail(obj.Detail).
+		SetStatus(obj.Status).
+		SetWhoIsTheOwnerOfThisScheduleID(obj.User).
+		Save(context.Background())
+
 	if err != nil {
 		c.JSON(400, gin.H{"error": "update1 failed"})
 		return
 	}
 
-	UpdateSchedule.Exec(obj.Activity, obj.Detail, obj.Status, obj.User, int(id))
-
-	defer db.Close()
-
 	c.JSON(200, gin.H{
-		"status" : true,
-		"data": UpdateSchedule,
+		"status": true,
+		"data":   updateSchedule,
 	})
 }
 

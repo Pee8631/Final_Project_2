@@ -6,7 +6,6 @@ import (
 	"FinalProject/ent/schedule"
 	"FinalProject/ent/scheduletime"
 	"context"
-	"errors"
 	"fmt"
 	"time"
 
@@ -27,9 +26,25 @@ func (stc *ScheduleTimeCreate) SetStartTime(t time.Time) *ScheduleTimeCreate {
 	return stc
 }
 
+// SetNillableStartTime sets the "startTime" field if the given value is not nil.
+func (stc *ScheduleTimeCreate) SetNillableStartTime(t *time.Time) *ScheduleTimeCreate {
+	if t != nil {
+		stc.SetStartTime(*t)
+	}
+	return stc
+}
+
 // SetStopTime sets the "stopTime" field.
 func (stc *ScheduleTimeCreate) SetStopTime(t time.Time) *ScheduleTimeCreate {
 	stc.mutation.SetStopTime(t)
+	return stc
+}
+
+// SetNillableStopTime sets the "stopTime" field if the given value is not nil.
+func (stc *ScheduleTimeCreate) SetNillableStopTime(t *time.Time) *ScheduleTimeCreate {
+	if t != nil {
+		stc.SetStopTime(*t)
+	}
 	return stc
 }
 
@@ -122,12 +137,6 @@ func (stc *ScheduleTimeCreate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (stc *ScheduleTimeCreate) check() error {
-	if _, ok := stc.mutation.StartTime(); !ok {
-		return &ValidationError{Name: "startTime", err: errors.New(`ent: missing required field "startTime"`)}
-	}
-	if _, ok := stc.mutation.StopTime(); !ok {
-		return &ValidationError{Name: "stopTime", err: errors.New(`ent: missing required field "stopTime"`)}
-	}
 	return nil
 }
 

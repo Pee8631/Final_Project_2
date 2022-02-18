@@ -27,6 +27,18 @@ func (tu *TelecomUpdate) Where(ps ...predicate.Telecom) *TelecomUpdate {
 	return tu
 }
 
+// SetEmail sets the "email" field.
+func (tu *TelecomUpdate) SetEmail(s string) *TelecomUpdate {
+	tu.mutation.SetEmail(s)
+	return tu
+}
+
+// SetTelephone sets the "telephone" field.
+func (tu *TelecomUpdate) SetTelephone(s string) *TelecomUpdate {
+	tu.mutation.SetTelephone(s)
+	return tu
+}
+
 // SetUsername sets the "username" field.
 func (tu *TelecomUpdate) SetUsername(s string) *TelecomUpdate {
 	tu.mutation.SetUsername(s)
@@ -76,18 +88,12 @@ func (tu *TelecomUpdate) Save(ctx context.Context) (int, error) {
 		affected int
 	)
 	if len(tu.hooks) == 0 {
-		if err = tu.check(); err != nil {
-			return 0, err
-		}
 		affected, err = tu.sqlSave(ctx)
 	} else {
 		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 			mutation, ok := m.(*TelecomMutation)
 			if !ok {
 				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			if err = tu.check(); err != nil {
-				return 0, err
 			}
 			tu.mutation = mutation
 			affected, err = tu.sqlSave(ctx)
@@ -129,21 +135,6 @@ func (tu *TelecomUpdate) ExecX(ctx context.Context) {
 	}
 }
 
-// check runs all checks and user-defined validators on the builder.
-func (tu *TelecomUpdate) check() error {
-	if v, ok := tu.mutation.Username(); ok {
-		if err := telecom.UsernameValidator(v); err != nil {
-			return &ValidationError{Name: "username", err: fmt.Errorf("ent: validator failed for field \"username\": %w", err)}
-		}
-	}
-	if v, ok := tu.mutation.Platform(); ok {
-		if err := telecom.PlatformValidator(v); err != nil {
-			return &ValidationError{Name: "platform", err: fmt.Errorf("ent: validator failed for field \"platform\": %w", err)}
-		}
-	}
-	return nil
-}
-
 func (tu *TelecomUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	_spec := &sqlgraph.UpdateSpec{
 		Node: &sqlgraph.NodeSpec{
@@ -161,6 +152,20 @@ func (tu *TelecomUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := tu.mutation.Email(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: telecom.FieldEmail,
+		})
+	}
+	if value, ok := tu.mutation.Telephone(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: telecom.FieldTelephone,
+		})
 	}
 	if value, ok := tu.mutation.Username(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
@@ -230,6 +235,18 @@ type TelecomUpdateOne struct {
 	mutation *TelecomMutation
 }
 
+// SetEmail sets the "email" field.
+func (tuo *TelecomUpdateOne) SetEmail(s string) *TelecomUpdateOne {
+	tuo.mutation.SetEmail(s)
+	return tuo
+}
+
+// SetTelephone sets the "telephone" field.
+func (tuo *TelecomUpdateOne) SetTelephone(s string) *TelecomUpdateOne {
+	tuo.mutation.SetTelephone(s)
+	return tuo
+}
+
 // SetUsername sets the "username" field.
 func (tuo *TelecomUpdateOne) SetUsername(s string) *TelecomUpdateOne {
 	tuo.mutation.SetUsername(s)
@@ -286,18 +303,12 @@ func (tuo *TelecomUpdateOne) Save(ctx context.Context) (*Telecom, error) {
 		node *Telecom
 	)
 	if len(tuo.hooks) == 0 {
-		if err = tuo.check(); err != nil {
-			return nil, err
-		}
 		node, err = tuo.sqlSave(ctx)
 	} else {
 		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 			mutation, ok := m.(*TelecomMutation)
 			if !ok {
 				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			if err = tuo.check(); err != nil {
-				return nil, err
 			}
 			tuo.mutation = mutation
 			node, err = tuo.sqlSave(ctx)
@@ -339,21 +350,6 @@ func (tuo *TelecomUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
-// check runs all checks and user-defined validators on the builder.
-func (tuo *TelecomUpdateOne) check() error {
-	if v, ok := tuo.mutation.Username(); ok {
-		if err := telecom.UsernameValidator(v); err != nil {
-			return &ValidationError{Name: "username", err: fmt.Errorf("ent: validator failed for field \"username\": %w", err)}
-		}
-	}
-	if v, ok := tuo.mutation.Platform(); ok {
-		if err := telecom.PlatformValidator(v); err != nil {
-			return &ValidationError{Name: "platform", err: fmt.Errorf("ent: validator failed for field \"platform\": %w", err)}
-		}
-	}
-	return nil
-}
-
 func (tuo *TelecomUpdateOne) sqlSave(ctx context.Context) (_node *Telecom, err error) {
 	_spec := &sqlgraph.UpdateSpec{
 		Node: &sqlgraph.NodeSpec{
@@ -388,6 +384,20 @@ func (tuo *TelecomUpdateOne) sqlSave(ctx context.Context) (_node *Telecom, err e
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := tuo.mutation.Email(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: telecom.FieldEmail,
+		})
+	}
+	if value, ok := tuo.mutation.Telephone(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: telecom.FieldTelephone,
+		})
 	}
 	if value, ok := tuo.mutation.Username(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{

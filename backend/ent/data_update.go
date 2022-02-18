@@ -65,6 +65,20 @@ func (du *DataUpdate) SetBrithDate(t time.Time) *DataUpdate {
 	return du
 }
 
+// SetNillableBrithDate sets the "brithDate" field if the given value is not nil.
+func (du *DataUpdate) SetNillableBrithDate(t *time.Time) *DataUpdate {
+	if t != nil {
+		du.SetBrithDate(*t)
+	}
+	return du
+}
+
+// ClearBrithDate clears the value of the "brithDate" field.
+func (du *DataUpdate) ClearBrithDate() *DataUpdate {
+	du.mutation.ClearBrithDate()
+	return du
+}
+
 // SetBloodGroup sets the "bloodGroup" field.
 func (du *DataUpdate) SetBloodGroup(s string) *DataUpdate {
 	du.mutation.SetBloodGroup(s)
@@ -221,6 +235,12 @@ func (du *DataUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: data.FieldBrithDate,
 		})
 	}
+	if du.mutation.BrithDateCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Column: data.FieldBrithDate,
+		})
+	}
 	if value, ok := du.mutation.BloodGroup(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -323,6 +343,20 @@ func (duo *DataUpdateOne) AddGender(i int) *DataUpdateOne {
 // SetBrithDate sets the "brithDate" field.
 func (duo *DataUpdateOne) SetBrithDate(t time.Time) *DataUpdateOne {
 	duo.mutation.SetBrithDate(t)
+	return duo
+}
+
+// SetNillableBrithDate sets the "brithDate" field if the given value is not nil.
+func (duo *DataUpdateOne) SetNillableBrithDate(t *time.Time) *DataUpdateOne {
+	if t != nil {
+		duo.SetBrithDate(*t)
+	}
+	return duo
+}
+
+// ClearBrithDate clears the value of the "brithDate" field.
+func (duo *DataUpdateOne) ClearBrithDate() *DataUpdateOne {
+	duo.mutation.ClearBrithDate()
 	return duo
 }
 
@@ -503,6 +537,12 @@ func (duo *DataUpdateOne) sqlSave(ctx context.Context) (_node *Data, err error) 
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
+			Column: data.FieldBrithDate,
+		})
+	}
+	if duo.mutation.BrithDateCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
 			Column: data.FieldBrithDate,
 		})
 	}

@@ -34,9 +34,37 @@ func (stu *ScheduleTimeUpdate) SetStartTime(t time.Time) *ScheduleTimeUpdate {
 	return stu
 }
 
+// SetNillableStartTime sets the "startTime" field if the given value is not nil.
+func (stu *ScheduleTimeUpdate) SetNillableStartTime(t *time.Time) *ScheduleTimeUpdate {
+	if t != nil {
+		stu.SetStartTime(*t)
+	}
+	return stu
+}
+
+// ClearStartTime clears the value of the "startTime" field.
+func (stu *ScheduleTimeUpdate) ClearStartTime() *ScheduleTimeUpdate {
+	stu.mutation.ClearStartTime()
+	return stu
+}
+
 // SetStopTime sets the "stopTime" field.
 func (stu *ScheduleTimeUpdate) SetStopTime(t time.Time) *ScheduleTimeUpdate {
 	stu.mutation.SetStopTime(t)
+	return stu
+}
+
+// SetNillableStopTime sets the "stopTime" field if the given value is not nil.
+func (stu *ScheduleTimeUpdate) SetNillableStopTime(t *time.Time) *ScheduleTimeUpdate {
+	if t != nil {
+		stu.SetStopTime(*t)
+	}
+	return stu
+}
+
+// ClearStopTime clears the value of the "stopTime" field.
+func (stu *ScheduleTimeUpdate) ClearStopTime() *ScheduleTimeUpdate {
+	stu.mutation.ClearStopTime()
 	return stu
 }
 
@@ -149,10 +177,22 @@ func (stu *ScheduleTimeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: scheduletime.FieldStartTime,
 		})
 	}
+	if stu.mutation.StartTimeCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Column: scheduletime.FieldStartTime,
+		})
+	}
 	if value, ok := stu.mutation.StopTime(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
+			Column: scheduletime.FieldStopTime,
+		})
+	}
+	if stu.mutation.StopTimeCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
 			Column: scheduletime.FieldStopTime,
 		})
 	}
@@ -216,9 +256,37 @@ func (stuo *ScheduleTimeUpdateOne) SetStartTime(t time.Time) *ScheduleTimeUpdate
 	return stuo
 }
 
+// SetNillableStartTime sets the "startTime" field if the given value is not nil.
+func (stuo *ScheduleTimeUpdateOne) SetNillableStartTime(t *time.Time) *ScheduleTimeUpdateOne {
+	if t != nil {
+		stuo.SetStartTime(*t)
+	}
+	return stuo
+}
+
+// ClearStartTime clears the value of the "startTime" field.
+func (stuo *ScheduleTimeUpdateOne) ClearStartTime() *ScheduleTimeUpdateOne {
+	stuo.mutation.ClearStartTime()
+	return stuo
+}
+
 // SetStopTime sets the "stopTime" field.
 func (stuo *ScheduleTimeUpdateOne) SetStopTime(t time.Time) *ScheduleTimeUpdateOne {
 	stuo.mutation.SetStopTime(t)
+	return stuo
+}
+
+// SetNillableStopTime sets the "stopTime" field if the given value is not nil.
+func (stuo *ScheduleTimeUpdateOne) SetNillableStopTime(t *time.Time) *ScheduleTimeUpdateOne {
+	if t != nil {
+		stuo.SetStopTime(*t)
+	}
+	return stuo
+}
+
+// ClearStopTime clears the value of the "stopTime" field.
+func (stuo *ScheduleTimeUpdateOne) ClearStopTime() *ScheduleTimeUpdateOne {
+	stuo.mutation.ClearStopTime()
 	return stuo
 }
 
@@ -355,10 +423,22 @@ func (stuo *ScheduleTimeUpdateOne) sqlSave(ctx context.Context) (_node *Schedule
 			Column: scheduletime.FieldStartTime,
 		})
 	}
+	if stuo.mutation.StartTimeCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Column: scheduletime.FieldStartTime,
+		})
+	}
 	if value, ok := stuo.mutation.StopTime(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
+			Column: scheduletime.FieldStopTime,
+		})
+	}
+	if stuo.mutation.StopTimeCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
 			Column: scheduletime.FieldStopTime,
 		})
 	}

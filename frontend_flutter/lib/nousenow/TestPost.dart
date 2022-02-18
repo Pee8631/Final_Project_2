@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:frontend_flutter/screen/main_screen.dart';
+import 'package:frontend_flutter/screens/main_screen.dart';
 import 'package:http/http.dart' as http;
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:frontend_flutter/model/user.dart';
@@ -35,7 +35,7 @@ Future<dynamic> authUser(User user) async {
 
 class _TestPostScreenState extends State<TestPostScreen> {
   final formkey = GlobalKey<FormState>();
-  User user = User(username: '', password: '');
+  User user = User(username: '', password: '', department: 0 , hospital: 0);
   Future<User>? _futureUser;
   @override
   Widget build(BuildContext context) {

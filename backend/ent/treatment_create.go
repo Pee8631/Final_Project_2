@@ -33,6 +33,14 @@ func (tc *TreatmentCreate) SetDateTime(t time.Time) *TreatmentCreate {
 	return tc
 }
 
+// SetNillableDateTime sets the "dateTime" field if the given value is not nil.
+func (tc *TreatmentCreate) SetNillableDateTime(t *time.Time) *TreatmentCreate {
+	if t != nil {
+		tc.SetDateTime(*t)
+	}
+	return tc
+}
+
 // SetTakeTime sets the "takeTime" field.
 func (tc *TreatmentCreate) SetTakeTime(f float64) *TreatmentCreate {
 	tc.mutation.SetTakeTime(f)
@@ -149,9 +157,6 @@ func (tc *TreatmentCreate) ExecX(ctx context.Context) {
 func (tc *TreatmentCreate) check() error {
 	if _, ok := tc.mutation.TreatmentRecord(); !ok {
 		return &ValidationError{Name: "treatmentRecord", err: errors.New(`ent: missing required field "treatmentRecord"`)}
-	}
-	if _, ok := tc.mutation.DateTime(); !ok {
-		return &ValidationError{Name: "dateTime", err: errors.New(`ent: missing required field "dateTime"`)}
 	}
 	if _, ok := tc.mutation.TakeTime(); !ok {
 		return &ValidationError{Name: "takeTime", err: errors.New(`ent: missing required field "takeTime"`)}

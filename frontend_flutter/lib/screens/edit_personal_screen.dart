@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
-import 'package:frontend_flutter/screen/Menu_screen.dart';
-import 'package:frontend_flutter/screen/main_screen.dart';
-import 'package:frontend_flutter/screen/notification_screen.dart';
-import 'package:frontend_flutter/screen/personal_screen.dart';
+import 'package:frontend_flutter/screens/main_screen.dart';
+import 'package:frontend_flutter/screens/notification_screen.dart';
+import 'package:frontend_flutter/screens/personal_screen.dart';
 import 'package:frontend_flutter/widget/appbar_mainscreen.dart';
 
 import 'doctors_screen.dart';

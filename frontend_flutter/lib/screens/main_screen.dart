@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:frontend_flutter/screen/Menu_screen.dart';
-import 'package:frontend_flutter/screen/doctors_screen.dart';
-import 'package:frontend_flutter/screen/notification_screen.dart';
-import 'package:frontend_flutter/screen/personal_screen.dart';
+import 'package:frontend_flutter/screens/menu_screen.dart';
+import 'package:frontend_flutter/screens/notification_screen.dart';
+import 'package:frontend_flutter/screens/personal_screen.dart';
 import 'package:frontend_flutter/widget/appbar_mainscreen.dart';
+
+import 'doctors_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen(Map<String, dynamic> accessToken, {Key? key})

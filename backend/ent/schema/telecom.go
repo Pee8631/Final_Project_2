@@ -15,8 +15,10 @@ type Telecom struct {
 func (Telecom) Fields() []ent.Field {
 	return []ent.Field{
 		//field.Int("id").Unique(),
-		field.String("username").NotEmpty(),
-		field.String("platform").NotEmpty(),
+		field.String("email").Unique(),
+		field.String("telephone").Unique(),
+		field.String("username"),
+		field.String("platform"),
 	}
 }
 

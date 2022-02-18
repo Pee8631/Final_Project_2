@@ -2,15 +2,18 @@ package controllers
 
 import (
 	"FinalProject/ent"
+	"FinalProject/ent/department"
+	"context"
 
 	"fmt"
 	"strconv"
+
 	"github.com/gin-gonic/gin"
 )
 
 // Department defines the struct for the department
 type Department struct {
-	Name   	string
+	Name string
 }
 
 // DepartmentController defines the struct for the department controller
@@ -31,7 +34,6 @@ type DepartmentController struct {
 // @Failure 500 {object} gin.H
 // @Router /departments [post]
 func (ctl *DepartmentController) CreateDepartment(c *gin.Context) {
-	db := databaseConnection()
 	obj := Department{}
 
 	if err := c.ShouldBind(&obj); err != nil {
@@ -41,31 +43,23 @@ func (ctl *DepartmentController) CreateDepartment(c *gin.Context) {
 		return
 	}
 
-	insertDepartment, err := db.Prepare("INSERT INTO department(name) VALUES (?)")
+	insertDepartment, err := ctl.client.Department.
+		Create().
+		SetName(obj.Name).
+		Save(context.Background())
+
 	if err != nil {
 		fmt.Println(err)
 		c.JSON(400, gin.H{
-			"status" : false,
-			"error": err,
-		})
-		return
-	}
-	insertDepartment.Exec(obj.Name)
-	if err != nil {
-		fmt.Println(err)
-		c.JSON(400, gin.H{
-			"status" : false,
-			"error": err,
+			"status": false,
+			"error":  err,
 		})
 		return
 	}
 
-	defer db.Close()
-
-	
 	c.JSON(200, gin.H{
-		"status" : true,
-		"data": insertDepartment,
+		"status": true,
+		"data":   insertDepartment,
 	})
 }
 
@@ -81,8 +75,6 @@ func (ctl *DepartmentController) CreateDepartment(c *gin.Context) {
 // @Failure 500 {object} gin.H
 // @Router /departments/{id} [get]
 func (ctl *DepartmentController) GetDepartment(c *gin.Context) {
-	db := databaseConnection()
-
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		c.JSON(400, gin.H{
@@ -90,7 +82,12 @@ func (ctl *DepartmentController) GetDepartment(c *gin.Context) {
 		})
 		return
 	}
-	resultsGetDepartment, err := db.Query("SELECT name FROM department WHERE id_department=?", id)
+
+	getDepartment, err := ctl.client.Department.
+		Query().
+		Where(department.IDEQ(int(id))).
+		Only(context.Background())
+
 	if err != nil {
 		c.JSON(400, gin.H{
 			"error": err.Error(),
@@ -98,22 +95,7 @@ func (ctl *DepartmentController) GetDepartment(c *gin.Context) {
 		return // proper error handling instead of panic in your app
 	}
 
-	for resultsGetDepartment.Next() {
-		var department Department
-		// for each row, scan the result into our tag composite object
-		err = resultsGetDepartment.Scan(&department.Name)
-		if err != nil {
-			c.JSON(404, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
-
-		defer db.Close()
-
-		c.JSON(200, department)
-
-	}
+	c.JSON(200, getDepartment)
 }
 
 // ListDepartment handles request to get a list of department entities
@@ -128,7 +110,6 @@ func (ctl *DepartmentController) GetDepartment(c *gin.Context) {
 // @Failure 500 {object} gin.H
 // @Router /departments [get]
 func (ctl *DepartmentController) ListDepartment(c *gin.Context) {
-	db := databaseConnection()
 	limitQuery := c.Query("limit")
 	limit := 10
 	if limitQuery != "" {
@@ -145,28 +126,19 @@ func (ctl *DepartmentController) ListDepartment(c *gin.Context) {
 			offset = int(offset64)
 		}
 	}
-	resultsListDepartment, err := db.Query("SELECT name FROM department limit ? offset ?", limit, offset)
+	listDepartment, err := ctl.client.Department.
+		Query().
+		Limit(limit).
+		Offset(offset).
+		All(context.Background())
+
 	if err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return // proper error handling instead of panic in your app
 	}
 
-	for resultsListDepartment.Next() {
-		var department Department
-		// for each row, scan the result into our tag composite object
-		err = resultsListDepartment.Scan(&department.Name)
-		if err != nil {
-			c.JSON(400, gin.H{"error": err.Error()})
-			return // proper error handling instead of panic in your app
-		}
-		// and then print out the tag's Name attribute
+	c.JSON(200, listDepartment)
 
-		defer db.Close()
-
-		c.JSON(200, department)
-	}
-
-	
 }
 
 // DeleteDepartment handles DELETE requests to delete a department entity
@@ -181,7 +153,6 @@ func (ctl *DepartmentController) ListDepartment(c *gin.Context) {
 // @Failure 500 {object} gin.H
 // @Router /departments/{id} [delete]
 func (ctl *DepartmentController) DeleteDepartment(c *gin.Context) {
-	db := databaseConnection()
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		c.JSON(400, gin.H{
@@ -190,17 +161,16 @@ func (ctl *DepartmentController) DeleteDepartment(c *gin.Context) {
 		return
 	}
 
-	deleteDepartment, err := db.Prepare("DELETE FROM department WHERE id_department=?")
-    if err != nil {
+	err = ctl.client.Department.
+		DeleteOneID(int(id)).
+		Exec(context.Background())
+
+	if err != nil {
 		c.JSON(404, gin.H{
 			"error": err.Error(),
 		})
 		return
-    }
-    deleteDepartment.Exec(id)
-
-    defer db.Close()
-
+	}
 	c.JSON(200, gin.H{"result": fmt.Sprintf("ok deleted %v", id)})
 }
 
@@ -217,7 +187,6 @@ func (ctl *DepartmentController) DeleteDepartment(c *gin.Context) {
 // @Failure 500 {object} gin.H
 // @Router /departments/{id} [put]
 func (ctl *DepartmentController) UpdateDepartment(c *gin.Context) {
-	db := databaseConnection()
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		c.JSON(400, gin.H{
@@ -233,19 +202,19 @@ func (ctl *DepartmentController) UpdateDepartment(c *gin.Context) {
 		return
 	}
 
-	UpdateDepartment, err := db.Prepare("UPDATE department SET name=? WHERE id_department=?")
+	updateDepartment, err := ctl.client.Department.
+		UpdateOneID(int(id)).
+		SetName(obj.Name).
+		Save(context.Background())
+
 	if err != nil {
 		c.JSON(400, gin.H{"error": "update1 failed"})
 		return
 	}
 
-	UpdateDepartment.Exec(obj.Name, int(id))
-
-	defer db.Close()
-
 	c.JSON(200, gin.H{
-		"status" : true,
-		"data": UpdateDepartment,
+		"status": true,
+		"data":   updateDepartment,
 	})
 }
 

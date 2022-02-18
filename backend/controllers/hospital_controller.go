@@ -2,16 +2,19 @@ package controllers
 
 import (
 	"FinalProject/ent"
+	"FinalProject/ent/hospital"
+	"context"
 	"fmt"
-	"strconv"
 	"log"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
+
 //"FinalProject/ent/hospital"
 // User defines the struct for the user
 type Hospital struct {
-	Name	string
+	Name string
 }
 
 // HospitalController defines the struct for the hospital controller
@@ -32,7 +35,6 @@ type HospitalController struct {
 // @Failure 500 {object} gin.H
 // @Router /hospitals [post]
 func (ctl *HospitalController) CreateHospital(c *gin.Context) {
-	db := databaseConnection()
 	obj := Hospital{}
 
 	if err := c.ShouldBind(&obj); err != nil {
@@ -42,30 +44,23 @@ func (ctl *HospitalController) CreateHospital(c *gin.Context) {
 		return
 	}
 
-	insertHospital, err := db.Prepare("INSERT INTO hospital(name) VALUES (?)")
+	insertHospital, err := ctl.client.Hospital.
+		Create().
+		SetName(obj.Name).
+		Save(context.Background())
+
 	if err != nil {
 		fmt.Println(err)
 		c.JSON(400, gin.H{
-			"status" : false,
-			"error": err,
-		})
-		return
-	}
-	insertHospital.Exec(obj.Name)
-	if err != nil {
-		fmt.Println(err)
-		c.JSON(400, gin.H{
-			"status" : false,
-			"error": err,
+			"status": false,
+			"error":  err,
 		})
 		return
 	}
 
-	defer db.Close()
-	
 	c.JSON(200, gin.H{
-		"status" : true,
-		"data": insertHospital,
+		"status": true,
+		"data":   insertHospital,
 	})
 }
 
@@ -81,8 +76,6 @@ func (ctl *HospitalController) CreateHospital(c *gin.Context) {
 // @Failure 500 {object} gin.H
 // @Router /hospitals/{id} [get]
 func (ctl *HospitalController) GetHospital(c *gin.Context) {
-	db := databaseConnection()
-	log.Println("Connected")
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	log.Println(id)
 	if err != nil {
@@ -91,33 +84,20 @@ func (ctl *HospitalController) GetHospital(c *gin.Context) {
 		})
 		return
 	}
-	
-	resultsGetHospital, err := db.Query("SELECT name FROM hospital WHERE id_hospital=1")
-	log.Println(resultsGetHospital)
+
+	getHospital, err := ctl.client.Hospital.
+		Query().
+		Where(hospital.IDEQ(int(id))).
+		Only(context.Background())
+
 	if err != nil {
 		c.JSON(400, gin.H{
 			"error": err.Error(),
 		})
 		return // proper error handling instead of panic in your app
 	}
-	
-	for resultsGetHospital.Next() {
-		var hospital Hospital
-		err = resultsGetHospital.Scan(&hospital.Name)
-		if err != nil {
-			c.JSON(404, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
 
-		// for each row, scan the result into our tag composite object
-		log.Println("Username: " + hospital.Name)
-
-		defer db.Close()
-
-		c.JSON(200, hospital)
-	}
+	c.JSON(200, getHospital)
 }
 
 // ListHospital handles request to get a list of hospital entities
@@ -132,7 +112,6 @@ func (ctl *HospitalController) GetHospital(c *gin.Context) {
 // @Failure 500 {object} gin.H
 // @Router /hospitals [get]
 func (ctl *HospitalController) ListHospital(c *gin.Context) {
-	db := databaseConnection()
 	limitQuery := c.Query("limit")
 	limit := 10
 	if limitQuery != "" {
@@ -149,26 +128,19 @@ func (ctl *HospitalController) ListHospital(c *gin.Context) {
 			offset = int(offset64)
 		}
 	}
-	resultsListUser, err := db.Query("SELECT name FROM hospital limit ? offset ?", limit, offset)
+
+	listHospitals, err := ctl.client.Hospital.
+		Query().
+		Limit(limit).
+		Offset(offset).
+		All(context.Background())
+
 	if err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return // proper error handling instead of panic in your app
 	}
 
-	for resultsListUser.Next() {
-		var hospital Hospital
-		// for each row, scan the result into our tag composite object
-		err = resultsListUser.Scan(&hospital.Name)
-		if err != nil {
-			c.JSON(400, gin.H{"error": err.Error()})
-			return // proper error handling instead of panic in your app
-		}
-		// and then print out the tag's Name attribute
-
-		defer db.Close()
-
-		c.JSON(200, hospital)
-	}
+	c.JSON(200, listHospitals)
 }
 
 // DeleteHospital handles DELETE requests to delete a hospital entity
@@ -183,7 +155,6 @@ func (ctl *HospitalController) ListHospital(c *gin.Context) {
 // @Failure 500 {object} gin.H
 // @Router /hospitals/{id} [delete]
 func (ctl *HospitalController) DeleteHospital(c *gin.Context) {
-	db := databaseConnection()
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		c.JSON(400, gin.H{
@@ -192,16 +163,16 @@ func (ctl *HospitalController) DeleteHospital(c *gin.Context) {
 		return
 	}
 
-	deleteHospital, err := db.Prepare("DELETE FROM hospital WHERE id_hospital=?")
-    if err != nil {
+	err = ctl.client.Hospital.
+		DeleteOneID(int(id)).
+		Exec(context.Background())
+
+	if err != nil {
 		c.JSON(404, gin.H{
 			"error": err.Error(),
 		})
 		return
-    }
-    deleteHospital.Exec(id)
-
-    defer db.Close()
+	}
 
 	c.JSON(200, gin.H{"result": fmt.Sprintf("ok deleted %v", id)})
 }
@@ -219,7 +190,6 @@ func (ctl *HospitalController) DeleteHospital(c *gin.Context) {
 // @Failure 500 {object} gin.H
 // @Router /hospitals/{id} [put]
 func (ctl *HospitalController) UpdateHospital(c *gin.Context) {
-	db := databaseConnection()
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		c.JSON(400, gin.H{
@@ -235,19 +205,15 @@ func (ctl *HospitalController) UpdateHospital(c *gin.Context) {
 		return
 	}
 
-	UpdateHospital, err := db.Prepare("UPDATE user SET name=? WHERE id_hospital=?")
+	updateHospital, err := ctl.client.Hospital.UpdateOneID(int(id)).SetName(obj.Name).Save(context.Background())
 	if err != nil {
 		c.JSON(400, gin.H{"error": "update1 failed"})
 		return
 	}
 
-	UpdateHospital.Exec(obj.Name, int(id))
-
-	defer db.Close()
-
 	c.JSON(200, gin.H{
-		"status" : true,
-		"data": UpdateHospital,
+		"status": true,
+		"data":   updateHospital,
 	})
 }
 

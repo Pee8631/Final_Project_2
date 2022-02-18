@@ -34,6 +34,7 @@ type hooks struct {
 	Schedule      []ent.Hook
 	ScheduleTime  []ent.Hook
 	Telecom       []ent.Hook
+	Token         []ent.Hook
 	Treatment     []ent.Hook
 	User          []ent.Hook
 }

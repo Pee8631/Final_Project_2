@@ -426,6 +426,20 @@ func DateOfIssuingLTE(v time.Time) predicate.Certification {
 	})
 }
 
+// DateOfIssuingIsNil applies the IsNil predicate on the "dateOfIssuing" field.
+func DateOfIssuingIsNil() predicate.Certification {
+	return predicate.Certification(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldDateOfIssuing)))
+	})
+}
+
+// DateOfIssuingNotNil applies the NotNil predicate on the "dateOfIssuing" field.
+func DateOfIssuingNotNil() predicate.Certification {
+	return predicate.Certification(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldDateOfIssuing)))
+	})
+}
+
 // DateOfExpEQ applies the EQ predicate on the "dateOfExp" field.
 func DateOfExpEQ(v time.Time) predicate.Certification {
 	return predicate.Certification(func(s *sql.Selector) {
@@ -499,6 +513,20 @@ func DateOfExpLT(v time.Time) predicate.Certification {
 func DateOfExpLTE(v time.Time) predicate.Certification {
 	return predicate.Certification(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldDateOfExp), v))
+	})
+}
+
+// DateOfExpIsNil applies the IsNil predicate on the "dateOfExp" field.
+func DateOfExpIsNil() predicate.Certification {
+	return predicate.Certification(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldDateOfExp)))
+	})
+}
+
+// DateOfExpNotNil applies the NotNil predicate on the "dateOfExp" field.
+func DateOfExpNotNil() predicate.Certification {
+	return predicate.Certification(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldDateOfExp)))
 	})
 }
 

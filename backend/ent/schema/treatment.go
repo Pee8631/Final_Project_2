@@ -2,6 +2,7 @@ package schema
 
 import (
 	"entgo.io/ent"
+	"entgo.io/ent/dialect"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
@@ -16,7 +17,11 @@ func (Treatment) Fields() []ent.Field {
 	return []ent.Field{
 		//field.Int("id").Unique(),
 		field.Text("treatmentRecord"),
-		field.Time("dateTime"),
+		field.Time("dateTime").
+		Optional().
+		SchemaType(map[string]string{
+			dialect.MySQL: "datetime",
+		}),
 		field.Float("takeTime"),
 	}
 }

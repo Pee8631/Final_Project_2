@@ -40,6 +40,20 @@ func (cu *ChattingUpdate) SetDateTime(t time.Time) *ChattingUpdate {
 	return cu
 }
 
+// SetNillableDateTime sets the "dateTime" field if the given value is not nil.
+func (cu *ChattingUpdate) SetNillableDateTime(t *time.Time) *ChattingUpdate {
+	if t != nil {
+		cu.SetDateTime(*t)
+	}
+	return cu
+}
+
+// ClearDateTime clears the value of the "dateTime" field.
+func (cu *ChattingUpdate) ClearDateTime() *ChattingUpdate {
+	cu.mutation.ClearDateTime()
+	return cu
+}
+
 // SetChattingWithWhomID sets the "chatting_with_whom" edge to the User entity by ID.
 func (cu *ChattingUpdate) SetChattingWithWhomID(id int) *ChattingUpdate {
 	cu.mutation.SetChattingWithWhomID(id)
@@ -181,6 +195,12 @@ func (cu *ChattingUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: chatting.FieldDateTime,
 		})
 	}
+	if cu.mutation.DateTimeCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Column: chatting.FieldDateTime,
+		})
+	}
 	if cu.mutation.ChattingWithWhomCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -279,6 +299,20 @@ func (cuo *ChattingUpdateOne) SetMessage(s string) *ChattingUpdateOne {
 // SetDateTime sets the "dateTime" field.
 func (cuo *ChattingUpdateOne) SetDateTime(t time.Time) *ChattingUpdateOne {
 	cuo.mutation.SetDateTime(t)
+	return cuo
+}
+
+// SetNillableDateTime sets the "dateTime" field if the given value is not nil.
+func (cuo *ChattingUpdateOne) SetNillableDateTime(t *time.Time) *ChattingUpdateOne {
+	if t != nil {
+		cuo.SetDateTime(*t)
+	}
+	return cuo
+}
+
+// ClearDateTime clears the value of the "dateTime" field.
+func (cuo *ChattingUpdateOne) ClearDateTime() *ChattingUpdateOne {
+	cuo.mutation.ClearDateTime()
 	return cuo
 }
 
@@ -444,6 +478,12 @@ func (cuo *ChattingUpdateOne) sqlSave(ctx context.Context) (_node *Chatting, err
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
+			Column: chatting.FieldDateTime,
+		})
+	}
+	if cuo.mutation.DateTimeCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
 			Column: chatting.FieldDateTime,
 		})
 	}

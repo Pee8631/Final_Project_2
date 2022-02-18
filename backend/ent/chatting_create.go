@@ -33,6 +33,14 @@ func (cc *ChattingCreate) SetDateTime(t time.Time) *ChattingCreate {
 	return cc
 }
 
+// SetNillableDateTime sets the "dateTime" field if the given value is not nil.
+func (cc *ChattingCreate) SetNillableDateTime(t *time.Time) *ChattingCreate {
+	if t != nil {
+		cc.SetDateTime(*t)
+	}
+	return cc
+}
+
 // SetChattingWithWhomID sets the "chatting_with_whom" edge to the User entity by ID.
 func (cc *ChattingCreate) SetChattingWithWhomID(id int) *ChattingCreate {
 	cc.mutation.SetChattingWithWhomID(id)
@@ -143,9 +151,6 @@ func (cc *ChattingCreate) ExecX(ctx context.Context) {
 func (cc *ChattingCreate) check() error {
 	if _, ok := cc.mutation.Message(); !ok {
 		return &ValidationError{Name: "message", err: errors.New(`ent: missing required field "message"`)}
-	}
-	if _, ok := cc.mutation.DateTime(); !ok {
-		return &ValidationError{Name: "dateTime", err: errors.New(`ent: missing required field "dateTime"`)}
 	}
 	return nil
 }

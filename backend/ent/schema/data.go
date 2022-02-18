@@ -2,6 +2,7 @@ package schema
 
 import (
 	"entgo.io/ent"
+	"entgo.io/ent/dialect"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
@@ -18,7 +19,11 @@ func (Data) Fields() []ent.Field {
 		field.String("firstName"),
 		field.String("lastName"),
 		field.Int("gender"),
-		field.Time("brithDate"),
+		field.Time("brithDate").
+		Optional().
+		SchemaType(map[string]string{
+			dialect.MySQL: "datetime",
+		}),
 		field.String("bloodGroup"),
 		field.Text("address"),
 	}

@@ -3,76 +3,87 @@
 package ent
 
 import (
-	"FinalProject/ent/telecom"
+	"FinalProject/ent/token"
 	"FinalProject/ent/user"
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 )
 
-// TelecomCreate is the builder for creating a Telecom entity.
-type TelecomCreate struct {
+// TokenCreate is the builder for creating a Token entity.
+type TokenCreate struct {
 	config
-	mutation *TelecomMutation
+	mutation *TokenMutation
 	hooks    []Hook
 }
 
-// SetEmail sets the "email" field.
-func (tc *TelecomCreate) SetEmail(s string) *TelecomCreate {
-	tc.mutation.SetEmail(s)
+// SetAuthToken sets the "AuthToken" field.
+func (tc *TokenCreate) SetAuthToken(s string) *TokenCreate {
+	tc.mutation.SetAuthToken(s)
 	return tc
 }
 
-// SetTelephone sets the "telephone" field.
-func (tc *TelecomCreate) SetTelephone(s string) *TelecomCreate {
-	tc.mutation.SetTelephone(s)
+// SetGeneratedAt sets the "GeneratedAt" field.
+func (tc *TokenCreate) SetGeneratedAt(t time.Time) *TokenCreate {
+	tc.mutation.SetGeneratedAt(t)
 	return tc
 }
 
-// SetUsername sets the "username" field.
-func (tc *TelecomCreate) SetUsername(s string) *TelecomCreate {
-	tc.mutation.SetUsername(s)
-	return tc
-}
-
-// SetPlatform sets the "platform" field.
-func (tc *TelecomCreate) SetPlatform(s string) *TelecomCreate {
-	tc.mutation.SetPlatform(s)
-	return tc
-}
-
-// SetWhoIsTheOwnerOfThisTelecomID sets the "who_is_the_owner_of_this_telecom" edge to the User entity by ID.
-func (tc *TelecomCreate) SetWhoIsTheOwnerOfThisTelecomID(id int) *TelecomCreate {
-	tc.mutation.SetWhoIsTheOwnerOfThisTelecomID(id)
-	return tc
-}
-
-// SetNillableWhoIsTheOwnerOfThisTelecomID sets the "who_is_the_owner_of_this_telecom" edge to the User entity by ID if the given value is not nil.
-func (tc *TelecomCreate) SetNillableWhoIsTheOwnerOfThisTelecomID(id *int) *TelecomCreate {
-	if id != nil {
-		tc = tc.SetWhoIsTheOwnerOfThisTelecomID(*id)
+// SetNillableGeneratedAt sets the "GeneratedAt" field if the given value is not nil.
+func (tc *TokenCreate) SetNillableGeneratedAt(t *time.Time) *TokenCreate {
+	if t != nil {
+		tc.SetGeneratedAt(*t)
 	}
 	return tc
 }
 
-// SetWhoIsTheOwnerOfThisTelecom sets the "who_is_the_owner_of_this_telecom" edge to the User entity.
-func (tc *TelecomCreate) SetWhoIsTheOwnerOfThisTelecom(u *User) *TelecomCreate {
-	return tc.SetWhoIsTheOwnerOfThisTelecomID(u.ID)
+// SetExpiresAt sets the "ExpiresAt" field.
+func (tc *TokenCreate) SetExpiresAt(t time.Time) *TokenCreate {
+	tc.mutation.SetExpiresAt(t)
+	return tc
 }
 
-// Mutation returns the TelecomMutation object of the builder.
-func (tc *TelecomCreate) Mutation() *TelecomMutation {
+// SetNillableExpiresAt sets the "ExpiresAt" field if the given value is not nil.
+func (tc *TokenCreate) SetNillableExpiresAt(t *time.Time) *TokenCreate {
+	if t != nil {
+		tc.SetExpiresAt(*t)
+	}
+	return tc
+}
+
+// SetAuthenticationTokenID sets the "authentication_token" edge to the User entity by ID.
+func (tc *TokenCreate) SetAuthenticationTokenID(id int) *TokenCreate {
+	tc.mutation.SetAuthenticationTokenID(id)
+	return tc
+}
+
+// SetNillableAuthenticationTokenID sets the "authentication_token" edge to the User entity by ID if the given value is not nil.
+func (tc *TokenCreate) SetNillableAuthenticationTokenID(id *int) *TokenCreate {
+	if id != nil {
+		tc = tc.SetAuthenticationTokenID(*id)
+	}
+	return tc
+}
+
+// SetAuthenticationToken sets the "authentication_token" edge to the User entity.
+func (tc *TokenCreate) SetAuthenticationToken(u *User) *TokenCreate {
+	return tc.SetAuthenticationTokenID(u.ID)
+}
+
+// Mutation returns the TokenMutation object of the builder.
+func (tc *TokenCreate) Mutation() *TokenMutation {
 	return tc.mutation
 }
 
-// Save creates the Telecom in the database.
-func (tc *TelecomCreate) Save(ctx context.Context) (*Telecom, error) {
+// Save creates the Token in the database.
+func (tc *TokenCreate) Save(ctx context.Context) (*Token, error) {
 	var (
 		err  error
-		node *Telecom
+		node *Token
 	)
 	if len(tc.hooks) == 0 {
 		if err = tc.check(); err != nil {
@@ -81,7 +92,7 @@ func (tc *TelecomCreate) Save(ctx context.Context) (*Telecom, error) {
 		node, err = tc.sqlSave(ctx)
 	} else {
 		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*TelecomMutation)
+			mutation, ok := m.(*TokenMutation)
 			if !ok {
 				return nil, fmt.Errorf("unexpected mutation type %T", m)
 			}
@@ -110,7 +121,7 @@ func (tc *TelecomCreate) Save(ctx context.Context) (*Telecom, error) {
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (tc *TelecomCreate) SaveX(ctx context.Context) *Telecom {
+func (tc *TokenCreate) SaveX(ctx context.Context) *Token {
 	v, err := tc.Save(ctx)
 	if err != nil {
 		panic(err)
@@ -119,36 +130,27 @@ func (tc *TelecomCreate) SaveX(ctx context.Context) *Telecom {
 }
 
 // Exec executes the query.
-func (tc *TelecomCreate) Exec(ctx context.Context) error {
+func (tc *TokenCreate) Exec(ctx context.Context) error {
 	_, err := tc.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (tc *TelecomCreate) ExecX(ctx context.Context) {
+func (tc *TokenCreate) ExecX(ctx context.Context) {
 	if err := tc.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (tc *TelecomCreate) check() error {
-	if _, ok := tc.mutation.Email(); !ok {
-		return &ValidationError{Name: "email", err: errors.New(`ent: missing required field "email"`)}
-	}
-	if _, ok := tc.mutation.Telephone(); !ok {
-		return &ValidationError{Name: "telephone", err: errors.New(`ent: missing required field "telephone"`)}
-	}
-	if _, ok := tc.mutation.Username(); !ok {
-		return &ValidationError{Name: "username", err: errors.New(`ent: missing required field "username"`)}
-	}
-	if _, ok := tc.mutation.Platform(); !ok {
-		return &ValidationError{Name: "platform", err: errors.New(`ent: missing required field "platform"`)}
+func (tc *TokenCreate) check() error {
+	if _, ok := tc.mutation.AuthToken(); !ok {
+		return &ValidationError{Name: "AuthToken", err: errors.New(`ent: missing required field "AuthToken"`)}
 	}
 	return nil
 }
 
-func (tc *TelecomCreate) sqlSave(ctx context.Context) (*Telecom, error) {
+func (tc *TokenCreate) sqlSave(ctx context.Context) (*Token, error) {
 	_node, _spec := tc.createSpec()
 	if err := sqlgraph.CreateNode(ctx, tc.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
@@ -161,55 +163,47 @@ func (tc *TelecomCreate) sqlSave(ctx context.Context) (*Telecom, error) {
 	return _node, nil
 }
 
-func (tc *TelecomCreate) createSpec() (*Telecom, *sqlgraph.CreateSpec) {
+func (tc *TokenCreate) createSpec() (*Token, *sqlgraph.CreateSpec) {
 	var (
-		_node = &Telecom{config: tc.config}
+		_node = &Token{config: tc.config}
 		_spec = &sqlgraph.CreateSpec{
-			Table: telecom.Table,
+			Table: token.Table,
 			ID: &sqlgraph.FieldSpec{
 				Type:   field.TypeInt,
-				Column: telecom.FieldID,
+				Column: token.FieldID,
 			},
 		}
 	)
-	if value, ok := tc.mutation.Email(); ok {
+	if value, ok := tc.mutation.AuthToken(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Value:  value,
-			Column: telecom.FieldEmail,
+			Column: token.FieldAuthToken,
 		})
-		_node.Email = value
+		_node.AuthToken = value
 	}
-	if value, ok := tc.mutation.Telephone(); ok {
+	if value, ok := tc.mutation.GeneratedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
+			Type:   field.TypeTime,
 			Value:  value,
-			Column: telecom.FieldTelephone,
+			Column: token.FieldGeneratedAt,
 		})
-		_node.Telephone = value
+		_node.GeneratedAt = value
 	}
-	if value, ok := tc.mutation.Username(); ok {
+	if value, ok := tc.mutation.ExpiresAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
+			Type:   field.TypeTime,
 			Value:  value,
-			Column: telecom.FieldUsername,
+			Column: token.FieldExpiresAt,
 		})
-		_node.Username = value
+		_node.ExpiresAt = value
 	}
-	if value, ok := tc.mutation.Platform(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: telecom.FieldPlatform,
-		})
-		_node.Platform = value
-	}
-	if nodes := tc.mutation.WhoIsTheOwnerOfThisTelecomIDs(); len(nodes) > 0 {
+	if nodes := tc.mutation.AuthenticationTokenIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   telecom.WhoIsTheOwnerOfThisTelecomTable,
-			Columns: []string{telecom.WhoIsTheOwnerOfThisTelecomColumn},
+			Table:   token.AuthenticationTokenTable,
+			Columns: []string{token.AuthenticationTokenColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -221,28 +215,28 @@ func (tc *TelecomCreate) createSpec() (*Telecom, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.user_user_have_telecoms = &nodes[0]
+		_node.user_user_have_token = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }
 
-// TelecomCreateBulk is the builder for creating many Telecom entities in bulk.
-type TelecomCreateBulk struct {
+// TokenCreateBulk is the builder for creating many Token entities in bulk.
+type TokenCreateBulk struct {
 	config
-	builders []*TelecomCreate
+	builders []*TokenCreate
 }
 
-// Save creates the Telecom entities in the database.
-func (tcb *TelecomCreateBulk) Save(ctx context.Context) ([]*Telecom, error) {
+// Save creates the Token entities in the database.
+func (tcb *TokenCreateBulk) Save(ctx context.Context) ([]*Token, error) {
 	specs := make([]*sqlgraph.CreateSpec, len(tcb.builders))
-	nodes := make([]*Telecom, len(tcb.builders))
+	nodes := make([]*Token, len(tcb.builders))
 	mutators := make([]Mutator, len(tcb.builders))
 	for i := range tcb.builders {
 		func(i int, root context.Context) {
 			builder := tcb.builders[i]
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-				mutation, ok := m.(*TelecomMutation)
+				mutation, ok := m.(*TokenMutation)
 				if !ok {
 					return nil, fmt.Errorf("unexpected mutation type %T", m)
 				}
@@ -289,7 +283,7 @@ func (tcb *TelecomCreateBulk) Save(ctx context.Context) ([]*Telecom, error) {
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (tcb *TelecomCreateBulk) SaveX(ctx context.Context) []*Telecom {
+func (tcb *TokenCreateBulk) SaveX(ctx context.Context) []*Token {
 	v, err := tcb.Save(ctx)
 	if err != nil {
 		panic(err)
@@ -298,13 +292,13 @@ func (tcb *TelecomCreateBulk) SaveX(ctx context.Context) []*Telecom {
 }
 
 // Exec executes the query.
-func (tcb *TelecomCreateBulk) Exec(ctx context.Context) error {
+func (tcb *TokenCreateBulk) Exec(ctx context.Context) error {
 	_, err := tcb.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (tcb *TelecomCreateBulk) ExecX(ctx context.Context) {
+func (tcb *TokenCreateBulk) ExecX(ctx context.Context) {
 	if err := tcb.Exec(ctx); err != nil {
 		panic(err)
 	}

@@ -13,6 +13,7 @@ import (
 	"FinalProject/ent/role"
 	"FinalProject/ent/schedule"
 	"FinalProject/ent/telecom"
+	"FinalProject/ent/token"
 	"FinalProject/ent/treatment"
 	"FinalProject/ent/user"
 	"context"
@@ -44,6 +45,7 @@ type UserQuery struct {
 	withUserHaveTelecoms       *TelecomQuery
 	withDoctorRecordTreatment  *TreatmentQuery
 	withUserHaveTreatment      *TreatmentQuery
+	withUserHaveToken          *TokenQuery
 	withHasDepartment          *DepartmentQuery
 	withFromHospital           *HospitalQuery
 	withUserHaveDisease        *DiseaseQuery
@@ -254,6 +256,28 @@ func (uq *UserQuery) QueryUserHaveTreatment() *TreatmentQuery {
 			sqlgraph.From(user.Table, user.FieldID, selector),
 			sqlgraph.To(treatment.Table, treatment.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, user.UserHaveTreatmentTable, user.UserHaveTreatmentColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryUserHaveToken chains the current query on the "user_have_token" edge.
+func (uq *UserQuery) QueryUserHaveToken() *TokenQuery {
+	query := &TokenQuery{config: uq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := uq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := uq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, selector),
+			sqlgraph.To(token.Table, token.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.UserHaveTokenTable, user.UserHaveTokenColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
 		return fromU, nil
@@ -538,6 +562,7 @@ func (uq *UserQuery) Clone() *UserQuery {
 		withUserHaveTelecoms:       uq.withUserHaveTelecoms.Clone(),
 		withDoctorRecordTreatment:  uq.withDoctorRecordTreatment.Clone(),
 		withUserHaveTreatment:      uq.withUserHaveTreatment.Clone(),
+		withUserHaveToken:          uq.withUserHaveToken.Clone(),
 		withHasDepartment:          uq.withHasDepartment.Clone(),
 		withFromHospital:           uq.withFromHospital.Clone(),
 		withUserHaveDisease:        uq.withUserHaveDisease.Clone(),
@@ -633,6 +658,17 @@ func (uq *UserQuery) WithUserHaveTreatment(opts ...func(*TreatmentQuery)) *UserQ
 		opt(query)
 	}
 	uq.withUserHaveTreatment = query
+	return uq
+}
+
+// WithUserHaveToken tells the query-builder to eager-load the nodes that are connected to
+// the "user_have_token" edge. The optional arguments are used to configure the query builder of the edge.
+func (uq *UserQuery) WithUserHaveToken(opts ...func(*TokenQuery)) *UserQuery {
+	query := &TokenQuery{config: uq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	uq.withUserHaveToken = query
 	return uq
 }
 
@@ -746,7 +782,7 @@ func (uq *UserQuery) sqlAll(ctx context.Context) ([]*User, error) {
 		nodes       = []*User{}
 		withFKs     = uq.withFKs
 		_spec       = uq.querySpec()
-		loadedTypes = [12]bool{
+		loadedTypes = [13]bool{
 			uq.withDoctorHasCertification != nil,
 			uq.withUserChattingWithWhom != nil,
 			uq.withWhoIsOwnerThisMsg != nil,
@@ -755,6 +791,7 @@ func (uq *UserQuery) sqlAll(ctx context.Context) ([]*User, error) {
 			uq.withUserHaveTelecoms != nil,
 			uq.withDoctorRecordTreatment != nil,
 			uq.withUserHaveTreatment != nil,
+			uq.withUserHaveToken != nil,
 			uq.withHasDepartment != nil,
 			uq.withFromHospital != nil,
 			uq.withUserHaveDisease != nil,
@@ -1016,6 +1053,35 @@ func (uq *UserQuery) sqlAll(ctx context.Context) ([]*User, error) {
 				return nil, fmt.Errorf(`unexpected foreign-key "user_user_have_treatment" returned %v for node %v`, *fk, n.ID)
 			}
 			node.Edges.UserHaveTreatment = append(node.Edges.UserHaveTreatment, n)
+		}
+	}
+
+	if query := uq.withUserHaveToken; query != nil {
+		fks := make([]driver.Value, 0, len(nodes))
+		nodeids := make(map[int]*User)
+		for i := range nodes {
+			fks = append(fks, nodes[i].ID)
+			nodeids[nodes[i].ID] = nodes[i]
+			nodes[i].Edges.UserHaveToken = []*Token{}
+		}
+		query.withFKs = true
+		query.Where(predicate.Token(func(s *sql.Selector) {
+			s.Where(sql.InValues(user.UserHaveTokenColumn, fks...))
+		}))
+		neighbors, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, n := range neighbors {
+			fk := n.user_user_have_token
+			if fk == nil {
+				return nil, fmt.Errorf(`foreign-key "user_user_have_token" is nil for node %v`, n.ID)
+			}
+			node, ok := nodeids[*fk]
+			if !ok {
+				return nil, fmt.Errorf(`unexpected foreign-key "user_user_have_token" returned %v for node %v`, *fk, n.ID)
+			}
+			node.Edges.UserHaveToken = append(node.Edges.UserHaveToken, n)
 		}
 	}
 

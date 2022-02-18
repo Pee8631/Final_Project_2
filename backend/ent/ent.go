@@ -13,6 +13,7 @@ import (
 	"FinalProject/ent/schedule"
 	"FinalProject/ent/scheduletime"
 	"FinalProject/ent/telecom"
+	"FinalProject/ent/token"
 	"FinalProject/ent/treatment"
 	"FinalProject/ent/user"
 	"errors"
@@ -50,6 +51,7 @@ func columnChecker(table string) func(string) error {
 		schedule.Table:      schedule.ValidColumn,
 		scheduletime.Table:  scheduletime.ValidColumn,
 		telecom.Table:       telecom.ValidColumn,
+		token.Table:         token.ValidColumn,
 		treatment.Table:     treatment.ValidColumn,
 		user.Table:          user.ValidColumn,
 	}

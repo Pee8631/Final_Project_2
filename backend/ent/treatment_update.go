@@ -40,6 +40,20 @@ func (tu *TreatmentUpdate) SetDateTime(t time.Time) *TreatmentUpdate {
 	return tu
 }
 
+// SetNillableDateTime sets the "dateTime" field if the given value is not nil.
+func (tu *TreatmentUpdate) SetNillableDateTime(t *time.Time) *TreatmentUpdate {
+	if t != nil {
+		tu.SetDateTime(*t)
+	}
+	return tu
+}
+
+// ClearDateTime clears the value of the "dateTime" field.
+func (tu *TreatmentUpdate) ClearDateTime() *TreatmentUpdate {
+	tu.mutation.ClearDateTime()
+	return tu
+}
+
 // SetTakeTime sets the "takeTime" field.
 func (tu *TreatmentUpdate) SetTakeTime(f float64) *TreatmentUpdate {
 	tu.mutation.ResetTakeTime()
@@ -194,6 +208,12 @@ func (tu *TreatmentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: treatment.FieldDateTime,
 		})
 	}
+	if tu.mutation.DateTimeCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Column: treatment.FieldDateTime,
+		})
+	}
 	if value, ok := tu.mutation.TakeTime(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeFloat64,
@@ -306,6 +326,20 @@ func (tuo *TreatmentUpdateOne) SetTreatmentRecord(s string) *TreatmentUpdateOne 
 // SetDateTime sets the "dateTime" field.
 func (tuo *TreatmentUpdateOne) SetDateTime(t time.Time) *TreatmentUpdateOne {
 	tuo.mutation.SetDateTime(t)
+	return tuo
+}
+
+// SetNillableDateTime sets the "dateTime" field if the given value is not nil.
+func (tuo *TreatmentUpdateOne) SetNillableDateTime(t *time.Time) *TreatmentUpdateOne {
+	if t != nil {
+		tuo.SetDateTime(*t)
+	}
+	return tuo
+}
+
+// ClearDateTime clears the value of the "dateTime" field.
+func (tuo *TreatmentUpdateOne) ClearDateTime() *TreatmentUpdateOne {
+	tuo.mutation.ClearDateTime()
 	return tuo
 }
 
@@ -484,6 +518,12 @@ func (tuo *TreatmentUpdateOne) sqlSave(ctx context.Context) (_node *Treatment, e
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
+			Column: treatment.FieldDateTime,
+		})
+	}
+	if tuo.mutation.DateTimeCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
 			Column: treatment.FieldDateTime,
 		})
 	}

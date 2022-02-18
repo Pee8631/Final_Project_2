@@ -294,6 +294,20 @@ func DateTimeLTE(v time.Time) predicate.Chatting {
 	})
 }
 
+// DateTimeIsNil applies the IsNil predicate on the "dateTime" field.
+func DateTimeIsNil() predicate.Chatting {
+	return predicate.Chatting(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldDateTime)))
+	})
+}
+
+// DateTimeNotNil applies the NotNil predicate on the "dateTime" field.
+func DateTimeNotNil() predicate.Chatting {
+	return predicate.Chatting(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldDateTime)))
+	})
+}
+
 // HasChattingWithWhom applies the HasEdge predicate on the "chatting_with_whom" edge.
 func HasChattingWithWhom() predicate.Chatting {
 	return predicate.Chatting(func(s *sql.Selector) {

@@ -2,20 +2,23 @@ package controllers
 
 import (
 	"FinalProject/ent"
+	"FinalProject/ent/certification"
+	"context"
 	"fmt"
-	"time"
 	"strconv"
+	"time"
+
 	"github.com/gin-gonic/gin"
 )
 
 // Certification defines the struct for the certification
 type Certification struct {
-	Code			string
-	Diloma			string
-	DateOfIssuing	string
-	DateOfExp		string
-	Issuer			string
-	User			int
+	Code          string
+	Diloma        string
+	DateOfIssuing string
+	DateOfExp     string
+	Issuer        string
+	User          int
 }
 
 // CertificationController defines the struct for the certification controller
@@ -36,7 +39,6 @@ type CertificationController struct {
 // @Failure 500 {object} gin.H
 // @Router /certifications [post]
 func (ctl *CertificationController) CreateCertification(c *gin.Context) {
-	db := databaseConnection()
 	obj := Certification{}
 
 	if err := c.ShouldBind(&obj); err != nil {
@@ -50,8 +52,8 @@ func (ctl *CertificationController) CreateCertification(c *gin.Context) {
 	if err != nil {
 		fmt.Println(err)
 		c.JSON(400, gin.H{
-			"status" : false,
-			"error": err,
+			"status": false,
+			"error":  err,
 		})
 		return
 	}
@@ -60,37 +62,33 @@ func (ctl *CertificationController) CreateCertification(c *gin.Context) {
 	if err != nil {
 		fmt.Println(err)
 		c.JSON(400, gin.H{
-			"status" : false,
-			"error": err,
+			"status": false,
+			"error":  err,
 		})
 		return
 	}
 
-	insertCertification, err := db.Prepare("INSERT INTO certification( code, diloma, dateofissuing, dateofexp, issuer, id_user) VALUES (?, ?, ?, ?, ?, ?)")
+	insertCertification, err := ctl.client.Certification.
+		Create().
+		SetCode(obj.Code).
+		SetDiloma(obj.Diloma).
+		SetDateOfIssuing(dateOfIssuing).
+		SetDateOfExp(dateOfExp).
+		SetIssuer(obj.Issuer).
+		SetDoctorOwnerID(obj.User).
+		Save(context.Background())
 	if err != nil {
 		fmt.Println(err)
 		c.JSON(400, gin.H{
-			"status" : false,
-			"error": err,
-		})
-		return
-	}
-	insertCertification.Exec(obj.Code, obj.Diloma, dateOfIssuing, dateOfExp, obj.Issuer, obj.User)
-	if err != nil {
-		fmt.Println(err)
-		c.JSON(400, gin.H{
-			"status" : false,
-			"error": err,
+			"status": false,
+			"error":  err,
 		})
 		return
 	}
 
-	defer db.Close()
-
-	
 	c.JSON(200, gin.H{
-		"status" : true,
-		"data": insertCertification,
+		"status": true,
+		"data":   insertCertification,
 	})
 }
 
@@ -106,8 +104,6 @@ func (ctl *CertificationController) CreateCertification(c *gin.Context) {
 // @Failure 500 {object} gin.H
 // @Router /certifications/{id} [get]
 func (ctl *CertificationController) GetCertification(c *gin.Context) {
-	db := databaseConnection()
-
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		c.JSON(400, gin.H{
@@ -115,7 +111,11 @@ func (ctl *CertificationController) GetCertification(c *gin.Context) {
 		})
 		return
 	}
-	resultsGetCertification, err := db.Query("SELECT code, diloma, dateofissuing, dateofexp, issuer, id_user FROM certification WHERE id_certification=?", id)
+
+	getCertification, err := ctl.client.Certification.
+		Query().
+		Where(certification.IDEQ(int(id))).
+		Only(context.Background())
 	if err != nil {
 		c.JSON(400, gin.H{
 			"error": err.Error(),
@@ -123,22 +123,7 @@ func (ctl *CertificationController) GetCertification(c *gin.Context) {
 		return // proper error handling instead of panic in your app
 	}
 
-	for resultsGetCertification.Next() {
-		var certification Certification
-		// for each row, scan the result into our tag composite object
-		err = resultsGetCertification.Scan(&certification.Code, &certification.Diloma, &certification.DateOfIssuing, &certification.DateOfExp, &certification.Issuer, &certification.User)
-		if err != nil {
-			c.JSON(404, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
-
-		defer db.Close()
-
-		c.JSON(200, certification)
-
-	}
+	c.JSON(200, getCertification)
 }
 
 // ListCertification handles request to get a list of certification entities
@@ -153,7 +138,6 @@ func (ctl *CertificationController) GetCertification(c *gin.Context) {
 // @Failure 500 {object} gin.H
 // @Router /certifications [get]
 func (ctl *CertificationController) ListCertification(c *gin.Context) {
-	db := databaseConnection()
 	limitQuery := c.Query("limit")
 	limit := 10
 	if limitQuery != "" {
@@ -170,28 +154,19 @@ func (ctl *CertificationController) ListCertification(c *gin.Context) {
 			offset = int(offset64)
 		}
 	}
-	resultsListCertification, err := db.Query("SELECT code, diloma, dateofissuing, dateofexp, issuer, id_user FROM certification limit ? offset ?", limit, offset)
+
+	listCertification, err := ctl.client.Certification.
+		Query().
+		Limit(limit).
+		Offset(offset).
+		All(context.Background())
 	if err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return // proper error handling instead of panic in your app
 	}
 
-	for resultsListCertification.Next() {
-		var certification Certification
-		// for each row, scan the result into our tag composite object
-		err = resultsListCertification.Scan(&certification.Code, &certification.Diloma, &certification.DateOfIssuing, &certification.DateOfExp, &certification.Issuer, &certification.User)
-		if err != nil {
-			c.JSON(400, gin.H{"error": err.Error()})
-			return // proper error handling instead of panic in your app
-		}
-		// and then print out the tag's Name attribute
+	c.JSON(200, listCertification)
 
-		defer db.Close()
-
-		c.JSON(200, certification)
-	}
-
-	
 }
 
 // DeleteCertification handles DELETE requests to delete a certification entity
@@ -206,7 +181,6 @@ func (ctl *CertificationController) ListCertification(c *gin.Context) {
 // @Failure 500 {object} gin.H
 // @Router /certifications/{id} [delete]
 func (ctl *CertificationController) DeleteCertification(c *gin.Context) {
-	db := databaseConnection()
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		c.JSON(400, gin.H{
@@ -215,16 +189,15 @@ func (ctl *CertificationController) DeleteCertification(c *gin.Context) {
 		return
 	}
 
-	deleteCertification, err := db.Prepare("DELETE FROM certification WHERE id_certification=?")
-    if err != nil {
+	err = ctl.client.Certification.
+		DeleteOneID(int(id)).
+		Exec(context.Background())
+	if err != nil {
 		c.JSON(404, gin.H{
 			"error": err.Error(),
 		})
 		return
-    }
-    deleteCertification.Exec(id)
-
-    defer db.Close()
+	}
 
 	c.JSON(200, gin.H{"result": fmt.Sprintf("ok deleted %v", id)})
 }
@@ -242,7 +215,6 @@ func (ctl *CertificationController) DeleteCertification(c *gin.Context) {
 // @Failure 500 {object} gin.H
 // @Router /certifications/{id} [put]
 func (ctl *CertificationController) UpdateCertification(c *gin.Context) {
-	db := databaseConnection()
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		c.JSON(400, gin.H{
@@ -261,35 +233,39 @@ func (ctl *CertificationController) UpdateCertification(c *gin.Context) {
 	if err != nil {
 		fmt.Println(err)
 		c.JSON(400, gin.H{
-			"status" : false,
-			"error": err,
-		})
-		return
-	}
-	
-	dateOfExp, err := time.Parse(time.RFC3339, obj.DateOfExp)
-	if err != nil {
-		fmt.Println(err)
-		c.JSON(400, gin.H{
-			"status" : false,
-			"error": err,
+			"status": false,
+			"error":  err,
 		})
 		return
 	}
 
-	UpdateCertification, err := db.Prepare("UPDATE certification SET code=?, diloma=?, dateofissuing=?, dateofexp=?, issuer=?, id_user=? WHERE id_certification=?")
+	dateOfExp, err := time.Parse(time.RFC3339, obj.DateOfExp)
+	if err != nil {
+		fmt.Println(err)
+		c.JSON(400, gin.H{
+			"status": false,
+			"error":  err,
+		})
+		return
+	}
+
+	updateCertification, err := ctl.client.Certification.
+		UpdateOneID(int(id)).
+		SetCode(obj.Code).
+		SetDiloma(obj.Diloma).
+		SetDateOfIssuing(dateOfIssuing).
+		SetDateOfExp(dateOfExp).
+		SetIssuer(obj.Issuer).
+		SetDoctorOwnerID(obj.User).
+		Save(context.Background())
 	if err != nil {
 		c.JSON(400, gin.H{"error": "update1 failed"})
 		return
 	}
 
-	UpdateCertification.Exec(obj.Code, obj.Diloma, dateOfIssuing, dateOfExp, obj.Issuer, obj.User, int(id))
-
-	defer db.Close()
-
 	c.JSON(200, gin.H{
-		"status" : true,
-		"data": UpdateCertification,
+		"status": true,
+		"data":   updateCertification,
 	})
 }
 

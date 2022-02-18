@@ -48,7 +48,7 @@ import (
 func main() {
 	router := gin.Default()
 	router.Use(cors.Default())
-	client, err := ent.Open("mysql", "root:@tcp(127.0.0.1:3306)/test?parseTime=True")
+	client, err := ent.Open("mysql", "root:@tcp(127.0.0.1:3306)/projectdb?parseTime=True")
 
 	if err != nil {
 		log.Fatalf("fail to open MySQL Database: %v", err)

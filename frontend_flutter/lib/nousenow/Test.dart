@@ -11,7 +11,7 @@ class Test extends StatefulWidget {
 
 class _Test extends State<Test> {
   final formkey = GlobalKey<FormState>();
-  User user = User(username: '', password: '');
+  User user = User(username: '', password: '', department: 0 , hospital: 0);
 
   get storage => null;
 

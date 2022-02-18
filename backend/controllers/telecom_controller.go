@@ -2,9 +2,12 @@ package controllers
 
 import (
 	"FinalProject/ent"
+	"FinalProject/ent/telecom"
+	"context"
 
 	"fmt"
 	"strconv"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -12,6 +15,8 @@ import (
 type Telecom struct {
 	Username   	string
 	Platform	string
+	Telephone	string
+	Email		string
 	User		int
 }
 
@@ -33,7 +38,6 @@ type TelecomController struct {
 // @Failure 500 {object} gin.H
 // @Router /telecoms [post]
 func (ctl *TelecomController) CreateTelecom(c *gin.Context) {
-	db := databaseConnection()
 	obj := Telecom{}
 
 	if err := c.ShouldBind(&obj); err != nil {
@@ -43,7 +47,14 @@ func (ctl *TelecomController) CreateTelecom(c *gin.Context) {
 		return
 	}
 
-	insertTelecom, err := db.Prepare("INSERT INTO telecom(username, platform, id_user) VALUES (?, ?, ?)")
+	insertTelecom, err := ctl.client.Telecom.
+	Create().
+	SetUsername(obj.Username).
+	SetPlatform(obj.Platform).
+	SetTelephone(obj.Telephone).
+	SetEmail(obj.Email).
+	Save(context.Background())
+
 	if err != nil {
 		fmt.Println(err)
 		c.JSON(400, gin.H{
@@ -52,18 +63,6 @@ func (ctl *TelecomController) CreateTelecom(c *gin.Context) {
 		})
 		return
 	}
-	insertTelecom.Exec(obj.Username, obj.Platform, obj.User)
-	if err != nil {
-		fmt.Println(err)
-		c.JSON(400, gin.H{
-			"status" : false,
-			"error": err,
-		})
-		return
-	}
-
-	defer db.Close()
-
 	
 	c.JSON(200, gin.H{
 		"status" : true,
@@ -83,8 +82,6 @@ func (ctl *TelecomController) CreateTelecom(c *gin.Context) {
 // @Failure 500 {object} gin.H
 // @Router /telecoms/{id} [get]
 func (ctl *TelecomController) GetTelecom(c *gin.Context) {
-	db := databaseConnection()
-
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		c.JSON(400, gin.H{
@@ -92,7 +89,12 @@ func (ctl *TelecomController) GetTelecom(c *gin.Context) {
 		})
 		return
 	}
-	resultsGetTelecom, err := db.Query("SELECT username, platform, id_user FROM telecom WHERE id_telecom=?", id)
+
+	getTelecom, err := ctl.client.Telecom.
+		Query().
+		Where(telecom.IDEQ(int(id))).
+		Only(context.Background())
+
 	if err != nil {
 		c.JSON(400, gin.H{
 			"error": err.Error(),
@@ -100,22 +102,8 @@ func (ctl *TelecomController) GetTelecom(c *gin.Context) {
 		return // proper error handling instead of panic in your app
 	}
 
-	for resultsGetTelecom.Next() {
-		var telecom Telecom
-		// for each row, scan the result into our tag composite object
-		err = resultsGetTelecom.Scan(&telecom.Username, &telecom.Platform, &telecom.User)
-		if err != nil {
-			c.JSON(404, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
 
-		defer db.Close()
-
-		c.JSON(200, telecom)
-
-	}
+		c.JSON(200, getTelecom)
 }
 
 // ListTelecom handles request to get a list of telecom entities
@@ -130,7 +118,6 @@ func (ctl *TelecomController) GetTelecom(c *gin.Context) {
 // @Failure 500 {object} gin.H
 // @Router /telecoms [get]
 func (ctl *TelecomController) ListTelecom(c *gin.Context) {
-	db := databaseConnection()
 	limitQuery := c.Query("limit")
 	limit := 10
 	if limitQuery != "" {
@@ -147,27 +134,14 @@ func (ctl *TelecomController) ListTelecom(c *gin.Context) {
 			offset = int(offset64)
 		}
 	}
-	resultsListTelecom, err := db.Query("SELECT username, platform, id_user FROM telecom limit ? offset ?", limit, offset)
+
+	listTelecom, err := ctl.client.Telecom.Query().Limit(limit).Offset(offset).All(context.Background())
 	if err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return // proper error handling instead of panic in your app
 	}
 
-	for resultsListTelecom.Next() {
-		var telecom Telecom
-		// for each row, scan the result into our tag composite object
-		err = resultsListTelecom.Scan(&telecom.Username, &telecom.Platform, &telecom.User)
-		if err != nil {
-			c.JSON(400, gin.H{"error": err.Error()})
-			return // proper error handling instead of panic in your app
-		}
-		// and then print out the tag's Name attribute
-
-		defer db.Close()
-
-		c.JSON(200, telecom)
-	}
-
+	c.JSON(200, listTelecom)
 	
 }
 
@@ -183,7 +157,6 @@ func (ctl *TelecomController) ListTelecom(c *gin.Context) {
 // @Failure 500 {object} gin.H
 // @Router /telecoms/{id} [delete]
 func (ctl *TelecomController) DeleteTelecom(c *gin.Context) {
-	db := databaseConnection()
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		c.JSON(400, gin.H{
@@ -192,16 +165,16 @@ func (ctl *TelecomController) DeleteTelecom(c *gin.Context) {
 		return
 	}
 
-	deleteTelecom, err := db.Prepare("DELETE FROM telecom WHERE id_telecom=?")
+	err = ctl.client.Telecom.
+	DeleteOneID(int(id)).
+	Exec(context.Background())
+
     if err != nil {
 		c.JSON(404, gin.H{
 			"error": err.Error(),
 		})
 		return
     }
-    deleteTelecom.Exec(id)
-
-    defer db.Close()
 
 	c.JSON(200, gin.H{"result": fmt.Sprintf("ok deleted %v", id)})
 }
@@ -219,7 +192,6 @@ func (ctl *TelecomController) DeleteTelecom(c *gin.Context) {
 // @Failure 500 {object} gin.H
 // @Router /telecoms/{id} [put]
 func (ctl *TelecomController) UpdateTelecom(c *gin.Context) {
-	db := databaseConnection()
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		c.JSON(400, gin.H{
@@ -235,19 +207,23 @@ func (ctl *TelecomController) UpdateTelecom(c *gin.Context) {
 		return
 	}
 
-	UpdateTelecom, err := db.Prepare("UPDATE telecom SET username=?, platform=?, id_user=? WHERE id_telecom=?")
+	updateTelecom, err := ctl.client.Telecom.
+	UpdateOneID(int(id)).
+	SetUsername(obj.Username).
+	SetPlatform(obj.Platform).
+	SetTelephone(obj.Telephone).
+	SetEmail(obj.Email).
+	SetWhoIsTheOwnerOfThisTelecomID(obj.User).
+	Save(context.Background())
+
 	if err != nil {
 		c.JSON(400, gin.H{"error": "update1 failed"})
 		return
 	}
 
-	UpdateTelecom.Exec(obj.Username, obj.Platform, obj.User, int(id))
-
-	defer db.Close()
-
 	c.JSON(200, gin.H{
 		"status" : true,
-		"data": UpdateTelecom,
+		"data": updateTelecom,
 	})
 }
 

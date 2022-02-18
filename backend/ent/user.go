@@ -21,10 +21,6 @@ type User struct {
 	Username string `json:"username,omitempty"`
 	// Password holds the value of the "password" field.
 	Password string `json:"password,omitempty"`
-	// Email holds the value of the "email" field.
-	Email string `json:"email,omitempty"`
-	// Telephone holds the value of the "telephone" field.
-	Telephone string `json:"telephone,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the UserQuery when eager-loading is set.
 	Edges                            UserEdges `json:"edges"`
@@ -50,6 +46,8 @@ type UserEdges struct {
 	DoctorRecordTreatment []*Treatment `json:"doctor_record_treatment,omitempty"`
 	// UserHaveTreatment holds the value of the user_have_treatment edge.
 	UserHaveTreatment []*Treatment `json:"user_have_treatment,omitempty"`
+	// UserHaveToken holds the value of the user_have_token edge.
+	UserHaveToken []*Token `json:"user_have_token,omitempty"`
 	// HasDepartment holds the value of the has_department edge.
 	HasDepartment *Department `json:"has_department,omitempty"`
 	// FromHospital holds the value of the from_hospital edge.
@@ -60,7 +58,7 @@ type UserEdges struct {
 	UserHaveRole []*Role `json:"user_have_role,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [12]bool
+	loadedTypes [13]bool
 }
 
 // DoctorHasCertificationOrErr returns the DoctorHasCertification value or an error if the edge
@@ -135,10 +133,19 @@ func (e UserEdges) UserHaveTreatmentOrErr() ([]*Treatment, error) {
 	return nil, &NotLoadedError{edge: "user_have_treatment"}
 }
 
+// UserHaveTokenOrErr returns the UserHaveToken value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) UserHaveTokenOrErr() ([]*Token, error) {
+	if e.loadedTypes[8] {
+		return e.UserHaveToken, nil
+	}
+	return nil, &NotLoadedError{edge: "user_have_token"}
+}
+
 // HasDepartmentOrErr returns the HasDepartment value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e UserEdges) HasDepartmentOrErr() (*Department, error) {
-	if e.loadedTypes[8] {
+	if e.loadedTypes[9] {
 		if e.HasDepartment == nil {
 			// The edge has_department was loaded in eager-loading,
 			// but was not found.
@@ -152,7 +159,7 @@ func (e UserEdges) HasDepartmentOrErr() (*Department, error) {
 // FromHospitalOrErr returns the FromHospital value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e UserEdges) FromHospitalOrErr() (*Hospital, error) {
-	if e.loadedTypes[9] {
+	if e.loadedTypes[10] {
 		if e.FromHospital == nil {
 			// The edge from_hospital was loaded in eager-loading,
 			// but was not found.
@@ -166,7 +173,7 @@ func (e UserEdges) FromHospitalOrErr() (*Hospital, error) {
 // UserHaveDiseaseOrErr returns the UserHaveDisease value or an error if the edge
 // was not loaded in eager-loading.
 func (e UserEdges) UserHaveDiseaseOrErr() ([]*Disease, error) {
-	if e.loadedTypes[10] {
+	if e.loadedTypes[11] {
 		return e.UserHaveDisease, nil
 	}
 	return nil, &NotLoadedError{edge: "user_have_disease"}
@@ -175,7 +182,7 @@ func (e UserEdges) UserHaveDiseaseOrErr() ([]*Disease, error) {
 // UserHaveRoleOrErr returns the UserHaveRole value or an error if the edge
 // was not loaded in eager-loading.
 func (e UserEdges) UserHaveRoleOrErr() ([]*Role, error) {
-	if e.loadedTypes[11] {
+	if e.loadedTypes[12] {
 		return e.UserHaveRole, nil
 	}
 	return nil, &NotLoadedError{edge: "user_have_role"}
@@ -188,7 +195,7 @@ func (*User) scanValues(columns []string) ([]interface{}, error) {
 		switch columns[i] {
 		case user.FieldID:
 			values[i] = new(sql.NullInt64)
-		case user.FieldUsername, user.FieldPassword, user.FieldEmail, user.FieldTelephone:
+		case user.FieldUsername, user.FieldPassword:
 			values[i] = new(sql.NullString)
 		case user.ForeignKeys[0]: // department_department_has_doctor
 			values[i] = new(sql.NullInt64)
@@ -226,18 +233,6 @@ func (u *User) assignValues(columns []string, values []interface{}) error {
 				return fmt.Errorf("unexpected type %T for field password", values[i])
 			} else if value.Valid {
 				u.Password = value.String
-			}
-		case user.FieldEmail:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field email", values[i])
-			} else if value.Valid {
-				u.Email = value.String
-			}
-		case user.FieldTelephone:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field telephone", values[i])
-			} else if value.Valid {
-				u.Telephone = value.String
 			}
 		case user.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -298,6 +293,11 @@ func (u *User) QueryUserHaveTreatment() *TreatmentQuery {
 	return (&UserClient{config: u.config}).QueryUserHaveTreatment(u)
 }
 
+// QueryUserHaveToken queries the "user_have_token" edge of the User entity.
+func (u *User) QueryUserHaveToken() *TokenQuery {
+	return (&UserClient{config: u.config}).QueryUserHaveToken(u)
+}
+
 // QueryHasDepartment queries the "has_department" edge of the User entity.
 func (u *User) QueryHasDepartment() *DepartmentQuery {
 	return (&UserClient{config: u.config}).QueryHasDepartment(u)
@@ -345,10 +345,6 @@ func (u *User) String() string {
 	builder.WriteString(u.Username)
 	builder.WriteString(", password=")
 	builder.WriteString(u.Password)
-	builder.WriteString(", email=")
-	builder.WriteString(u.Email)
-	builder.WriteString(", telephone=")
-	builder.WriteString(u.Telephone)
 	builder.WriteByte(')')
 	return builder.String()
 }

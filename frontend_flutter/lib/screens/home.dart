@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:frontend_flutter/model/user.dart';
+import 'package:frontend_flutter/screens/main_screen.dart';
+import 'package:frontend_flutter/screens/register.dart';
 import 'package:frontend_flutter/widget/home_button.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 import 'login.dart';
 import 'register.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

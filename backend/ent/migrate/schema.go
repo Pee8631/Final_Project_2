@@ -13,8 +13,8 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "code", Type: field.TypeString},
 		{Name: "diloma", Type: field.TypeString},
-		{Name: "date_of_issuing", Type: field.TypeTime},
-		{Name: "date_of_exp", Type: field.TypeTime},
+		{Name: "date_of_issuing", Type: field.TypeTime, Nullable: true, SchemaType: map[string]string{"mysql": "datetime"}},
+		{Name: "date_of_exp", Type: field.TypeTime, Nullable: true, SchemaType: map[string]string{"mysql": "datetime"}},
 		{Name: "issuer", Type: field.TypeString},
 		{Name: "user_doctor_has_certification", Type: field.TypeInt, Nullable: true},
 	}
@@ -36,7 +36,7 @@ var (
 	ChattingsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "message", Type: field.TypeString},
-		{Name: "date_time", Type: field.TypeTime},
+		{Name: "date_time", Type: field.TypeTime, Nullable: true, SchemaType: map[string]string{"mysql": "datetime"}},
 		{Name: "user_user_chatting_with_whom", Type: field.TypeInt, Nullable: true},
 		{Name: "user_who_is_owner_this_msg", Type: field.TypeInt, Nullable: true},
 	}
@@ -67,7 +67,7 @@ var (
 		{Name: "first_name", Type: field.TypeString},
 		{Name: "last_name", Type: field.TypeString},
 		{Name: "gender", Type: field.TypeInt},
-		{Name: "brith_date", Type: field.TypeTime},
+		{Name: "brith_date", Type: field.TypeTime, Nullable: true, SchemaType: map[string]string{"mysql": "datetime"}},
 		{Name: "blood_group", Type: field.TypeString},
 		{Name: "address", Type: field.TypeString, Size: 2147483647},
 		{Name: "user_user_has_data", Type: field.TypeInt, Nullable: true},
@@ -156,8 +156,8 @@ var (
 	// ScheduleTimesColumns holds the columns for the "schedule_times" table.
 	ScheduleTimesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "start_time", Type: field.TypeTime},
-		{Name: "stop_time", Type: field.TypeTime},
+		{Name: "start_time", Type: field.TypeTime, Nullable: true, SchemaType: map[string]string{"mysql": "datetime"}},
+		{Name: "stop_time", Type: field.TypeTime, Nullable: true, SchemaType: map[string]string{"mysql": "datetime"}},
 		{Name: "schedule_time_schedule", Type: field.TypeInt, Nullable: true},
 	}
 	// ScheduleTimesTable holds the schema information for the "schedule_times" table.
@@ -177,6 +177,8 @@ var (
 	// TelecomsColumns holds the columns for the "telecoms" table.
 	TelecomsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "email", Type: field.TypeString, Unique: true},
+		{Name: "telephone", Type: field.TypeString, Unique: true},
 		{Name: "username", Type: field.TypeString},
 		{Name: "platform", Type: field.TypeString},
 		{Name: "user_user_have_telecoms", Type: field.TypeInt, Nullable: true},
@@ -189,7 +191,29 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "telecoms_users_user_have_telecoms",
-				Columns:    []*schema.Column{TelecomsColumns[3]},
+				Columns:    []*schema.Column{TelecomsColumns[5]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// TokensColumns holds the columns for the "tokens" table.
+	TokensColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "auth_token", Type: field.TypeString},
+		{Name: "generated_at", Type: field.TypeTime, Nullable: true, SchemaType: map[string]string{"mysql": "datetime"}},
+		{Name: "expires_at", Type: field.TypeTime, Nullable: true, SchemaType: map[string]string{"mysql": "datetime"}},
+		{Name: "user_user_have_token", Type: field.TypeInt, Nullable: true},
+	}
+	// TokensTable holds the schema information for the "tokens" table.
+	TokensTable = &schema.Table{
+		Name:       "tokens",
+		Columns:    TokensColumns,
+		PrimaryKey: []*schema.Column{TokensColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "tokens_users_user_have_token",
+				Columns:    []*schema.Column{TokensColumns[4]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -199,7 +223,7 @@ var (
 	TreatmentsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "treatment_record", Type: field.TypeString, Size: 2147483647},
-		{Name: "date_time", Type: field.TypeTime},
+		{Name: "date_time", Type: field.TypeTime, Nullable: true, SchemaType: map[string]string{"mysql": "datetime"}},
 		{Name: "take_time", Type: field.TypeFloat64},
 		{Name: "user_doctor_record_treatment", Type: field.TypeInt, Nullable: true},
 		{Name: "user_user_have_treatment", Type: field.TypeInt, Nullable: true},
@@ -229,8 +253,6 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "username", Type: field.TypeString, Unique: true},
 		{Name: "password", Type: field.TypeString},
-		{Name: "email", Type: field.TypeString},
-		{Name: "telephone", Type: field.TypeString},
 		{Name: "department_department_has_doctor", Type: field.TypeInt, Nullable: true},
 		{Name: "hospital_hospital_has_doctor", Type: field.TypeInt, Nullable: true},
 	}
@@ -242,13 +264,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "users_departments_department_has_doctor",
-				Columns:    []*schema.Column{UsersColumns[5]},
+				Columns:    []*schema.Column{UsersColumns[3]},
 				RefColumns: []*schema.Column{DepartmentsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "users_hospitals_hospital_has_doctor",
-				Columns:    []*schema.Column{UsersColumns[6]},
+				Columns:    []*schema.Column{UsersColumns[4]},
 				RefColumns: []*schema.Column{HospitalsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -316,6 +338,7 @@ var (
 		SchedulesTable,
 		ScheduleTimesTable,
 		TelecomsTable,
+		TokensTable,
 		TreatmentsTable,
 		UsersTable,
 		DiseaseDiseaseUserTable,
@@ -331,6 +354,7 @@ func init() {
 	SchedulesTable.ForeignKeys[0].RefTable = UsersTable
 	ScheduleTimesTable.ForeignKeys[0].RefTable = SchedulesTable
 	TelecomsTable.ForeignKeys[0].RefTable = UsersTable
+	TokensTable.ForeignKeys[0].RefTable = UsersTable
 	TreatmentsTable.ForeignKeys[0].RefTable = UsersTable
 	TreatmentsTable.ForeignKeys[1].RefTable = UsersTable
 	UsersTable.ForeignKeys[0].RefTable = DepartmentsTable

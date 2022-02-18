@@ -183,6 +183,20 @@ func StartTimeLTE(v time.Time) predicate.ScheduleTime {
 	})
 }
 
+// StartTimeIsNil applies the IsNil predicate on the "startTime" field.
+func StartTimeIsNil() predicate.ScheduleTime {
+	return predicate.ScheduleTime(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldStartTime)))
+	})
+}
+
+// StartTimeNotNil applies the NotNil predicate on the "startTime" field.
+func StartTimeNotNil() predicate.ScheduleTime {
+	return predicate.ScheduleTime(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldStartTime)))
+	})
+}
+
 // StopTimeEQ applies the EQ predicate on the "stopTime" field.
 func StopTimeEQ(v time.Time) predicate.ScheduleTime {
 	return predicate.ScheduleTime(func(s *sql.Selector) {
@@ -256,6 +270,20 @@ func StopTimeLT(v time.Time) predicate.ScheduleTime {
 func StopTimeLTE(v time.Time) predicate.ScheduleTime {
 	return predicate.ScheduleTime(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldStopTime), v))
+	})
+}
+
+// StopTimeIsNil applies the IsNil predicate on the "stopTime" field.
+func StopTimeIsNil() predicate.ScheduleTime {
+	return predicate.ScheduleTime(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldStopTime)))
+	})
+}
+
+// StopTimeNotNil applies the NotNil predicate on the "stopTime" field.
+func StopTimeNotNil() predicate.ScheduleTime {
+	return predicate.ScheduleTime(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldStopTime)))
 	})
 }
 

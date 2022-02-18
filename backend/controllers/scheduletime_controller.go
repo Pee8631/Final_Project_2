@@ -2,6 +2,8 @@ package controllers
 
 import (
 	"FinalProject/ent"
+	"FinalProject/ent/scheduletime"
+	"context"
 	"time"
 
 	"fmt"
@@ -35,7 +37,6 @@ type ScheduleTimeController struct {
 // @Failure 500 {object} gin.H
 // @Router /scheduletimes [post]
 func (ctl *ScheduleTimeController) CreateScheduleTime(c *gin.Context) {
-	db := databaseConnection()
 	obj := ScheduleTime{}
 
 	if err := c.ShouldBind(&obj); err != nil {
@@ -65,7 +66,12 @@ func (ctl *ScheduleTimeController) CreateScheduleTime(c *gin.Context) {
 		return
 	}
 
-	insertScheduleTime, err := db.Prepare("INSERT INTO scheduletime(starttime, stoptime, id_schedule) VALUES (?, ?, ?)")
+	insertScheduleTime, err := ctl.client.ScheduleTime.Create().
+	SetStartTime(startTime).
+	SetStopTime(stopTime).
+	SetWhatTimeIsTheScheduleID(obj.Schedule).
+	Save(context.Background())
+
 	if err != nil {
 		fmt.Println(err)
 		c.JSON(400, gin.H{
@@ -74,18 +80,6 @@ func (ctl *ScheduleTimeController) CreateScheduleTime(c *gin.Context) {
 		})
 		return
 	}
-	insertScheduleTime.Exec(startTime, stopTime, obj.Schedule)
-	if err != nil {
-		fmt.Println(err)
-		c.JSON(400, gin.H{
-			"status": false,
-			"error":  err,
-		})
-		return
-	}
-
-	defer db.Close()
-
 	c.JSON(200, gin.H{
 		"status": true,
 		"data":   insertScheduleTime,
@@ -104,8 +98,6 @@ func (ctl *ScheduleTimeController) CreateScheduleTime(c *gin.Context) {
 // @Failure 500 {object} gin.H
 // @Router /scheduletimes/{id} [get]
 func (ctl *ScheduleTimeController) GetScheduleTime(c *gin.Context) {
-	db := databaseConnection()
-
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		c.JSON(400, gin.H{
@@ -113,7 +105,11 @@ func (ctl *ScheduleTimeController) GetScheduleTime(c *gin.Context) {
 		})
 		return
 	}
-	resultsGetScheduleTime, err := db.Query("SELECT starttime, stoptime, id_schedule FROM scheduletime WHERE id_scheduletime=?", id)
+	GetScheduleTime, err := ctl.client.ScheduleTime.
+		Query().
+		Where(scheduletime.IDEQ(int(id))).
+		Only(context.Background())
+
 	if err != nil {
 		c.JSON(400, gin.H{
 			"error": err.Error(),
@@ -121,22 +117,7 @@ func (ctl *ScheduleTimeController) GetScheduleTime(c *gin.Context) {
 		return // proper error handling instead of panic in your app
 	}
 
-	for resultsGetScheduleTime.Next() {
-		var scheduletime ScheduleTime
-		// for each row, scan the result into our tag composite object
-		err = resultsGetScheduleTime.Scan(&scheduletime.StartTime, &scheduletime.StopTime, &scheduletime.Schedule)
-		if err != nil {
-			c.JSON(404, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
-
-		defer db.Close()
-
-		c.JSON(200, scheduletime)
-
-	}
+	c.JSON(200, GetScheduleTime)
 }
 
 // ListScheduleTime handles request to get a list of scheduletime entities
@@ -151,7 +132,6 @@ func (ctl *ScheduleTimeController) GetScheduleTime(c *gin.Context) {
 // @Failure 500 {object} gin.H
 // @Router /scheduletimes [get]
 func (ctl *ScheduleTimeController) ListScheduleTime(c *gin.Context) {
-	db := databaseConnection()
 	limitQuery := c.Query("limit")
 	limit := 10
 	if limitQuery != "" {
@@ -168,26 +148,14 @@ func (ctl *ScheduleTimeController) ListScheduleTime(c *gin.Context) {
 			offset = int(offset64)
 		}
 	}
-	resultsListScheduleTime, err := db.Query("SELECT starttime, stoptime, id_schedule FROM scheduletime limit ? offset ?", limit, offset)
+
+	listScheduleTime, err := ctl.client.ScheduleTime.Query().Limit(limit).Offset(offset).All(context.Background())
 	if err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return // proper error handling instead of panic in your app
 	}
 
-	for resultsListScheduleTime.Next() {
-		var scheduletime ScheduleTime
-		// for each row, scan the result into our tag composite object
-		err = resultsListScheduleTime.Scan(&scheduletime.StartTime, &scheduletime.StopTime, &scheduletime.Schedule)
-		if err != nil {
-			c.JSON(400, gin.H{"error": err.Error()})
-			return // proper error handling instead of panic in your app
-		}
-		// and then print out the tag's Name attribute
-
-		defer db.Close()
-
-		c.JSON(200, scheduletime)
-	}
+	c.JSON(200, listScheduleTime)
 
 }
 
@@ -203,7 +171,6 @@ func (ctl *ScheduleTimeController) ListScheduleTime(c *gin.Context) {
 // @Failure 500 {object} gin.H
 // @Router /scheduletimes/{id} [delete]
 func (ctl *ScheduleTimeController) DeleteScheduleTime(c *gin.Context) {
-	db := databaseConnection()
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		c.JSON(400, gin.H{
@@ -212,16 +179,13 @@ func (ctl *ScheduleTimeController) DeleteScheduleTime(c *gin.Context) {
 		return
 	}
 
-	deleteScheduleTime, err := db.Prepare("DELETE FROM scheduletime WHERE id_scheduletime=?")
+	err = ctl.client.ScheduleTime.DeleteOneID(int(id)).Exec(context.Background())
 	if err != nil {
 		c.JSON(404, gin.H{
 			"error": err.Error(),
 		})
 		return
 	}
-	deleteScheduleTime.Exec(id)
-
-	defer db.Close()
 
 	c.JSON(200, gin.H{"result": fmt.Sprintf("ok deleted %v", id)})
 }
@@ -239,7 +203,6 @@ func (ctl *ScheduleTimeController) DeleteScheduleTime(c *gin.Context) {
 // @Failure 500 {object} gin.H
 // @Router /scheduletimes/{id} [put]
 func (ctl *ScheduleTimeController) UpdateScheduleTime(c *gin.Context) {
-	db := databaseConnection()
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		c.JSON(400, gin.H{
@@ -275,19 +238,21 @@ func (ctl *ScheduleTimeController) UpdateScheduleTime(c *gin.Context) {
 		return
 	}
 
-	UpdateScheduleTime, err := db.Prepare("UPDATE scheduletime SET starttime=?, stoptime=?, id_schedule=? WHERE id_scheduletime=?")
+	updateScheduleTime, err := ctl.client.ScheduleTime.
+	UpdateOneID(int(id)).
+	SetStartTime(startTime).
+	SetStopTime(stopTime).
+	SetNillableWhatTimeIsTheScheduleID(&obj.Schedule).
+	Save(context.Background())
+
 	if err != nil {
 		c.JSON(400, gin.H{"error": "update1 failed"})
 		return
 	}
 
-	UpdateScheduleTime.Exec(startTime, stopTime, obj.Schedule, int(id))
-
-	defer db.Close()
-
 	c.JSON(200, gin.H{
 		"status": true,
-		"data":   UpdateScheduleTime,
+		"data":   updateScheduleTime,
 	})
 }
 

@@ -2,16 +2,19 @@ package controllers
 
 import (
 	"FinalProject/ent"
+	"FinalProject/ent/disease"
+	"context"
 
 	"fmt"
 	"strconv"
+
 	"github.com/gin-gonic/gin"
 )
 
 // Disease defines the struct for the disease
 type Disease struct {
-	Name   		string
-	Symptoms	string
+	Name     string
+	Symptoms string
 }
 
 // DiseaseController defines the struct for the disease controller
@@ -32,7 +35,6 @@ type DiseaseController struct {
 // @Failure 500 {object} gin.H
 // @Router /diseases [post]
 func (ctl *DiseaseController) CreateDisease(c *gin.Context) {
-	db := databaseConnection()
 	obj := Disease{}
 
 	if err := c.ShouldBind(&obj); err != nil {
@@ -42,31 +44,24 @@ func (ctl *DiseaseController) CreateDisease(c *gin.Context) {
 		return
 	}
 
-	insertDisease, err := db.Prepare("INSERT INTO disease(name, symptoms) VALUES (?, ?)")
+	insertDisease, err := ctl.client.Disease.
+		Create().
+		SetName(obj.Name).
+		SetSymtoms(obj.Symptoms).
+		Save(context.Background())
+
 	if err != nil {
 		fmt.Println(err)
 		c.JSON(400, gin.H{
-			"status" : false,
-			"error": err,
-		})
-		return
-	}
-	insertDisease.Exec(obj.Name, obj.Symptoms)
-	if err != nil {
-		fmt.Println(err)
-		c.JSON(400, gin.H{
-			"status" : false,
-			"error": err,
+			"status": false,
+			"error":  err,
 		})
 		return
 	}
 
-	defer db.Close()
-
-	
 	c.JSON(200, gin.H{
-		"status" : true,
-		"data": insertDisease,
+		"status": true,
+		"data":   insertDisease,
 	})
 }
 
@@ -82,8 +77,6 @@ func (ctl *DiseaseController) CreateDisease(c *gin.Context) {
 // @Failure 500 {object} gin.H
 // @Router /diseases/{id} [get]
 func (ctl *DiseaseController) GetDisease(c *gin.Context) {
-	db := databaseConnection()
-
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		c.JSON(400, gin.H{
@@ -91,30 +84,19 @@ func (ctl *DiseaseController) GetDisease(c *gin.Context) {
 		})
 		return
 	}
-	resultsGetDisease, err := db.Query("SELECT name, symptoms FROM disease WHERE id_disease=?", id)
+	getDisease, err := ctl.client.Disease.
+		Query().
+		Where(disease.IDEQ(int(id))).
+		Only(context.Background())
+
 	if err != nil {
 		c.JSON(400, gin.H{
 			"error": err.Error(),
 		})
 		return // proper error handling instead of panic in your app
 	}
+	c.JSON(200, getDisease)
 
-	for resultsGetDisease.Next() {
-		var disease Disease
-		// for each row, scan the result into our tag composite object
-		err = resultsGetDisease.Scan(&disease.Name, &disease.Symptoms)
-		if err != nil {
-			c.JSON(404, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
-
-		defer db.Close()
-
-		c.JSON(200, disease)
-
-	}
 }
 
 // ListDisease handles request to get a list of disease entities
@@ -129,7 +111,6 @@ func (ctl *DiseaseController) GetDisease(c *gin.Context) {
 // @Failure 500 {object} gin.H
 // @Router /diseases [get]
 func (ctl *DiseaseController) ListDisease(c *gin.Context) {
-	db := databaseConnection()
 	limitQuery := c.Query("limit")
 	limit := 10
 	if limitQuery != "" {
@@ -146,28 +127,20 @@ func (ctl *DiseaseController) ListDisease(c *gin.Context) {
 			offset = int(offset64)
 		}
 	}
-	resultsListDisease, err := db.Query("SELECT name, symptoms FROM disease limit ? offset ?", limit, offset)
+
+	listDisease, err := ctl.client.Disease.
+		Query().
+		Limit(limit).
+		Offset(offset).
+		All(context.Background())
+
 	if err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return // proper error handling instead of panic in your app
 	}
 
-	for resultsListDisease.Next() {
-		var disease Disease
-		// for each row, scan the result into our tag composite object
-		err = resultsListDisease.Scan(&disease.Name, &disease.Symptoms)
-		if err != nil {
-			c.JSON(400, gin.H{"error": err.Error()})
-			return // proper error handling instead of panic in your app
-		}
-		// and then print out the tag's Name attribute
+	c.JSON(200, listDisease)
 
-		defer db.Close()
-
-		c.JSON(200, disease)
-	}
-
-	
 }
 
 // DeleteDisease handles DELETE requests to delete a disease entity
@@ -182,7 +155,6 @@ func (ctl *DiseaseController) ListDisease(c *gin.Context) {
 // @Failure 500 {object} gin.H
 // @Router /diseases/{id} [delete]
 func (ctl *DiseaseController) DeleteDisease(c *gin.Context) {
-	db := databaseConnection()
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		c.JSON(400, gin.H{
@@ -191,16 +163,16 @@ func (ctl *DiseaseController) DeleteDisease(c *gin.Context) {
 		return
 	}
 
-	deleteDisease, err := db.Prepare("DELETE FROM disease WHERE id_disease=?")
-    if err != nil {
+	err = ctl.client.Disease.
+		DeleteOneID(int(id)).
+		Exec(context.Background())
+
+	if err != nil {
 		c.JSON(404, gin.H{
 			"error": err.Error(),
 		})
 		return
-    }
-    deleteDisease.Exec(id)
-
-    defer db.Close()
+	}
 
 	c.JSON(200, gin.H{"result": fmt.Sprintf("ok deleted %v", id)})
 }
@@ -218,7 +190,6 @@ func (ctl *DiseaseController) DeleteDisease(c *gin.Context) {
 // @Failure 500 {object} gin.H
 // @Router /diseases/{id} [put]
 func (ctl *DiseaseController) UpdateDisease(c *gin.Context) {
-	db := databaseConnection()
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		c.JSON(400, gin.H{
@@ -234,19 +205,20 @@ func (ctl *DiseaseController) UpdateDisease(c *gin.Context) {
 		return
 	}
 
-	UpdateDisease, err := db.Prepare("UPDATE disease SET name=?,symptoms=? WHERE id_disease=?")
+	updateDisease, err := ctl.client.Disease.
+		UpdateOneID(int(id)).
+		SetName(obj.Name).
+		SetSymtoms(obj.Symptoms).
+		Save(context.Background())
+
 	if err != nil {
 		c.JSON(400, gin.H{"error": "update1 failed"})
 		return
 	}
 
-	UpdateDisease.Exec(obj.Name, obj.Symptoms, int(id))
-
-	defer db.Close()
-
 	c.JSON(200, gin.H{
-		"status" : true,
-		"data": UpdateDisease,
+		"status": true,
+		"data":   updateDisease,
 	})
 }
 

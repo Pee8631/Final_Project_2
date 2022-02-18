@@ -39,9 +39,25 @@ func (cc *CertificationCreate) SetDateOfIssuing(t time.Time) *CertificationCreat
 	return cc
 }
 
+// SetNillableDateOfIssuing sets the "dateOfIssuing" field if the given value is not nil.
+func (cc *CertificationCreate) SetNillableDateOfIssuing(t *time.Time) *CertificationCreate {
+	if t != nil {
+		cc.SetDateOfIssuing(*t)
+	}
+	return cc
+}
+
 // SetDateOfExp sets the "dateOfExp" field.
 func (cc *CertificationCreate) SetDateOfExp(t time.Time) *CertificationCreate {
 	cc.mutation.SetDateOfExp(t)
+	return cc
+}
+
+// SetNillableDateOfExp sets the "dateOfExp" field if the given value is not nil.
+func (cc *CertificationCreate) SetNillableDateOfExp(t *time.Time) *CertificationCreate {
+	if t != nil {
+		cc.SetDateOfExp(*t)
+	}
 	return cc
 }
 
@@ -155,12 +171,6 @@ func (cc *CertificationCreate) check() error {
 		if err := certification.DilomaValidator(v); err != nil {
 			return &ValidationError{Name: "diloma", err: fmt.Errorf(`ent: validator failed for field "diloma": %w`, err)}
 		}
-	}
-	if _, ok := cc.mutation.DateOfIssuing(); !ok {
-		return &ValidationError{Name: "dateOfIssuing", err: errors.New(`ent: missing required field "dateOfIssuing"`)}
-	}
-	if _, ok := cc.mutation.DateOfExp(); !ok {
-		return &ValidationError{Name: "dateOfExp", err: errors.New(`ent: missing required field "dateOfExp"`)}
 	}
 	if _, ok := cc.mutation.Issuer(); !ok {
 		return &ValidationError{Name: "Issuer", err: errors.New(`ent: missing required field "Issuer"`)}

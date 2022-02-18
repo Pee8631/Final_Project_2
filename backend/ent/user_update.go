@@ -13,6 +13,7 @@ import (
 	"FinalProject/ent/role"
 	"FinalProject/ent/schedule"
 	"FinalProject/ent/telecom"
+	"FinalProject/ent/token"
 	"FinalProject/ent/treatment"
 	"FinalProject/ent/user"
 	"context"
@@ -45,18 +46,6 @@ func (uu *UserUpdate) SetUsername(s string) *UserUpdate {
 // SetPassword sets the "password" field.
 func (uu *UserUpdate) SetPassword(s string) *UserUpdate {
 	uu.mutation.SetPassword(s)
-	return uu
-}
-
-// SetEmail sets the "email" field.
-func (uu *UserUpdate) SetEmail(s string) *UserUpdate {
-	uu.mutation.SetEmail(s)
-	return uu
-}
-
-// SetTelephone sets the "telephone" field.
-func (uu *UserUpdate) SetTelephone(s string) *UserUpdate {
-	uu.mutation.SetTelephone(s)
 	return uu
 }
 
@@ -178,6 +167,21 @@ func (uu *UserUpdate) AddUserHaveTreatment(t ...*Treatment) *UserUpdate {
 		ids[i] = t[i].ID
 	}
 	return uu.AddUserHaveTreatmentIDs(ids...)
+}
+
+// AddUserHaveTokenIDs adds the "user_have_token" edge to the Token entity by IDs.
+func (uu *UserUpdate) AddUserHaveTokenIDs(ids ...int) *UserUpdate {
+	uu.mutation.AddUserHaveTokenIDs(ids...)
+	return uu
+}
+
+// AddUserHaveToken adds the "user_have_token" edges to the Token entity.
+func (uu *UserUpdate) AddUserHaveToken(t ...*Token) *UserUpdate {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return uu.AddUserHaveTokenIDs(ids...)
 }
 
 // SetHasDepartmentID sets the "has_department" edge to the Department entity by ID.
@@ -421,6 +425,27 @@ func (uu *UserUpdate) RemoveUserHaveTreatment(t ...*Treatment) *UserUpdate {
 	return uu.RemoveUserHaveTreatmentIDs(ids...)
 }
 
+// ClearUserHaveToken clears all "user_have_token" edges to the Token entity.
+func (uu *UserUpdate) ClearUserHaveToken() *UserUpdate {
+	uu.mutation.ClearUserHaveToken()
+	return uu
+}
+
+// RemoveUserHaveTokenIDs removes the "user_have_token" edge to Token entities by IDs.
+func (uu *UserUpdate) RemoveUserHaveTokenIDs(ids ...int) *UserUpdate {
+	uu.mutation.RemoveUserHaveTokenIDs(ids...)
+	return uu
+}
+
+// RemoveUserHaveToken removes "user_have_token" edges to Token entities.
+func (uu *UserUpdate) RemoveUserHaveToken(t ...*Token) *UserUpdate {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return uu.RemoveUserHaveTokenIDs(ids...)
+}
+
 // ClearHasDepartment clears the "has_department" edge to the Department entity.
 func (uu *UserUpdate) ClearHasDepartment() *UserUpdate {
 	uu.mutation.ClearHasDepartment()
@@ -575,20 +600,6 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Type:   field.TypeString,
 			Value:  value,
 			Column: user.FieldPassword,
-		})
-	}
-	if value, ok := uu.mutation.Email(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: user.FieldEmail,
-		})
-	}
-	if value, ok := uu.mutation.Telephone(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: user.FieldTelephone,
 		})
 	}
 	if uu.mutation.DoctorHasCertificationCleared() {
@@ -1023,6 +1034,60 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if uu.mutation.UserHaveTokenCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserHaveTokenTable,
+			Columns: []string{user.UserHaveTokenColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: token.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RemovedUserHaveTokenIDs(); len(nodes) > 0 && !uu.mutation.UserHaveTokenCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserHaveTokenTable,
+			Columns: []string{user.UserHaveTokenColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: token.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.UserHaveTokenIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserHaveTokenTable,
+			Columns: []string{user.UserHaveTokenColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: token.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if uu.mutation.HasDepartmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -1232,18 +1297,6 @@ func (uuo *UserUpdateOne) SetPassword(s string) *UserUpdateOne {
 	return uuo
 }
 
-// SetEmail sets the "email" field.
-func (uuo *UserUpdateOne) SetEmail(s string) *UserUpdateOne {
-	uuo.mutation.SetEmail(s)
-	return uuo
-}
-
-// SetTelephone sets the "telephone" field.
-func (uuo *UserUpdateOne) SetTelephone(s string) *UserUpdateOne {
-	uuo.mutation.SetTelephone(s)
-	return uuo
-}
-
 // AddDoctorHasCertificationIDs adds the "doctor_has_certification" edge to the Certification entity by IDs.
 func (uuo *UserUpdateOne) AddDoctorHasCertificationIDs(ids ...int) *UserUpdateOne {
 	uuo.mutation.AddDoctorHasCertificationIDs(ids...)
@@ -1362,6 +1415,21 @@ func (uuo *UserUpdateOne) AddUserHaveTreatment(t ...*Treatment) *UserUpdateOne {
 		ids[i] = t[i].ID
 	}
 	return uuo.AddUserHaveTreatmentIDs(ids...)
+}
+
+// AddUserHaveTokenIDs adds the "user_have_token" edge to the Token entity by IDs.
+func (uuo *UserUpdateOne) AddUserHaveTokenIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.AddUserHaveTokenIDs(ids...)
+	return uuo
+}
+
+// AddUserHaveToken adds the "user_have_token" edges to the Token entity.
+func (uuo *UserUpdateOne) AddUserHaveToken(t ...*Token) *UserUpdateOne {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return uuo.AddUserHaveTokenIDs(ids...)
 }
 
 // SetHasDepartmentID sets the "has_department" edge to the Department entity by ID.
@@ -1605,6 +1673,27 @@ func (uuo *UserUpdateOne) RemoveUserHaveTreatment(t ...*Treatment) *UserUpdateOn
 	return uuo.RemoveUserHaveTreatmentIDs(ids...)
 }
 
+// ClearUserHaveToken clears all "user_have_token" edges to the Token entity.
+func (uuo *UserUpdateOne) ClearUserHaveToken() *UserUpdateOne {
+	uuo.mutation.ClearUserHaveToken()
+	return uuo
+}
+
+// RemoveUserHaveTokenIDs removes the "user_have_token" edge to Token entities by IDs.
+func (uuo *UserUpdateOne) RemoveUserHaveTokenIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.RemoveUserHaveTokenIDs(ids...)
+	return uuo
+}
+
+// RemoveUserHaveToken removes "user_have_token" edges to Token entities.
+func (uuo *UserUpdateOne) RemoveUserHaveToken(t ...*Token) *UserUpdateOne {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return uuo.RemoveUserHaveTokenIDs(ids...)
+}
+
 // ClearHasDepartment clears the "has_department" edge to the Department entity.
 func (uuo *UserUpdateOne) ClearHasDepartment() *UserUpdateOne {
 	uuo.mutation.ClearHasDepartment()
@@ -1783,20 +1872,6 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Type:   field.TypeString,
 			Value:  value,
 			Column: user.FieldPassword,
-		})
-	}
-	if value, ok := uuo.mutation.Email(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: user.FieldEmail,
-		})
-	}
-	if value, ok := uuo.mutation.Telephone(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: user.FieldTelephone,
 		})
 	}
 	if uuo.mutation.DoctorHasCertificationCleared() {
@@ -2223,6 +2298,60 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
 					Column: treatment.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uuo.mutation.UserHaveTokenCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserHaveTokenTable,
+			Columns: []string{user.UserHaveTokenColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: token.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RemovedUserHaveTokenIDs(); len(nodes) > 0 && !uuo.mutation.UserHaveTokenCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserHaveTokenTable,
+			Columns: []string{user.UserHaveTokenColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: token.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.UserHaveTokenIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserHaveTokenTable,
+			Columns: []string{user.UserHaveTokenColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: token.FieldID,
 				},
 			},
 		}

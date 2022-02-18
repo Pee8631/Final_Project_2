@@ -36,6 +36,9 @@ type ScheduleTime func(*sql.Selector)
 // Telecom is the predicate function for telecom builders.
 type Telecom func(*sql.Selector)
 
+// Token is the predicate function for token builders.
+type Token func(*sql.Selector)
+
 // Treatment is the predicate function for treatment builders.
 type Treatment func(*sql.Selector)
 

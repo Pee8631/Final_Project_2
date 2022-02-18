@@ -2,22 +2,25 @@ package controllers
 
 import (
 	"FinalProject/ent"
-	"time"
+	"FinalProject/ent/data"
+	"context"
 	"fmt"
 	"strconv"
+	"time"
+
 	"github.com/gin-gonic/gin"
 )
 
 // Data defines the struct for the data
 type Data struct {
-	IdCardNumber 	string 
-	FirstName		string 
-	LastName		string 
-	Gender			int 
-	BrithDate		string 
-	BloodGroup		string 
-	Address			string
-	User			int
+	IdCardNumber string
+	FirstName    string
+	LastName     string
+	Gender       int
+	BrithDate    string
+	BloodGroup   string
+	Address      string
+	User         int
 }
 
 // DataController defines the struct for the data controller
@@ -38,7 +41,6 @@ type DataController struct {
 // @Failure 500 {object} gin.H
 // @Router /datas [post]
 func (ctl *DataController) CreateData(c *gin.Context) {
-	db := databaseConnection()
 	obj := Data{}
 
 	if err := c.ShouldBind(&obj); err != nil {
@@ -47,42 +49,39 @@ func (ctl *DataController) CreateData(c *gin.Context) {
 		})
 		return
 	}
-	
+
 	brithDate, err := time.Parse(time.RFC3339, obj.BrithDate)
 	if err != nil {
 		fmt.Println(err)
 		c.JSON(400, gin.H{
-			"status" : false,
-			"error": err,
+			"status": false,
+			"error":  err,
 		})
 		return
 	}
 
-	insertData, err := db.Prepare("INSERT INTO data(idcardnumber, firstname, lastname, gender, brithdate, bloodgroup, address, id_user) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
+	insertData, err := ctl.client.Data.
+		Create().
+		SetIdCardNumber(obj.IdCardNumber).
+		SetFirstName(obj.FirstName).
+		SetLastName(obj.LastName).
+		SetGender(obj.Gender).
+		SetBrithDate(brithDate).
+		SetBloodGroup(obj.BloodGroup).
+		SetWhoIsTheOwnerOfThisDataID(obj.User).
+		Save(context.Background())
 	if err != nil {
 		fmt.Println(err)
 		c.JSON(400, gin.H{
-			"status" : false,
-			"error": err,
-		})
-		return
-	}
-	insertData.Exec(obj.IdCardNumber, obj.FirstName, obj.LastName, obj.Gender, brithDate, obj.BloodGroup, obj.Address, obj.User)
-	if err != nil {
-		fmt.Println(err)
-		c.JSON(400, gin.H{
-			"status" : false,
-			"error": err,
+			"status": false,
+			"error":  err,
 		})
 		return
 	}
 
-	defer db.Close()
-
-	
 	c.JSON(200, gin.H{
-		"status" : true,
-		"data": insertData,
+		"status": true,
+		"data":   insertData,
 	})
 }
 
@@ -98,8 +97,6 @@ func (ctl *DataController) CreateData(c *gin.Context) {
 // @Failure 500 {object} gin.H
 // @Router /datas/{id} [get]
 func (ctl *DataController) GetData(c *gin.Context) {
-	db := databaseConnection()
-
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		c.JSON(400, gin.H{
@@ -107,7 +104,11 @@ func (ctl *DataController) GetData(c *gin.Context) {
 		})
 		return
 	}
-	resultsGetData, err := db.Query("SELECT idcardnumber, firstname, lastname, gender, brithdate, bloodgroup, address, id_user FROM data WHERE id_data=?", id)
+
+	getData, err := ctl.client.Data.
+		Query().
+		Where(data.IDEQ(int(id))).
+		Only(context.Background())
 	if err != nil {
 		c.JSON(400, gin.H{
 			"error": err.Error(),
@@ -115,22 +116,8 @@ func (ctl *DataController) GetData(c *gin.Context) {
 		return // proper error handling instead of panic in your app
 	}
 
-	for resultsGetData.Next() {
-		var data Data
-		// for each row, scan the result into our tag composite object
-		err = resultsGetData.Scan(&data.IdCardNumber, &data.FirstName, &data.LastName, &data.Gender, &data.BrithDate, &data.BloodGroup, &data.Address, &data.User)
-		if err != nil {
-			c.JSON(404, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
+	c.JSON(200, getData)
 
-		defer db.Close()
-
-		c.JSON(200, data)
-
-	}
 }
 
 // ListData handles request to get a list of data entities
@@ -145,7 +132,6 @@ func (ctl *DataController) GetData(c *gin.Context) {
 // @Failure 500 {object} gin.H
 // @Router /datas [get]
 func (ctl *DataController) ListData(c *gin.Context) {
-	db := databaseConnection()
 	limitQuery := c.Query("limit")
 	limit := 10
 	if limitQuery != "" {
@@ -162,26 +148,19 @@ func (ctl *DataController) ListData(c *gin.Context) {
 			offset = int(offset64)
 		}
 	}
-	resultsListData, err := db.Query("SELECT idcardnumber, firstname, lastname, gender, brithdate, bloodgroup, address, id_user FROM data limit ? offset ?", limit, offset)
+
+
+	listData, err := ctl.client.Data.
+		Query().
+		Limit(limit).
+		Offset(offset).
+		All(context.Background())
 	if err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return // proper error handling instead of panic in your app
 	}
 
-	for resultsListData.Next() {
-		var data Data
-		// for each row, scan the result into our tag composite object
-		err = resultsListData.Scan(&data.IdCardNumber, &data.FirstName, &data.LastName, &data.Gender, &data.BrithDate, &data.BloodGroup, &data.Address, &data.User)
-		if err != nil {
-			c.JSON(400, gin.H{"error": err.Error()})
-			return // proper error handling instead of panic in your app
-		}
-		// and then print out the tag's Name attribute
-
-		defer db.Close()
-
-		c.JSON(200, data)
-	}
+		c.JSON(200, listData)
 
 }
 
@@ -197,7 +176,6 @@ func (ctl *DataController) ListData(c *gin.Context) {
 // @Failure 500 {object} gin.H
 // @Router /datas/{id} [delete]
 func (ctl *DataController) DeleteData(c *gin.Context) {
-	db := databaseConnection()
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		c.JSON(400, gin.H{
@@ -206,16 +184,15 @@ func (ctl *DataController) DeleteData(c *gin.Context) {
 		return
 	}
 
-	deleteData, err := db.Prepare("DELETE FROM data WHERE id_data=?")
-    if err != nil {
+	err = ctl.client.Data.
+	DeleteOneID(int(id)).
+	Exec(context.Background())
+	if err != nil {
 		c.JSON(404, gin.H{
 			"error": err.Error(),
 		})
 		return
-    }
-    deleteData.Exec(id)
-
-    defer db.Close()
+	}
 
 	c.JSON(200, gin.H{"result": fmt.Sprintf("ok deleted %v", id)})
 }
@@ -233,7 +210,6 @@ func (ctl *DataController) DeleteData(c *gin.Context) {
 // @Failure 500 {object} gin.H
 // @Router /datas/{id} [put]
 func (ctl *DataController) UpdateData(c *gin.Context) {
-	db := databaseConnection()
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		c.JSON(400, gin.H{
@@ -253,25 +229,30 @@ func (ctl *DataController) UpdateData(c *gin.Context) {
 	if err != nil {
 		fmt.Println(err)
 		c.JSON(400, gin.H{
-			"status" : false,
-			"error": err,
+			"status": false,
+			"error":  err,
 		})
 		return
 	}
 
-	UpdateData, err := db.Prepare("UPDATE data SET idcardnumber=?, firstname=?, lastname=?, gender=?, brithdate=?, bloodgroup=?, address=?, id_user=? WHERE id_data=?")
+	UpdateData, err := ctl.client.Data.
+		UpdateOneID(int(id)).
+		SetIdCardNumber(obj.IdCardNumber).
+		SetFirstName(obj.FirstName).
+		SetLastName(obj.LastName).
+		SetGender(obj.Gender).
+		SetBrithDate(brithDate).
+		SetBloodGroup(obj.BloodGroup).
+		SetWhoIsTheOwnerOfThisDataID(obj.User).
+		Save(context.Background())
 	if err != nil {
 		c.JSON(400, gin.H{"error": "update1 failed"})
 		return
 	}
 
-	UpdateData.Exec(obj.IdCardNumber, obj.FirstName, obj.LastName, obj.Gender, brithDate, obj.BloodGroup, obj.Address, obj.User, int(id))
-
-	defer db.Close()
-
 	c.JSON(200, gin.H{
-		"status" : true,
-		"data": UpdateData,
+		"status": true,
+		"data":   UpdateData,
 	})
 }
 

@@ -301,6 +301,20 @@ func DateTimeLTE(v time.Time) predicate.Treatment {
 	})
 }
 
+// DateTimeIsNil applies the IsNil predicate on the "dateTime" field.
+func DateTimeIsNil() predicate.Treatment {
+	return predicate.Treatment(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldDateTime)))
+	})
+}
+
+// DateTimeNotNil applies the NotNil predicate on the "dateTime" field.
+func DateTimeNotNil() predicate.Treatment {
+	return predicate.Treatment(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldDateTime)))
+	})
+}
+
 // TakeTimeEQ applies the EQ predicate on the "takeTime" field.
 func TakeTimeEQ(v float64) predicate.Treatment {
 	return predicate.Treatment(func(s *sql.Selector) {

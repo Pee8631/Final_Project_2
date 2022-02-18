@@ -8,7 +8,6 @@ import (
 	"FinalProject/ent/hospital"
 	"FinalProject/ent/schedule"
 	"FinalProject/ent/schema"
-	"FinalProject/ent/telecom"
 	"FinalProject/ent/user"
 )
 
@@ -44,16 +43,6 @@ func init() {
 	scheduleDescStatus := scheduleFields[2].Descriptor()
 	// schedule.StatusValidator is a validator for the "status" field. It is called by the builders before save.
 	schedule.StatusValidator = scheduleDescStatus.Validators[0].(func(string) error)
-	telecomFields := schema.Telecom{}.Fields()
-	_ = telecomFields
-	// telecomDescUsername is the schema descriptor for username field.
-	telecomDescUsername := telecomFields[0].Descriptor()
-	// telecom.UsernameValidator is a validator for the "username" field. It is called by the builders before save.
-	telecom.UsernameValidator = telecomDescUsername.Validators[0].(func(string) error)
-	// telecomDescPlatform is the schema descriptor for platform field.
-	telecomDescPlatform := telecomFields[1].Descriptor()
-	// telecom.PlatformValidator is a validator for the "platform" field. It is called by the builders before save.
-	telecom.PlatformValidator = telecomDescPlatform.Validators[0].(func(string) error)
 	userFields := schema.User{}.Fields()
 	_ = userFields
 	// userDescUsername is the schema descriptor for username field.

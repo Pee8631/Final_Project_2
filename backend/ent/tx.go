@@ -32,6 +32,8 @@ type Tx struct {
 	ScheduleTime *ScheduleTimeClient
 	// Telecom is the client for interacting with the Telecom builders.
 	Telecom *TelecomClient
+	// Token is the client for interacting with the Token builders.
+	Token *TokenClient
 	// Treatment is the client for interacting with the Treatment builders.
 	Treatment *TreatmentClient
 	// User is the client for interacting with the User builders.
@@ -181,6 +183,7 @@ func (tx *Tx) init() {
 	tx.Schedule = NewScheduleClient(tx.config)
 	tx.ScheduleTime = NewScheduleTimeClient(tx.config)
 	tx.Telecom = NewTelecomClient(tx.config)
+	tx.Token = NewTokenClient(tx.config)
 	tx.Treatment = NewTreatmentClient(tx.config)
 	tx.User = NewUserClient(tx.config)
 }

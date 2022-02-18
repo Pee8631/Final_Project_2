@@ -46,9 +46,37 @@ func (cu *CertificationUpdate) SetDateOfIssuing(t time.Time) *CertificationUpdat
 	return cu
 }
 
+// SetNillableDateOfIssuing sets the "dateOfIssuing" field if the given value is not nil.
+func (cu *CertificationUpdate) SetNillableDateOfIssuing(t *time.Time) *CertificationUpdate {
+	if t != nil {
+		cu.SetDateOfIssuing(*t)
+	}
+	return cu
+}
+
+// ClearDateOfIssuing clears the value of the "dateOfIssuing" field.
+func (cu *CertificationUpdate) ClearDateOfIssuing() *CertificationUpdate {
+	cu.mutation.ClearDateOfIssuing()
+	return cu
+}
+
 // SetDateOfExp sets the "dateOfExp" field.
 func (cu *CertificationUpdate) SetDateOfExp(t time.Time) *CertificationUpdate {
 	cu.mutation.SetDateOfExp(t)
+	return cu
+}
+
+// SetNillableDateOfExp sets the "dateOfExp" field if the given value is not nil.
+func (cu *CertificationUpdate) SetNillableDateOfExp(t *time.Time) *CertificationUpdate {
+	if t != nil {
+		cu.SetDateOfExp(*t)
+	}
+	return cu
+}
+
+// ClearDateOfExp clears the value of the "dateOfExp" field.
+func (cu *CertificationUpdate) ClearDateOfExp() *CertificationUpdate {
+	cu.mutation.ClearDateOfExp()
 	return cu
 }
 
@@ -202,10 +230,22 @@ func (cu *CertificationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: certification.FieldDateOfIssuing,
 		})
 	}
+	if cu.mutation.DateOfIssuingCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Column: certification.FieldDateOfIssuing,
+		})
+	}
 	if value, ok := cu.mutation.DateOfExp(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
+			Column: certification.FieldDateOfExp,
+		})
+	}
+	if cu.mutation.DateOfExpCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
 			Column: certification.FieldDateOfExp,
 		})
 	}
@@ -288,9 +328,37 @@ func (cuo *CertificationUpdateOne) SetDateOfIssuing(t time.Time) *CertificationU
 	return cuo
 }
 
+// SetNillableDateOfIssuing sets the "dateOfIssuing" field if the given value is not nil.
+func (cuo *CertificationUpdateOne) SetNillableDateOfIssuing(t *time.Time) *CertificationUpdateOne {
+	if t != nil {
+		cuo.SetDateOfIssuing(*t)
+	}
+	return cuo
+}
+
+// ClearDateOfIssuing clears the value of the "dateOfIssuing" field.
+func (cuo *CertificationUpdateOne) ClearDateOfIssuing() *CertificationUpdateOne {
+	cuo.mutation.ClearDateOfIssuing()
+	return cuo
+}
+
 // SetDateOfExp sets the "dateOfExp" field.
 func (cuo *CertificationUpdateOne) SetDateOfExp(t time.Time) *CertificationUpdateOne {
 	cuo.mutation.SetDateOfExp(t)
+	return cuo
+}
+
+// SetNillableDateOfExp sets the "dateOfExp" field if the given value is not nil.
+func (cuo *CertificationUpdateOne) SetNillableDateOfExp(t *time.Time) *CertificationUpdateOne {
+	if t != nil {
+		cuo.SetDateOfExp(*t)
+	}
+	return cuo
+}
+
+// ClearDateOfExp clears the value of the "dateOfExp" field.
+func (cuo *CertificationUpdateOne) ClearDateOfExp() *CertificationUpdateOne {
+	cuo.mutation.ClearDateOfExp()
 	return cuo
 }
 
@@ -468,10 +536,22 @@ func (cuo *CertificationUpdateOne) sqlSave(ctx context.Context) (_node *Certific
 			Column: certification.FieldDateOfIssuing,
 		})
 	}
+	if cuo.mutation.DateOfIssuingCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Column: certification.FieldDateOfIssuing,
+		})
+	}
 	if value, ok := cuo.mutation.DateOfExp(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
+			Column: certification.FieldDateOfExp,
+		})
+	}
+	if cuo.mutation.DateOfExpCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
 			Column: certification.FieldDateOfExp,
 		})
 	}

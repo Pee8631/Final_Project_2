@@ -4,18 +4,15 @@ import (
 	"FinalProject/ent"
 	"FinalProject/ent/user"
 	"context"
-	"database/sql"
 	"fmt"
-	"os"
 	"strconv"
-	"time"
 
-	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt"
 )
 
 //Function determine database connection
-func databaseConnection() (db *sql.DB) {
+/*func databaseConnection() (db *sql.DB) {
 	dbDriver := "mysql"
 	dbUser := "root"
 	dbPass := ""
@@ -25,26 +22,20 @@ func databaseConnection() (db *sql.DB) {
 		panic(err.Error())
 	}
 	return db
-}
+}*/
 
 // User defines the struct for the user
 type User struct {
-	Username   	string
-	Password   	string
-	Email      	string
-	Telephone  	string
-	Department 	int
-	Hospital	int
+	Username   string
+	Password   string
+	Department int
+	Hospital   int
 }
 
 // UserController defines the struct for the user controller
 type UserController struct {
 	client *ent.Client
 	router gin.IRouter
-}
-
-func (p User) GetIDDepartmentAsString() string {
-	return strconv.Itoa(p.Department)
 }
 
 // CreateUser handles POST requests for adding user entities
@@ -59,7 +50,6 @@ func (p User) GetIDDepartmentAsString() string {
 // @Failure 500 {object} gin.H
 // @Router /users [post]
 func (ctl *UserController) CreateUser(c *gin.Context) {
-	db := databaseConnection()
 	obj := User{}
 
 	if err := c.ShouldBind(&obj); err != nil {
@@ -68,35 +58,53 @@ func (ctl *UserController) CreateUser(c *gin.Context) {
 		})
 		return
 	}
+	if obj.Department != 0 && obj.Hospital != 0 {
 
-	insertUser, err := db.Prepare("INSERT INTO user(username, password, email, telephone, id_department, id_hospital) VALUES (?, ?, ?, ?, ?)")
-	if err != nil {
-		fmt.Println(err)
-		c.JSON(400, gin.H{
-			"status" : false,
-			"error": err,
+		hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(obj.Password), 14)
+
+		insertUser, err := ctl.client.User.
+			Create().
+			SetUsername(obj.Username).
+			SetPassword(string(hashedPassword)).
+			SetHasDepartmentID(obj.Department).
+			SetFromHospitalID(obj.Hospital).
+			Save(context.Background())
+		if err != nil {
+			fmt.Println(err)
+			c.JSON(400, gin.H{
+				"status": false,
+				"error":  err,
+			})
+			return
+		}
+
+		c.JSON(200, gin.H{
+			"status": true,
+			"data":   insertUser,
 		})
-		return
-	}
-	insertUser.Exec(obj.Username, obj.Password, obj.Email, obj.Telephone, obj.Department, obj.Hospital)
-	if err != nil {
-		fmt.Println(err)
-		c.JSON(400, gin.H{
-			"status" : false,
-			"error": err,
+	} else {
+
+		hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(obj.Password), 14)
+
+		insertUser, err := ctl.client.User.
+			Create().
+			SetUsername(obj.Username).
+			SetPassword(string(hashedPassword)).
+			Save(context.Background())
+		if err != nil {
+			fmt.Println(err)
+			c.JSON(400, gin.H{
+				"status": false,
+				"error":  err,
+			})
+			return
+		}
+
+		c.JSON(200, gin.H{
+			"status": true,
+			"data":   insertUser,
 		})
-		return
 	}
-
-	defer db.Close()
-
-	println("Username: " + obj.Username + ", Password: " + obj.Password + ", Email: " + obj.Telephone)
-
-	
-	c.JSON(200, gin.H{
-		"status" : true,
-		"data": insertUser,
-	})
 }
 
 // GetUser handles GET requests to retrieve a user entity
@@ -111,8 +119,6 @@ func (ctl *UserController) CreateUser(c *gin.Context) {
 // @Failure 500 {object} gin.H
 // @Router /users/{id} [get]
 func (ctl *UserController) GetUser(c *gin.Context) {
-	db := databaseConnection()
-
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		c.JSON(400, gin.H{
@@ -120,7 +126,11 @@ func (ctl *UserController) GetUser(c *gin.Context) {
 		})
 		return
 	}
-	resultsGetUser, err := db.Query("SELECT username, password, email, telephone, id_department, id_hospital FROM user WHERE id_user=?", id)
+	getUser, err := ctl.client.User.
+		Query().
+		Where(user.IDEQ(int(id))).
+		Only(context.Background())
+
 	if err != nil {
 		c.JSON(400, gin.H{
 			"error": err.Error(),
@@ -128,22 +138,8 @@ func (ctl *UserController) GetUser(c *gin.Context) {
 		return // proper error handling instead of panic in your app
 	}
 
-	for resultsGetUser.Next() {
-		var user User
-		// for each row, scan the result into our tag composite object
-		err = resultsGetUser.Scan(&user.Username, &user.Password, &user.Email, &user.Telephone, &user.Department, &user.Hospital)
-		if err != nil {
-			c.JSON(404, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
+	c.JSON(200, getUser)
 
-		defer db.Close()
-
-		c.JSON(200, user)
-
-	}
 }
 
 // FindUser handles POST requests to retrieve a user entity
@@ -158,42 +154,46 @@ func (ctl *UserController) GetUser(c *gin.Context) {
 // @Failure 500 {object} gin.H
 // @Router /users/{username} [post]
 func (ctl *UserController) AuthUser(c *gin.Context) {
-	object := ent.User{}
-	if err := c.ShouldBind(&object); err != nil {
+	obj := ent.User{}
+	if err := c.ShouldBind(&obj); err != nil {
 		c.JSON(400, gin.H{
 			"error": "user binding failed",
 		})
 		return
 	}
-	user, err := ctl.client.User.
+
+	getUser, err := ctl.client.User.
 		Query().
-		Where(user.UsernameEQ(object.Username)).
+		Where(user.UsernameEQ(obj.Username)).
 		Only(context.Background())
 	if err != nil {
-		c.JSON(404, gin.H{
-			"error": err.Error(),
+		c.JSON(400, gin.H{
+			"error": "Invalid Username",
 		})
 		return
 	}
 
-	if  user.Password != object.Password {
-		c.JSON(404, gin.H{"error": "invalid Password"})
+	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(obj.Password), 14)
+
+	err = bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(getUser.Password))
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error": "Invalid Password",
+		})
 		return
 	}
-
-	token, err := CreateToken(user.Username)
+	token, err := generateToken(getUser.Username)
 	if err != nil {
-		c.JSON(404, gin.H{
+		c.JSON(400, gin.H{
 			"error": err.Error(),
 		})
 		return
 	}
 
 	c.JSON(200, token)
-
 }
 
-func CreateToken(username string) (string, error) {
+/*func CreateToken(username string) (string, error) {
 	var err error
 	//Creating Access Token
 	os.Setenv("ACCESS_SECRET", "jdnfksdmfksd") //this should be in an env file
@@ -207,7 +207,7 @@ func CreateToken(username string) (string, error) {
 		return "", err
 	}
 	return token, nil
-}
+}*/
 
 // ListUser handles request to get a list of user entities
 // @Summary List user entities
@@ -221,7 +221,6 @@ func CreateToken(username string) (string, error) {
 // @Failure 500 {object} gin.H
 // @Router /users [get]
 func (ctl *UserController) ListUser(c *gin.Context) {
-	db := databaseConnection()
 	limitQuery := c.Query("limit")
 	limit := 10
 	if limitQuery != "" {
@@ -238,28 +237,19 @@ func (ctl *UserController) ListUser(c *gin.Context) {
 			offset = int(offset64)
 		}
 	}
-	resultsListUser, err := db.Query("SELECT username, password, email, telephone, id_department, id_hospital FROM user limit ? offset ?", limit, offset)
+
+	listUser, err := ctl.client.User.
+		Query().
+		Limit(limit).
+		Offset(offset).
+		All(context.Background())
 	if err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return // proper error handling instead of panic in your app
 	}
 
-	for resultsListUser.Next() {
-		var user User
-		// for each row, scan the result into our tag composite object
-		err = resultsListUser.Scan(&user.Username, &user.Password, &user.Email, &user.Telephone, &user.Department, &user.Hospital)
-		if err != nil {
-			c.JSON(400, gin.H{"error": err.Error()})
-			return // proper error handling instead of panic in your app
-		}
-		// and then print out the tag's Name attribute
+	c.JSON(200, listUser)
 
-		defer db.Close()
-
-		c.JSON(200, user)
-	}
-
-	
 }
 
 // DeleteUser handles DELETE requests to delete a user entity
@@ -274,7 +264,6 @@ func (ctl *UserController) ListUser(c *gin.Context) {
 // @Failure 500 {object} gin.H
 // @Router /users/{id} [delete]
 func (ctl *UserController) DeleteUser(c *gin.Context) {
-	db := databaseConnection()
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		c.JSON(400, gin.H{
@@ -283,16 +272,15 @@ func (ctl *UserController) DeleteUser(c *gin.Context) {
 		return
 	}
 
-	deleteUser, err := db.Prepare("DELETE FROM user WHERE id_user=?")
-    if err != nil {
+	err = ctl.client.User.
+		DeleteOneID(int(id)).
+		Exec(context.Background())
+	if err != nil {
 		c.JSON(404, gin.H{
 			"error": err.Error(),
 		})
 		return
-    }
-    deleteUser.Exec(id)
-
-    defer db.Close()
+	}
 
 	c.JSON(200, gin.H{"result": fmt.Sprintf("ok deleted %v", id)})
 }
@@ -310,7 +298,6 @@ func (ctl *UserController) DeleteUser(c *gin.Context) {
 // @Failure 500 {object} gin.H
 // @Router /users/{id} [put]
 func (ctl *UserController) UpdateUser(c *gin.Context) {
-	db := databaseConnection()
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		c.JSON(400, gin.H{
@@ -326,19 +313,23 @@ func (ctl *UserController) UpdateUser(c *gin.Context) {
 		return
 	}
 
-	UpdateUser, err := db.Prepare("UPDATE user SET username=?,password=?,email=?,telephone=?,id_department=?,id_hospital=? WHERE id_user=?")
+	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(obj.Password), 14)
+
+	updateUser, err := ctl.client.User.
+		UpdateOneID(int(id)).
+		SetUsername(obj.Username).
+		SetPassword(string(hashedPassword)).
+		SetHasDepartmentID(obj.Department).
+		SetFromHospitalID(obj.Hospital).
+		Save(context.Background())
 	if err != nil {
 		c.JSON(400, gin.H{"error": "update1 failed"})
 		return
 	}
 
-	UpdateUser.Exec(obj.Username, obj.Password, obj.Email, obj.Telephone, obj.Department, obj.Hospital, int(id))
-
-	defer db.Close()
-
 	c.JSON(200, gin.H{
-		"status" : true,
-		"data": UpdateUser,
+		"status": true,
+		"data":   updateUser,
 	})
 }
 

@@ -16,6 +16,10 @@ type Telecom struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
+	// Email holds the value of the "email" field.
+	Email string `json:"email,omitempty"`
+	// Telephone holds the value of the "telephone" field.
+	Telephone string `json:"telephone,omitempty"`
 	// Username holds the value of the "username" field.
 	Username string `json:"username,omitempty"`
 	// Platform holds the value of the "platform" field.
@@ -56,7 +60,7 @@ func (*Telecom) scanValues(columns []string) ([]interface{}, error) {
 		switch columns[i] {
 		case telecom.FieldID:
 			values[i] = new(sql.NullInt64)
-		case telecom.FieldUsername, telecom.FieldPlatform:
+		case telecom.FieldEmail, telecom.FieldTelephone, telecom.FieldUsername, telecom.FieldPlatform:
 			values[i] = new(sql.NullString)
 		case telecom.ForeignKeys[0]: // user_user_have_telecoms
 			values[i] = new(sql.NullInt64)
@@ -81,6 +85,18 @@ func (t *Telecom) assignValues(columns []string, values []interface{}) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			t.ID = int(value.Int64)
+		case telecom.FieldEmail:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field email", values[i])
+			} else if value.Valid {
+				t.Email = value.String
+			}
+		case telecom.FieldTelephone:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field telephone", values[i])
+			} else if value.Valid {
+				t.Telephone = value.String
+			}
 		case telecom.FieldUsername:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field username", values[i])
@@ -133,6 +149,10 @@ func (t *Telecom) String() string {
 	var builder strings.Builder
 	builder.WriteString("Telecom(")
 	builder.WriteString(fmt.Sprintf("id=%v", t.ID))
+	builder.WriteString(", email=")
+	builder.WriteString(t.Email)
+	builder.WriteString(", telephone=")
+	builder.WriteString(t.Telephone)
 	builder.WriteString(", username=")
 	builder.WriteString(t.Username)
 	builder.WriteString(", platform=")

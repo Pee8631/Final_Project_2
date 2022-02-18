@@ -51,6 +51,14 @@ func (dc *DataCreate) SetBrithDate(t time.Time) *DataCreate {
 	return dc
 }
 
+// SetNillableBrithDate sets the "brithDate" field if the given value is not nil.
+func (dc *DataCreate) SetNillableBrithDate(t *time.Time) *DataCreate {
+	if t != nil {
+		dc.SetBrithDate(*t)
+	}
+	return dc
+}
+
 // SetBloodGroup sets the "bloodGroup" field.
 func (dc *DataCreate) SetBloodGroup(s string) *DataCreate {
 	dc.mutation.SetBloodGroup(s)
@@ -163,9 +171,6 @@ func (dc *DataCreate) check() error {
 	}
 	if _, ok := dc.mutation.Gender(); !ok {
 		return &ValidationError{Name: "gender", err: errors.New(`ent: missing required field "gender"`)}
-	}
-	if _, ok := dc.mutation.BrithDate(); !ok {
-		return &ValidationError{Name: "brithDate", err: errors.New(`ent: missing required field "brithDate"`)}
 	}
 	if _, ok := dc.mutation.BloodGroup(); !ok {
 		return &ValidationError{Name: "bloodGroup", err: errors.New(`ent: missing required field "bloodGroup"`)}

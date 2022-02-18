@@ -7,6 +7,10 @@ const (
 	Label = "telecom"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldEmail holds the string denoting the email field in the database.
+	FieldEmail = "email"
+	// FieldTelephone holds the string denoting the telephone field in the database.
+	FieldTelephone = "telephone"
 	// FieldUsername holds the string denoting the username field in the database.
 	FieldUsername = "username"
 	// FieldPlatform holds the string denoting the platform field in the database.
@@ -27,6 +31,8 @@ const (
 // Columns holds all SQL columns for telecom fields.
 var Columns = []string{
 	FieldID,
+	FieldEmail,
+	FieldTelephone,
 	FieldUsername,
 	FieldPlatform,
 }
@@ -51,10 +57,3 @@ func ValidColumn(column string) bool {
 	}
 	return false
 }
-
-var (
-	// UsernameValidator is a validator for the "username" field. It is called by the builders before save.
-	UsernameValidator func(string) error
-	// PlatformValidator is a validator for the "platform" field. It is called by the builders before save.
-	PlatformValidator func(string) error
-)

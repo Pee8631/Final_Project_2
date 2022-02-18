@@ -627,6 +627,20 @@ func BrithDateLTE(v time.Time) predicate.Data {
 	})
 }
 
+// BrithDateIsNil applies the IsNil predicate on the "brithDate" field.
+func BrithDateIsNil() predicate.Data {
+	return predicate.Data(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldBrithDate)))
+	})
+}
+
+// BrithDateNotNil applies the NotNil predicate on the "brithDate" field.
+func BrithDateNotNil() predicate.Data {
+	return predicate.Data(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldBrithDate)))
+	})
+}
+
 // BloodGroupEQ applies the EQ predicate on the "bloodGroup" field.
 func BloodGroupEQ(v string) predicate.Data {
 	return predicate.Data(func(s *sql.Selector) {
