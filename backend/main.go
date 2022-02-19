@@ -71,6 +71,7 @@ func main() {
 	controllers.NewScheduleController(v1, client)
 	controllers.NewScheduleTimeController(v1, client)
 	controllers.NewTelecomController(v1, client)
+	controllers.NewTokenController(v1, client)
 	controllers.NewTreatmentController(v1, client)
 
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

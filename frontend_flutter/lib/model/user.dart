@@ -2,6 +2,8 @@
 //
 //     final user = userFromJson(jsonString);
 
+// ignore_for_file: unnecessary_null_comparison
+
 import 'package:meta/meta.dart';
 import 'dart:convert';
 
@@ -17,14 +19,14 @@ class User {
         required this.hospital,
     });
 
-    String username;
-    String password;
-    int department;
-    int hospital;
+    String? username;
+    String? password;
+    int? department;
+    int? hospital;
 
     factory User.fromJson(Map<String, dynamic> json) => User(
-        username: json["Username"] == null ? null : json["Username"],
-        password: json["Password"] == null ? null : json["Password"],
+        username: json["Username"] == '' ? null : json["Username"],
+        password: json["Password"] == '' ? null : json["Password"],
         department: json["Department"] == null ? null : json["Department"],
         hospital: json["Hospital"] == null ? null : json["Hospital"],
     );

@@ -173,16 +173,15 @@ func (ctl *UserController) AuthUser(c *gin.Context) {
 		return
 	}
 
-	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(obj.Password), 14)
-
-	err = bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(getUser.Password))
+	err = bcrypt.CompareHashAndPassword([]byte(getUser.Password), []byte(obj.Password))
 	if err != nil {
 		c.JSON(400, gin.H{
 			"error": "Invalid Password",
 		})
 		return
 	}
-	token, err := generateToken(getUser.Username)
+
+	token, err := generateToken(getUser.ID)
 	if err != nil {
 		c.JSON(400, gin.H{
 			"error": err.Error(),

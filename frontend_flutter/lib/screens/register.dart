@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:frontend_flutter/model/user.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:frontend_flutter/screens/home.dart';
 import 'package:frontend_flutter/util/http_exception.dart';
 import 'package:http/http.dart' as http;
 //import 'home.dart';
@@ -17,12 +18,8 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final formkey = GlobalKey<FormState>();
-  User user = User(
-      username: "",
-      password: "",
-      department: 0,
-      hospital: 0);
-      
+  User user = User(username: '', password: '', department: 0, hospital: 0);
+
   Future<User> _futureUser() async {
     final url = Uri.parse('http://10.0.2.2:8080/api/v1/users/1');
     final response = await http.get(url);
@@ -46,7 +43,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
 
     if (response.statusCode == 200) {
-      User userFromAPI = userFromJson(response.body);
+      User? userFromAPI = userFromJson(response.body);
       print(userFromAPI);
     } else {
       var error;
@@ -71,7 +68,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 title: Text("Error"),
               ),
               body: Center(
-                child: Text("ขออภัยไม่สามารถเชื่อมต่อกับ Server ได้ในขณะนี้\n\nError : ${snapshot.error}"),
+                child: Text(
+                    "ขออภัยไม่สามารถเชื่อมต่อกับ Server ได้ในขณะนี้\n\nError : ${snapshot.error}"),
               ),
             );
           }
@@ -133,18 +131,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   if (formkey.currentState!.validate()) {
                                     formkey.currentState!.save();
                                     try {
-                                      await createUser(
-                                              user.username, user.password)
+                                      await createUser(user.username.toString(),
+                                              user.password.toString())
                                           .then((value) {
                                         Fluttertoast.showToast(
                                             msg:
                                                 "สร้างบัญชีผู้ใช้เรียบร้อยแล้ว",
                                             gravity: ToastGravity.CENTER);
-                                        /*Navigator.pushReplacement(context,
+                                        Navigator.pushReplacement(context,
                                             MaterialPageRoute(
                                                 builder: (context) {
                                           return HomeScreen();
-                                        }));*/
+                                        }));
                                       });
                                     } on HttpException catch (error) {
                                       Fluttertoast.showToast(

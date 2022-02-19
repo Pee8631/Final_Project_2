@@ -93,7 +93,7 @@ func (ctl *TokenController) CreateToken(c *gin.Context) {
 	})
 }
 
-func generateToken(username string) (map[string]interface{}, error) {
+func generateToken(id int) (map[string]interface{}, error) {
 	randomToken := make([]byte, 32)
 
 	_, err := rand.Read(randomToken)
@@ -103,22 +103,24 @@ func generateToken(username string) (map[string]interface{}, error) {
 	}
 
 	authToken := base64.URLEncoding.EncodeToString(randomToken)
-
-	const timeLayout = "2006-01-02 15:04:05"
+	//const timeLayout = "2006-01-02T15:04:05Z"
 
 	dt := time.Now()
 	expirtyTime := time.Now().Add(time.Minute * 60)
 
-	generatedAt := dt.Format(timeLayout)
-	expiresAt := expirtyTime.Format(timeLayout)
+	generatedAt := dt.Format("2006-01-02" + "T" + "15:04:05" + "Z")
+	expiresAt := expirtyTime.Format("2006-01-02" + "T" + "15:04:05" + "Z")
 
-	values := map[string]string{
-		"authtoken":   authToken,
-		"generatedat": generatedAt,
-		"expiresat":   expiresAt,
-		"user":        username,
+	values := map[string]interface{}{
+		"AuthToken":   authToken,
+		"GeneratedAt": generatedAt,
+		"ExpiresAt":   expiresAt,
+		"User":        id,
 	}
 	json_data, err := json.Marshal(values)
+	if err != nil {
+		return nil, err
+	}
 
 	_, err = http.Post("http://localhost:8080/api/v1/tokens", "application/json", bytes.NewBuffer(json_data))
 
@@ -126,14 +128,14 @@ func generateToken(username string) (map[string]interface{}, error) {
 		return nil, err
 	}
 
-	tokenDetails := map[string]interface{}{
+	/*tokenDetails := map[string]interface{}{
 		"token_type":   "Bearer",
 		"auth_token":   authToken,
 		"generated_at": generatedAt,
 		"expires_at":   expiresAt,
-	}
+	}*/
 
-	return tokenDetails, nil
+	return values, nil
 }
 
 // GetToken handles GET requests to retrieve a token entity

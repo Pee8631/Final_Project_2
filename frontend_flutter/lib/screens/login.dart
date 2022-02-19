@@ -22,7 +22,8 @@ class _LoginScreenState extends State<LoginScreen> {
   final formkey = GlobalKey<FormState>();
   User user = User(username: '', password: '', department: 0, hospital: 0);
   LoginToken loginToken = LoginToken(authorized: false, exp: 0, userId: '');
-  Future<User> _futureUser() async {
+  var _response;
+  Future<User?> _futureUser() async {
     final url = Uri.parse('http://10.0.2.2:8080/api/v1/users/1');
     final response = await http.get(url);
     print(response.statusCode);
@@ -30,9 +31,10 @@ class _LoginScreenState extends State<LoginScreen> {
     return _results;
   }
 
-  Future<Map<String, dynamic>?> authUser(User user) async {
-    var response = await http.post(
-      Uri.parse('http://10.0.2.2:8080/api/v1/users/' + user.username),
+  Future<void> authUser(User user) async {
+    _response = await http.post(
+      Uri.parse(
+          'http://10.0.2.2:8080/api/v1/users/' + user.username.toString()),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -43,27 +45,25 @@ class _LoginScreenState extends State<LoginScreen> {
         'hospital': 0,
       }),
     );
-    try {
+    /*try {
       if (response.statusCode == 200) {
         Map<String, dynamic> token = JwtDecoder.decode(response.body);
         print(token);
-        return token;
       } else {
         Map<String, dynamic> err = {'error': response.body};
-        return err;
       }
     } catch (error) {
       Fluttertoast.showToast(
           msg: error.toString(), gravity: ToastGravity.CENTER);
-    }
+    }*/
   }
 
-  String removeSomeWord(String msgError) {
+  /*String removeSomeWord(String msgError) {
     msgError = msgError.replaceAll(new RegExp(r'[^\w\s]+'), '');
     msgError = msgError.replaceAll("error", '');
     msgError = msgError.replaceAll("ent", '');
     return msgError;
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -103,7 +103,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     errorText: "กรุณาป้อนชื่อผู้ใช้"),
                               ]),
                               onSaved: (username) {
-                                user.username = username!;
+                                user.username = username ?? '';
                               },
                             ),
                             SizedBox(
@@ -118,7 +118,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   errorText: "กรุณาป้อนรหัสผ่าน"),
                               obscureText: true,
                               onSaved: (password) {
-                                user.password = password!;
+                                user.password = password ?? '';
                               },
                             ),
                             SizedBox(
@@ -134,39 +134,13 @@ class _LoginScreenState extends State<LoginScreen> {
                                     formkey.currentState!.save();
                                   }
                                   try {
-                                    Map<String, dynamic>? accessToken =
-                                        await authUser(user);
-
-                                    if (accessToken!['authorized'] == true) {
-                                      print("บันทึกสำเร็จ");
-                                      print(accessToken);
+                                    await authUser(user).then((value) {
                                       formkey.currentState!.reset();
                                       Navigator.pushReplacement(context,
                                           MaterialPageRoute(builder: (context) {
-                                        return MainScreen(accessToken);
+                                        return MainScreen(_response);
                                       }));
-                                    } else {
-                                      String msgError =
-                                          accessToken.values.toString();
-                                      msgError = removeSomeWord(msgError);
-                                      print(msgError);
-                                      switch (msgError) {
-                                        case " user not found":
-                                          msgError =
-                                              "ไม่พบชื่อผู้ใช้ในระบบ\nกรุณาตรวจสอบชื่อผู้ใช้ใหม่อีกครั่ง";
-                                          break;
-                                        case "invalid Password":
-                                          msgError =
-                                              "รหัสผ่านไม่ถูกต้อง\nกรุณากรอกรหัสผ่านใหม่อีกครั่ง";
-                                          break;
-                                        default:
-                                          msgError =
-                                              "ไม่สามารถล็อกอินได้ \nกรุณาตรวจสอบชื่อบัญชีและรหัสผ่านใหม่อีกครั้ง";
-                                      }
-                                      Fluttertoast.showToast(
-                                          msg: msgError,
-                                          gravity: ToastGravity.CENTER);
-                                    }
+                                    });
                                   } catch (error) {
                                     Fluttertoast.showToast(
                                         msg: error.toString(),

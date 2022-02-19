@@ -15,7 +15,7 @@ class TestPostScreen extends StatefulWidget {
 
 Future<dynamic> authUser(User user) async {
   var response = await http.post(
-    Uri.parse('http://10.0.2.2:8080/api/v1/users/' + user.username),
+    Uri.parse('http://10.0.2.2:8080/api/v1/users/' + user.username.toString()),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
     },

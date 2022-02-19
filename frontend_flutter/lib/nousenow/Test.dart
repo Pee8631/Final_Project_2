@@ -20,11 +20,11 @@ class _Test extends State<Test> {
     getUser();
   }
 
-  Future<User> getUser() async {
+  Future<User?> getUser() async {
     var url = "http://10.0.2.2:8080/api/v1/users/4";
     var response = await http.get(Uri.parse(url));
     print(response.body);
-    User DataFromAPI = userFromJson(response.body);
+    User? DataFromAPI = userFromJson(response.body);
     return DataFromAPI;
   }
 
