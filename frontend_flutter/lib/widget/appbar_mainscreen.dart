@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:frontend_flutter/screens/home.dart';
+import 'package:frontend_flutter/screens/home_screen.dart';
 import 'package:frontend_flutter/util/user_references.dart';
 import 'package:frontend_flutter/widget/small_profile_widget.dart';
 

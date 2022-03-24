@@ -7,7 +7,7 @@ import 'package:frontend_flutter/widget/appbar_mainscreen.dart';
 import 'doctors_screen.dart';
 
 class MainScreen extends StatefulWidget {
-  const MainScreen(accessToken, {Key? key})
+  const MainScreen({Key? key})
       : super(key: key);
 
   @override

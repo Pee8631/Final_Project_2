@@ -49,7 +49,7 @@ func (ctl *DataController) CreateData(c *gin.Context) {
 		})
 		return
 	}
-
+	obj.BrithDate += "Z";
 	brithDate, err := time.Parse(time.RFC3339, obj.BrithDate)
 	if err != nil {
 		fmt.Println(err)
@@ -68,6 +68,7 @@ func (ctl *DataController) CreateData(c *gin.Context) {
 		SetGender(obj.Gender).
 		SetBrithDate(brithDate).
 		SetBloodGroup(obj.BloodGroup).
+		SetAddress(obj.Address).
 		SetWhoIsTheOwnerOfThisDataID(obj.User).
 		Save(context.Background())
 	if err != nil {
@@ -97,6 +98,7 @@ func (ctl *DataController) CreateData(c *gin.Context) {
 // @Failure 500 {object} gin.H
 // @Router /datas/{id} [get]
 func (ctl *DataController) GetData(c *gin.Context) {
+	obj := Data{}
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		c.JSON(400, gin.H{
@@ -116,7 +118,18 @@ func (ctl *DataController) GetData(c *gin.Context) {
 		return // proper error handling instead of panic in your app
 	}
 
-	c.JSON(200, getData)
+	
+	obj.IdCardNumber = getData.IdCardNumber
+	obj.FirstName = getData.FirstName
+	obj.LastName = getData.LastName
+	layout := "2006-01-02 15:04:05"
+	obj.BrithDate = getData.BrithDate.Format(layout)
+	obj.Gender = getData.Gender
+	obj.BloodGroup = getData.BloodGroup
+	obj.Address = getData.Address
+	obj.User = 1
+
+	c.JSON(200, obj)
 
 }
 
@@ -224,7 +237,8 @@ func (ctl *DataController) UpdateData(c *gin.Context) {
 		})
 		return
 	}
-
+	
+	obj.BrithDate += "Z";
 	brithDate, err := time.Parse(time.RFC3339, obj.BrithDate)
 	if err != nil {
 		fmt.Println(err)
@@ -243,6 +257,7 @@ func (ctl *DataController) UpdateData(c *gin.Context) {
 		SetGender(obj.Gender).
 		SetBrithDate(brithDate).
 		SetBloodGroup(obj.BloodGroup).
+		SetAddress(obj.Address).
 		SetWhoIsTheOwnerOfThisDataID(obj.User).
 		Save(context.Background())
 	if err != nil {

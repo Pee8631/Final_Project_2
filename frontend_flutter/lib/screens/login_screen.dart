@@ -1,26 +1,29 @@
 import 'dart:convert';
-import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:form_field_validator/form_field_validator.dart';
-import 'package:frontend_flutter/model/user.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:frontend_flutter/screens/home.dart';
+import 'package:form_field_validator/form_field_validator.dart';
+import 'package:frontend_flutter/model/errorMsg.dart';
+import 'package:frontend_flutter/model/loginToken.dart';
+import 'package:frontend_flutter/model/user.dart';
+import 'package:frontend_flutter/screens/main_screen.dart';
 import 'package:frontend_flutter/util/http_exception.dart';
 import 'package:http/http.dart' as http;
-//import 'home.dart';
 
-class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({Key? key}) : super(key: key);
+//import 'main_screen.dart';
+
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({Key? key}) : super(key: key);
 
   @override
-  _RegisterScreenState createState() => _RegisterScreenState();
+  _LoginScreenState createState() => _LoginScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
+class _LoginScreenState extends State<LoginScreen> {
   final formkey = GlobalKey<FormState>();
   User user = User(username: '', password: '', department: 0, hospital: 0);
-
-  Future<User> _futureUser() async {
+  LoginToken loginToken = LoginToken(authToken: '', expiresAt: null, generatedAt: null, user: null);
+  Future<User?> _futureUser() async {
     final url = Uri.parse('http://10.0.2.2:8080/api/v1/users/1');
     final response = await http.get(url);
     print(response.statusCode);
@@ -28,56 +31,65 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return _results;
   }
 
-  Future<void> createUser(String username, String password) async {
-    final response = await http.post(
-      Uri.parse('http://10.0.2.2:8080/api/v1/users'),
+  Future<void> authUser(User user) async {
+    var response = await http.post(
+      Uri.parse(
+          'http://10.0.2.2:8080/api/v1/users/' + user.username.toString()),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
       body: jsonEncode(<String, dynamic>{
-        'username': username,
-        'password': password,
+        'username': user.username,
+        'password': user.password,
         'department': 0,
         'hospital': 0,
       }),
     );
-
-    if (response.statusCode == 200) {
-      User? userFromAPI = userFromJson(response.body);
-      print(userFromAPI);
-    } else {
-      var error;
-      if (response.body == "saving failed") {
-        error = "ชื่อผู้ใช้นี้มีในระบบอยู่แล้ว";
+    try {
+      if (response.statusCode == 200) {
+        var token = loginTokenFromJson(response.body);
+        print(token);
       } else {
-        error =
-            "ไม่สามารถสมัครบัญชีใหม่ได้ \nกรุณาตรวจสอบชื่อผู้ใช้และรหัสผ่านใหม่อีกครั้ง";
+        ErrorMsg? errorFromAPI = errorMsgFromJson(response.body);
+        if (errorFromAPI.error == "Invalid Username") {
+          throw "ไม่มีชื่อผู้ใช้นี้อยู่ในระบบ";
+        } else if (errorFromAPI.error == "Invalid Password") {
+          throw "รหัสผ่านไม่ถูกต้อง";
+        } else {
+          throw "ไม่สามารถเข้าสู่ระบบได้ในขณะนี้";
+        }
       }
-      Fluttertoast.showToast(msg: error, gravity: ToastGravity.CENTER);
+    } on HttpException {
+      rethrow;
     }
   }
+
+  /*String removeSomeWord(String msgError) {
+    msgError = msgError.replaceAll(new RegExp(r'[^\w\s]+'), '');
+    msgError = msgError.replaceAll("error", '');
+    msgError = msgError.replaceAll("ent", '');
+    return msgError;
+  }*/
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
         future: _futureUser(),
-        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+        builder: (context, snapshot) {
           if (snapshot.hasError) {
             return Scaffold(
               appBar: AppBar(
                 title: Text("Error"),
               ),
               body: Center(
-                child: Text(
-                    "ขออภัยไม่สามารถเชื่อมต่อกับ Server ได้ในขณะนี้\n\nError : ${snapshot.error}"),
+                child: Text("${snapshot.error}"),
               ),
             );
           }
           if (snapshot.connectionState == ConnectionState.done) {
-            print(snapshot.connectionState);
             return Scaffold(
                 appBar: AppBar(
-                  title: Text("สร้างบัญชีผู้ใช้"),
+                  title: Text("เข้าสู่ระบบ"),
                 ),
                 body: Container(
                   padding: const EdgeInsets.all(10.0),
@@ -97,7 +109,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     errorText: "กรุณาป้อนชื่อผู้ใช้"),
                               ]),
                               onSaved: (username) {
-                                user.username = username!;
+                                user.username = username ?? '';
                               },
                             ),
                             SizedBox(
@@ -108,15 +120,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               style: TextStyle(fontSize: 20),
                             ),
                             TextFormField(
-                              validator: MultiValidator([
-                                RequiredValidator(
-                                    errorText: "กรุณาป้อนรหัสผ่าน"),
-                                MinLengthValidator(6,
-                                    errorText: 'รหัสผ่านจะต้องมี 6 ตัวขึ้นไป')
-                              ]),
+                              validator: RequiredValidator(
+                                  errorText: "กรุณาป้อนรหัสผ่าน"),
                               obscureText: true,
                               onSaved: (password) {
-                                user.password = password!;
+                                user.password = password ?? '';
                               },
                             ),
                             SizedBox(
@@ -125,31 +133,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             SizedBox(
                               width: double.infinity,
                               child: ElevatedButton(
-                                child: Text("ลงทะเบียน",
+                                child: Text("ลงชื่อเข้าใช้",
                                     style: TextStyle(fontSize: 20)),
                                 onPressed: () async {
                                   if (formkey.currentState!.validate()) {
                                     formkey.currentState!.save();
-                                    try {
-                                      await createUser(user.username.toString(),
-                                              user.password.toString())
-                                          .then((value) {
-                                        Fluttertoast.showToast(
-                                            msg:
-                                                "สร้างบัญชีผู้ใช้เรียบร้อยแล้ว",
-                                            gravity: ToastGravity.CENTER);
-                                        Navigator.pushReplacement(context,
-                                            MaterialPageRoute(
-                                                builder: (context) {
-                                          return HomeScreen();
-                                        }));
-                                      });
-                                    } on HttpException catch (error) {
-                                      Fluttertoast.showToast(
-                                          msg: error.toString(),
-                                          gravity: ToastGravity.CENTER);
-                                    }
-                                    formkey.currentState!.reset();
+                                  }
+                                  try {
+                                    await authUser(user).then((value) {
+                                      formkey.currentState!.reset();
+                                      Navigator.pushReplacement(context,
+                                          MaterialPageRoute(builder: (context) {
+                                        return MainScreen();
+                                      }));
+                                    });
+                                  } catch (error) {
+                                    Fluttertoast.showToast(
+                                        msg: error.toString(),
+                                        gravity: ToastGravity.CENTER);
                                   }
                                 },
                               ),

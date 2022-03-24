@@ -102,7 +102,7 @@ class _TestPostScreenState extends State<TestPostScreen> {
                                     formkey.currentState!.reset();
                                     Navigator.pushReplacement(context,
                                         MaterialPageRoute(builder: (context) {
-                                      return MainScreen(accessToken);
+                                      return MainScreen();
                                     }));
                                   }
                                 } catch (error) {}

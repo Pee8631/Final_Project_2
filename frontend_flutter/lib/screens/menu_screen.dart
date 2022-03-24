@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend_flutter/util/user_references.dart';
 import 'package:frontend_flutter/widget/menu_button.dart';
 
-import 'home.dart';
+import 'home_screen.dart';
 
 class MenuScreen extends StatelessWidget {
   MenuScreen({Key? key}) : super(key: key);

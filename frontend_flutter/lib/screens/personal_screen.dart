@@ -5,7 +5,7 @@ import 'package:frontend_flutter/util/user_references.dart';
 import 'package:frontend_flutter/widget/button_widget.dart';
 import 'package:frontend_flutter/widget/large_profile_widget.dart';
 import 'package:frontend_flutter/widget/personal_button.dart';
-import 'home.dart';
+import 'home_screen.dart';
 
 class PersonalScreen extends StatelessWidget {
   const PersonalScreen({Key? key}) : super(key: key);

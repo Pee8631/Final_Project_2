@@ -73,7 +73,7 @@ func (ctl *UserController) CreateUser(c *gin.Context) {
 			fmt.Println(err)
 			c.JSON(400, gin.H{
 				"status": false,
-				"error":  err,
+				"error":  "saving failed",
 			})
 			return
 		}
@@ -95,7 +95,7 @@ func (ctl *UserController) CreateUser(c *gin.Context) {
 			fmt.Println(err)
 			c.JSON(400, gin.H{
 				"status": false,
-				"error":  err,
+				"error":  "saving failed",
 			})
 			return
 		}
@@ -168,6 +168,7 @@ func (ctl *UserController) AuthUser(c *gin.Context) {
 		Only(context.Background())
 	if err != nil {
 		c.JSON(400, gin.H{
+			"status": false,
 			"error": "Invalid Username",
 		})
 		return
@@ -176,6 +177,7 @@ func (ctl *UserController) AuthUser(c *gin.Context) {
 	err = bcrypt.CompareHashAndPassword([]byte(getUser.Password), []byte(obj.Password))
 	if err != nil {
 		c.JSON(400, gin.H{
+			"status": false,
 			"error": "Invalid Password",
 		})
 		return

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:frontend_flutter/model/user.dart';
 import 'package:frontend_flutter/screens/main_screen.dart';
-import 'package:frontend_flutter/screens/register.dart';
+import 'package:frontend_flutter/screens/register_screen.dart';
 import 'package:frontend_flutter/widget/home_button.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
-import 'login.dart';
-import 'register.dart';
+import 'login_screen.dart';
+import 'register_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
