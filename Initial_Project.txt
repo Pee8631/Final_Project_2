@@ -1,0 +1,26 @@
+Golang
+go mod init <project>
+
+go get -d entgo.io/ent/cmd/ent
+go install entgo.io/ent/cmd/ent@latest
+
+go run entgo.io/ent/cmd/ent init User
+
+go generate ./ent
+
+go install github.com/swaggo/swag/cmd/swag@latest
+go get -u github.com/swaggo/swag/cmd/swag@latest
+
+swag init --parseDependency --parseInternal
+
+go mod tidy
+
+go build -o main.exe main.go
+
+.\main.exe
+
+flutter
+
+flutter packages get
+
+flutter packages upgrade

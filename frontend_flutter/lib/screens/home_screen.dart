@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:frontend_flutter/model/user.dart';
-import 'package:frontend_flutter/screens/main_screen.dart';
-import 'package:frontend_flutter/screens/register_screen.dart';
+import 'package:frontend_flutter/screens/signupandsignin/signup_userscreen.dart';
 import 'package:frontend_flutter/widget/home_button.dart';
-import 'package:jwt_decoder/jwt_decoder.dart';
-import 'login_screen.dart';
-import 'register_screen.dart';
+import 'signupandsignin/signin_userscreen.dart';
+import 'signupandsignin/signup_userscreen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -22,10 +19,10 @@ class HomeScreen extends StatelessWidget {
             Image.asset("assets/images/Default.png"),
             SizedBox(height: 5),
             HomeButton(Icon(Icons.add), "สร้างบัญชีผู้ใช้", 20, Colors.blue,
-                RegisterScreen()),
+                SignUpUserScreen()),
             SizedBox(height: 5),
             HomeButton(Icon(Icons.login), "เข้าสู่ระบบ", 20, Colors.blue,
-                LoginScreen()),
+                SignInScreen()),
           ],
         ),
       ),

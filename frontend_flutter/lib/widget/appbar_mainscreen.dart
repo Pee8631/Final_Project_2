@@ -1,28 +1,49 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:frontend_flutter/screens/home_screen.dart';
-import 'package:frontend_flutter/util/user_references.dart';
 import 'package:frontend_flutter/widget/small_profile_widget.dart';
 
-AppBar buildAppBarMain(BuildContext context) {
-  final myprofile = UserReferences.myProfile;
+AppBar buildAppBarMain(BuildContext context, String name) {
   return AppBar(
-    leading: BackButton(),
-    backgroundColor: Colors.blue,
+    // leading: context.widget.toString() == "DoctorsScreen"
+    //     BackButton(
+    //         color: Colors.white,
+    //         onPressed: () {
+    //           Navigator.pushReplacement(context,
+    //               MaterialPageRoute(builder: (context) {
+    //             return MainScreen();
+    //           }));
+    //         },
+    //       )
+    //     : null,
+    backgroundColor: Color.fromARGB(232, 100, 180, 255),
     elevation: 0,
     actions: [
       Row(
         children: [
-          Text(myprofile.name, style: TextStyle(fontSize: 10)),
-          SmallProfileWidget(
-            imagePath: myprofile.imagePath,
-            onClicked: () async {
-              Navigator.pushReplacement(context,
-                  MaterialPageRoute(builder: (context) {
-                return HomeScreen();
-              }));
-            },
+          Text(name + "", style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: Colors.black45)),
+          SizedBox(
+            width: 10,
           ),
+          SmallProfileWidget(
+            imagePath:
+                'https://www.jumpstarttech.com/files/2018/08/Network-Profile.png',
+          ),
+          // PopupMenuButton<int>(
+
+          // ),
+          //   itemBuilder: (BuildContext context) => [
+          //     PopupMenuItem<int>(
+          //       value: 0,
+          //       child: Text('Settings'),
+          //     ),
+          //   ],
+          // ),
+          // SmallProfileWidget(
+          //   imagePath:
+          //       'https://www.jumpstarttech.com/files/2018/08/Network-Profile.png',
+          //   onClicked: () async {
+
+          //   },
+          // ),
         ],
       ),
       SizedBox(width: 10),

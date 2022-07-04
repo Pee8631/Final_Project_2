@@ -15,7 +15,7 @@ class MenuButtonWidget extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: Ink.image(
-          image: NetworkImage(imagePath),
+          image: AssetImage(imagePath),
           fit: BoxFit.cover,
           width: 100,
           height: 100,
@@ -24,7 +24,7 @@ class MenuButtonWidget extends StatelessWidget {
       ),
     ); 
   }
-
+//NetworkImage(imagePath),
 
 
 }
