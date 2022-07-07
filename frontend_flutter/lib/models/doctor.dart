@@ -1,6 +1,8 @@
 // To parse this JSON data, do
 //
 //     final doctor = doctorFromJson(jsonString);
+
+import 'package:meta/meta.dart';
 import 'dart:convert';
 
 Doctor doctorFromJson(String str) => Doctor.fromJson(json.decode(str));
@@ -95,7 +97,7 @@ class DoctorHasCertification {
     Map<String, dynamic> toJson() => {
         "id": id,
         "code": code,
-        "diloma": diloma ,
+        "diloma": diloma,
         "dateOfIssuing": dateOfIssuing == null ? null : dateOfIssuing!.toIso8601String(),
         "dateOfExp": dateOfExp == null ? null : dateOfExp!.toIso8601String(),
         "Issuer": issuer,
@@ -141,22 +143,26 @@ class HasDepartment {
     HasDepartment({
         required this.id,
         required this.name,
+        required this.image,
         required this.edges,
     });
 
     int id;
     String name;
+    String image;
     DoctorHasCertificationEdges? edges;
 
     factory HasDepartment.fromJson(Map<String, dynamic> json) => HasDepartment(
         id: json["id"] == null ? null : json["id"],
         name: json["name"] == null ? null : json["name"],
+        image: json["image"] == null ? null : json["image"],
         edges: json["edges"] == null ? null : DoctorHasCertificationEdges.fromJson(json["edges"]),
     );
 
     Map<String, dynamic> toJson() => {
         "id": id,
-        "names": name,
+        "name": name,
+        "image": image,
         "edges": edges == null ? null : edges!.toJson(),
     };
 }
@@ -164,47 +170,59 @@ class HasDepartment {
 class UserHasPInfo {
     UserHasPInfo({
         required this.id,
+        required this.profile,
         required this.idCardNumber,
+        required this.prefix,
         required this.firstName,
         required this.lastName,
         required this.gender,
         required this.brithDate,
         required this.bloodGroup,
         required this.address,
+        required this.about,
         required this.edges,
     });
 
     int id;
+    String? profile;
     String idCardNumber;
+    String? prefix;
     String firstName;
     String lastName;
     int gender;
     DateTime? brithDate;
     String bloodGroup;
-    String address;
+    String? address;
+    String? about;
     DoctorHasCertificationEdges? edges;
 
     factory UserHasPInfo.fromJson(Map<String, dynamic> json) => UserHasPInfo(
         id: json["id"] == null ? null : json["id"],
+        profile: json["profile"] == null ? null : json["profile"],
         idCardNumber: json["idCardNumber"] == null ? null : json["idCardNumber"],
+        prefix: json["prefix"] == null ? null : json["prefix"],
         firstName: json["firstName"] == null ? null : json["firstName"],
         lastName: json["lastName"] == null ? null : json["lastName"],
         gender: json["gender"] == null ? null : json["gender"],
         brithDate: json["brithDate"] == null ? null : DateTime.parse(json["brithDate"]),
         bloodGroup: json["bloodGroup"] == null ? null : json["bloodGroup"],
         address: json["address"] == null ? null : json["address"],
+        about: json["about"] == null ? null : json["about"],
         edges: json["edges"] == null ? null : DoctorHasCertificationEdges.fromJson(json["edges"]),
     );
 
     Map<String, dynamic> toJson() => {
         "id": id,
+        "profile": profile == null ? null : profile,
         "idCardNumber": idCardNumber,
+        "prefix": prefix == null ? null : prefix,
         "firstName": firstName,
         "lastName": lastName,
-        "gender": gender ,
+        "gender": gender,
         "brithDate": brithDate == null ? null : brithDate!.toIso8601String(),
         "bloodGroup": bloodGroup,
-        "address": address ,
+        "address": address == null ? null : address,
+        "about": about == null ? null : about,
         "edges": edges == null ? null : edges!.toJson(),
     };
 }

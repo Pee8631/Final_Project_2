@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend_flutter/widget/small_profile_widget.dart';
 
-AppBar buildAppBarBackToScreen(BuildContext context, String name, Widget screen) {
+AppBar buildAppBarBackToScreen(BuildContext context, String name, Widget screen, String profile) {
   return AppBar(
     leading: 
         BackButton(
@@ -13,7 +13,7 @@ AppBar buildAppBarBackToScreen(BuildContext context, String name, Widget screen)
               }));
             },
           ),
-    backgroundColor: Colors.blue,
+    backgroundColor: Color.fromARGB(232, 100, 180, 255),
     elevation: 0,
     actions: [
       Row(
@@ -24,7 +24,7 @@ AppBar buildAppBarBackToScreen(BuildContext context, String name, Widget screen)
           ),
           SmallProfileWidget(
             imagePath:
-                'https://www.jumpstarttech.com/files/2018/08/Network-Profile.png',
+                profile,
           ),
           // PopupMenuButton<int>(
 

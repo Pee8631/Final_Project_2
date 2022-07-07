@@ -111,10 +111,16 @@ class _CalendarDoctorWidgetState extends State<CalendarDoctorWidget> {
       dataSource: _calendarDataSource,
       controller: _controller,
       firstDayOfWeek: 7,
+      selectionDecoration: BoxDecoration(
+        color: Color.fromARGB(235, 190, 242, 229),
+        border: Border.all(color: Colors.blueGrey, width: 2),
+        borderRadius: const BorderRadius.all(Radius.circular(4)),
+        shape: BoxShape.rectangle,
+      ),
       monthViewSettings: MonthViewSettings(
           appointmentDisplayMode: MonthAppointmentDisplayMode.appointment),
       initialSelectedDate: DateTime.now(),
-      cellBorderColor: Colors.transparent,
+      cellBorderColor: Colors.blueGrey,
       loadMoreWidgetBuilder:
           (BuildContext context, LoadMoreCallback loadMoreAppointments) {
         return FutureBuilder(

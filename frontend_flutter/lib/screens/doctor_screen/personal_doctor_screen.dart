@@ -22,12 +22,20 @@ class PersonalDoctorScreen extends StatefulWidget {
 class _PersonalDoctorScreenState extends State<PersonalDoctorScreen> {
   final profile = UserPreferences.myProfile;
   final text = 'แก้ไขโปรไฟล์ของคุณ';
-  int _UserId = 0;
+  String _name = 'FristName LastName';
+  var BD_format = DateFormat.yMMM();
   late Future<PInfo> pInfos;
   @override
   initState() {
+    getName();
     pInfos = getPInfo();
     super.initState();
+  }
+
+  Future<void> getName() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    final String? name = sharedPreferences.getString('username');
+    setState(() => _name = name!);
   }
 
   Future<String> getToken() async {
@@ -50,11 +58,10 @@ class _PersonalDoctorScreenState extends State<PersonalDoctorScreen> {
     }
   }
 
-
   Future<PInfo> getPInfo() async {
     var UserId = await getUserId();
-    var response = await http.get(Uri.parse(
-        'http://10.0.2.2:8080/api/v1/pinfos/' + UserId.toString()));
+    var response = await http.get(
+        Uri.parse('http://10.0.2.2:8080/api/v1/pinfos/' + UserId.toString()));
     if (response.statusCode == 200) {
       final results = pInfoFromJson(response.body);
       return results;
@@ -79,7 +86,41 @@ class _PersonalDoctorScreenState extends State<PersonalDoctorScreen> {
             ),
           );
         } else if (snapshot.connectionState == ConnectionState.done) {
+          String _Profile = snapshot.data!.profile != ""
+              ? snapshot.data!.profile!
+              : 'assets/images/Profile_Default.png';
+          String IdCardNumber = snapshot.data == null
+              ? 'ยังไม่มีข้อมูล'
+              : snapshot.data!.idCardNumber;
+          String BrithDate = snapshot.data!.brithDate == null
+              ? 'ยังไม่มีข้อมูล'
+              : BD_format.format(snapshot.data!.brithDate!);
+          String Age = snapshot.data!.brithDate == null
+              ? 'ยังไม่มีข้อมูล'
+              : BD_format.format(DateTime(
+                  DateTime.now().year - snapshot.data!.brithDate!.year));
+          String Gender = 'ยังไม่มีข้อมูล';
+          if (snapshot.data != null) {
+            if (snapshot.data!.gender == 1) {
+              Gender = 'ชาย';
+            } else if (snapshot.data!.gender == 2) {
+              Gender = 'หญิง';
+            } else {
+              Gender = 'ยังไม่มีข้อมูล';
+            }
+          }
+          String BloodGroup = snapshot.data == null
+              ? 'ยังไม่มีข้อมูล'
+              : snapshot.data!.bloodGroup;
+          String Address = snapshot.data!.address == null
+              ? 'ยังไม่มีข้อมูล'
+              : snapshot.data!.address!;
+          String About =
+              (snapshot.data!.about == '' || snapshot.data!.about == null)
+                  ? 'ยังไม่มีข้อมูล'
+                  : snapshot.data!.about!;
           return Scaffold(
+            backgroundColor: Color.fromARGB(255, 208, 244, 255),
             body: ListView(
               physics: BouncingScrollPhysics(),
               children: [
@@ -87,11 +128,11 @@ class _PersonalDoctorScreenState extends State<PersonalDoctorScreen> {
                   height: 10,
                 ),
                 LargeProfileWidget(
-                  imagePath: profile.imagePath,
+                  imagePath: _Profile,
                   onClicked: () async {
                     Navigator.pushReplacement(context,
                         MaterialPageRoute(builder: (context) {
-                      return HomeScreen();
+                      return EditPersonalDoctorScreen();
                     }));
                   },
                 ),
@@ -99,14 +140,13 @@ class _PersonalDoctorScreenState extends State<PersonalDoctorScreen> {
                   height: 24,
                 ),
                 buildName(snapshot.data!),
-                const SizedBox(
-                  height: 24,
-                ),
-                Center(child: buildUpgradeButton()),
-                const SizedBox(
-                  height: 24,
-                ),
-                buildAbout(snapshot.data!),
+                buildData('เลขบัตรประชาชน', IdCardNumber),
+                buildData('วันเดือนปีเกิด', BrithDate),
+                buildData('อายุ', Age + ' ปี'),
+                buildData('เพศ', Gender),
+                buildData('กรุ๊ปเลือด', BloodGroup),
+                buildDetails('ที่อยู่', Address),
+                buildDetails('เกี่ยวกับ', About),
                 const SizedBox(
                   height: 24,
                 ),
@@ -155,20 +195,6 @@ class _PersonalDoctorScreenState extends State<PersonalDoctorScreen> {
                       SizedBox(
                         height: 3,
                       ),
-                      PersonalButtonWidget(
-                        text: 'ตั้งค่า',
-                        onClicked: () {},
-                      ),
-                      SizedBox(
-                        height: 3,
-                      ),
-                      Container(
-                        height: 1,
-                        color: Colors.grey,
-                      ),
-                      SizedBox(
-                        height: 3,
-                      ),
                     ],
                   ),
                 ),
@@ -189,7 +215,7 @@ class _PersonalDoctorScreenState extends State<PersonalDoctorScreen> {
   Widget buildName(PInfo profile) => Column(
         children: [
           Text(
-            profile.firstName + ' ' + profile.lastName,
+            profile.prefix! + ' ' + profile.firstName + ' ' + profile.lastName,
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 24,
@@ -199,38 +225,70 @@ class _PersonalDoctorScreenState extends State<PersonalDoctorScreen> {
             height: 4,
           ),
           Text(
-            DateFormat('yyyy-MM-dd').format(profile.brithDate!).toString(),
+            _name,
             style: TextStyle(
                 fontWeight: FontWeight.bold, fontSize: 15, color: Colors.grey),
           ),
         ],
       );
 
-  Widget buildUpgradeButton() => ButtonWidget(
-        onClicked: () {},
-        text: text,
+  buildData(String title, String data) => Container(
+        padding: EdgeInsets.only(left: 48, top: 5, bottom: 5, right: 48),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Expanded(
+              flex: 1,
+              child: Text(
+                title,
+                style: TextStyle(
+                  //fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+            Expanded(
+              flex: 1,
+              child: Text(
+                data,
+                style: TextStyle(
+                  //fontWeight: FontWeight.bold,
+                  color:
+                      data != 'ยังไม่มีข้อมูล' ? Colors.black87 : Colors.grey,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+          ],
+        ),
       );
 
-  buildAbout(PInfo profile) => Container(
+  buildDetails(String title, String data) => Container(
+        margin: const EdgeInsets.only(
+          top: 5,
+          bottom: 5,
+        ),
         padding: EdgeInsets.symmetric(horizontal: 48),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'เกี่ยวกับ',
+              title,
               style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 24,
+                //fontWeight: FontWeight.bold,
+                fontSize: 18,
               ),
             ),
             const SizedBox(
               height: 16,
             ),
             Text(
-              profile.address,
+              data,
               style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 15,
+                //fontWeight: FontWeight.bold,
+                color: data != 'ยังไม่มีข้อมูล' ? Colors.black87 : Colors.grey,
+                fontSize: 14,
               ),
             ),
           ],

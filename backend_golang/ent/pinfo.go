@@ -17,8 +17,12 @@ type PInfo struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
+	// Profile holds the value of the "profile" field.
+	Profile string `json:"profile,omitempty"`
 	// IdCardNumber holds the value of the "idCardNumber" field.
 	IdCardNumber string `json:"idCardNumber,omitempty"`
+	// Prefix holds the value of the "prefix" field.
+	Prefix string `json:"prefix,omitempty"`
 	// FirstName holds the value of the "firstName" field.
 	FirstName string `json:"firstName,omitempty"`
 	// LastName holds the value of the "lastName" field.
@@ -31,6 +35,8 @@ type PInfo struct {
 	BloodGroup string `json:"bloodGroup,omitempty"`
 	// Address holds the value of the "address" field.
 	Address string `json:"address,omitempty"`
+	// About holds the value of the "about" field.
+	About string `json:"about,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the PInfoQuery when eager-loading is set.
 	Edges                PInfoEdges `json:"edges"`
@@ -67,7 +73,7 @@ func (*PInfo) scanValues(columns []string) ([]interface{}, error) {
 		switch columns[i] {
 		case pinfo.FieldID, pinfo.FieldGender:
 			values[i] = new(sql.NullInt64)
-		case pinfo.FieldIdCardNumber, pinfo.FieldFirstName, pinfo.FieldLastName, pinfo.FieldBloodGroup, pinfo.FieldAddress:
+		case pinfo.FieldProfile, pinfo.FieldIdCardNumber, pinfo.FieldPrefix, pinfo.FieldFirstName, pinfo.FieldLastName, pinfo.FieldBloodGroup, pinfo.FieldAddress, pinfo.FieldAbout:
 			values[i] = new(sql.NullString)
 		case pinfo.FieldBrithDate:
 			values[i] = new(sql.NullTime)
@@ -94,11 +100,23 @@ func (pi *PInfo) assignValues(columns []string, values []interface{}) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			pi.ID = int(value.Int64)
+		case pinfo.FieldProfile:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field profile", values[i])
+			} else if value.Valid {
+				pi.Profile = value.String
+			}
 		case pinfo.FieldIdCardNumber:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field idCardNumber", values[i])
 			} else if value.Valid {
 				pi.IdCardNumber = value.String
+			}
+		case pinfo.FieldPrefix:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field prefix", values[i])
+			} else if value.Valid {
+				pi.Prefix = value.String
 			}
 		case pinfo.FieldFirstName:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -135,6 +153,12 @@ func (pi *PInfo) assignValues(columns []string, values []interface{}) error {
 				return fmt.Errorf("unexpected type %T for field address", values[i])
 			} else if value.Valid {
 				pi.Address = value.String
+			}
+		case pinfo.FieldAbout:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field about", values[i])
+			} else if value.Valid {
+				pi.About = value.String
 			}
 		case pinfo.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -176,8 +200,12 @@ func (pi *PInfo) String() string {
 	var builder strings.Builder
 	builder.WriteString("PInfo(")
 	builder.WriteString(fmt.Sprintf("id=%v", pi.ID))
+	builder.WriteString(", profile=")
+	builder.WriteString(pi.Profile)
 	builder.WriteString(", idCardNumber=")
 	builder.WriteString(pi.IdCardNumber)
+	builder.WriteString(", prefix=")
+	builder.WriteString(pi.Prefix)
 	builder.WriteString(", firstName=")
 	builder.WriteString(pi.FirstName)
 	builder.WriteString(", lastName=")
@@ -190,6 +218,8 @@ func (pi *PInfo) String() string {
 	builder.WriteString(pi.BloodGroup)
 	builder.WriteString(", address=")
 	builder.WriteString(pi.Address)
+	builder.WriteString(", about=")
+	builder.WriteString(pi.About)
 	builder.WriteByte(')')
 	return builder.String()
 }

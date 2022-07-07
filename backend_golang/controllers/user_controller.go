@@ -9,6 +9,7 @@ import (
 	"context"
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -36,6 +37,7 @@ type User struct {
 	Hospital      int
 	RoleId        int
 	Certification Certification
+	PInfo         PInfo
 }
 
 // UserController defines the struct for the user controller
@@ -60,7 +62,7 @@ func (ctl *UserController) CreateUser(c *gin.Context) {
 
 	if err := c.ShouldBind(&obj); err != nil {
 		c.JSON(400, gin.H{
-			"error": "user binding failed",
+			"error": "user binding failed : "  + err.Error(),
 		})
 		return
 	}
@@ -107,6 +109,49 @@ func (ctl *UserController) CreateUser(c *gin.Context) {
 			})
 			return
 		}
+		if !strings.Contains(obj.PInfo.BrithDate, "Z") {
+			obj.PInfo.BrithDate += "Z"
+		}
+		if !strings.Contains(obj.Certification.DateOfIssuing, "Z") {
+			obj.Certification.DateOfIssuing += "Z"
+		}
+		if !strings.Contains(obj.Certification.DateOfExp, "Z") {
+			obj.Certification.DateOfExp += "Z"
+		}
+		
+		brithDate, err := time.Parse(time.RFC3339, obj.PInfo.BrithDate)
+		if err != nil {
+			fmt.Println(err)
+			c.JSON(400, gin.H{
+				"status": false,
+				"error":  err,
+			})
+			return
+		}
+
+		insertPInfo, err := ctl.client.PInfo.
+			Create().
+			SetProfile(obj.PInfo.Profile).
+			SetIdCardNumber(obj.PInfo.IdCardNumber).
+			SetPrefix(obj.PInfo.Prefix).
+			SetFirstName(obj.PInfo.FirstName).
+			SetLastName(obj.PInfo.LastName).
+			SetGender(obj.PInfo.Gender).
+			SetBrithDate(brithDate).
+			SetBloodGroup(obj.PInfo.BloodGroup).
+			SetAddress(obj.PInfo.Address).
+			SetAbout(obj.PInfo.About).
+			SetWhoIsTheOwnerOfThisPInfoID(insertUser.ID).
+			Save(context.Background())
+		if err != nil {
+			fmt.Println(err)
+			c.JSON(400, gin.H{
+				"status": false,
+				"error":  err,
+			})
+			return
+		}
+
 		DateOfIssuing, err := time.Parse(time.RFC3339, obj.Certification.DateOfIssuing)
 		if err != nil {
 			fmt.Println(err)
@@ -156,6 +201,7 @@ func (ctl *UserController) CreateUser(c *gin.Context) {
 			"Department":    departments,
 			"Hospital":      hospitals,
 			"RoleId":        Roles,
+			"PInfo":         insertPInfo,
 			"Certification": insertCer,
 		}
 
@@ -250,17 +296,16 @@ func (ctl *UserController) AuthUser(c *gin.Context) {
 	}
 
 	Roles, err := ctl.client.Role.
-	Query().
-	Where(role.IDEQ(int(obj.RoleId))).
-	Only(context.Background())
+		Query().
+		Where(role.IDEQ(int(obj.RoleId))).
+		Only(context.Background())
 
 	if err != nil {
-	c.JSON(400, gin.H{
-		"error": "Role not found",
-	})
-	return
+		c.JSON(400, gin.H{
+			"error": "Role not found",
+		})
+		return
 	}
-
 
 	getUser, err := ctl.client.User.
 		Query().
@@ -269,7 +314,7 @@ func (ctl *UserController) AuthUser(c *gin.Context) {
 		WithHasDepartment().
 		WithUserHaveRole().
 		Only(context.Background())
-	
+
 	if err != nil {
 		c.JSON(400, gin.H{
 			"status": false,
@@ -295,7 +340,6 @@ func (ctl *UserController) AuthUser(c *gin.Context) {
 		})
 		return
 	}
-	
 
 	token, err := generateToken(getUser.ID)
 	if err != nil {

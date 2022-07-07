@@ -8,7 +8,8 @@ import 'package:http/http.dart' as http;
 class MenuScreen extends StatefulWidget {
   final String name;
   final int UserId;
-  const MenuScreen({Key? key, required this.name, required this.UserId}) : super(key: key);
+  final String Profile;
+  const MenuScreen({Key? key, required this.name, required this.UserId, required this.Profile}) : super(key: key);
 
   @override
   State<MenuScreen> createState() => _MenuScreenState();
@@ -99,7 +100,7 @@ class _MenuScreenState extends State<MenuScreen> {
                                   onClicked: () async {
                                     Navigator.pushReplacement(context,
                                       MaterialPageRoute(builder: (context) {
-                                    return DoctorsScreen(name: widget.name, DepartmentId: snapshot.data![index].id, UserId: widget.UserId);
+                                    return DoctorsScreen(name: widget.name, DepartmentId: snapshot.data![index].id, UserId: widget.UserId, Profile: widget.Profile);
                                   }));
                                   },
                                 ),

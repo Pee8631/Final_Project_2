@@ -21,9 +21,21 @@ type PInfoCreate struct {
 	hooks    []Hook
 }
 
+// SetProfile sets the "profile" field.
+func (pc *PInfoCreate) SetProfile(s string) *PInfoCreate {
+	pc.mutation.SetProfile(s)
+	return pc
+}
+
 // SetIdCardNumber sets the "idCardNumber" field.
 func (pc *PInfoCreate) SetIdCardNumber(s string) *PInfoCreate {
 	pc.mutation.SetIdCardNumber(s)
+	return pc
+}
+
+// SetPrefix sets the "prefix" field.
+func (pc *PInfoCreate) SetPrefix(s string) *PInfoCreate {
+	pc.mutation.SetPrefix(s)
 	return pc
 }
 
@@ -68,6 +80,12 @@ func (pc *PInfoCreate) SetBloodGroup(s string) *PInfoCreate {
 // SetAddress sets the "address" field.
 func (pc *PInfoCreate) SetAddress(s string) *PInfoCreate {
 	pc.mutation.SetAddress(s)
+	return pc
+}
+
+// SetAbout sets the "about" field.
+func (pc *PInfoCreate) SetAbout(s string) *PInfoCreate {
+	pc.mutation.SetAbout(s)
 	return pc
 }
 
@@ -160,8 +178,14 @@ func (pc *PInfoCreate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (pc *PInfoCreate) check() error {
+	if _, ok := pc.mutation.Profile(); !ok {
+		return &ValidationError{Name: "profile", err: errors.New(`ent: missing required field "PInfo.profile"`)}
+	}
 	if _, ok := pc.mutation.IdCardNumber(); !ok {
 		return &ValidationError{Name: "idCardNumber", err: errors.New(`ent: missing required field "PInfo.idCardNumber"`)}
+	}
+	if _, ok := pc.mutation.Prefix(); !ok {
+		return &ValidationError{Name: "prefix", err: errors.New(`ent: missing required field "PInfo.prefix"`)}
 	}
 	if _, ok := pc.mutation.FirstName(); !ok {
 		return &ValidationError{Name: "firstName", err: errors.New(`ent: missing required field "PInfo.firstName"`)}
@@ -177,6 +201,9 @@ func (pc *PInfoCreate) check() error {
 	}
 	if _, ok := pc.mutation.Address(); !ok {
 		return &ValidationError{Name: "address", err: errors.New(`ent: missing required field "PInfo.address"`)}
+	}
+	if _, ok := pc.mutation.About(); !ok {
+		return &ValidationError{Name: "about", err: errors.New(`ent: missing required field "PInfo.about"`)}
 	}
 	return nil
 }
@@ -205,6 +232,14 @@ func (pc *PInfoCreate) createSpec() (*PInfo, *sqlgraph.CreateSpec) {
 			},
 		}
 	)
+	if value, ok := pc.mutation.Profile(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: pinfo.FieldProfile,
+		})
+		_node.Profile = value
+	}
 	if value, ok := pc.mutation.IdCardNumber(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -212,6 +247,14 @@ func (pc *PInfoCreate) createSpec() (*PInfo, *sqlgraph.CreateSpec) {
 			Column: pinfo.FieldIdCardNumber,
 		})
 		_node.IdCardNumber = value
+	}
+	if value, ok := pc.mutation.Prefix(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: pinfo.FieldPrefix,
+		})
+		_node.Prefix = value
 	}
 	if value, ok := pc.mutation.FirstName(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -260,6 +303,14 @@ func (pc *PInfoCreate) createSpec() (*PInfo, *sqlgraph.CreateSpec) {
 			Column: pinfo.FieldAddress,
 		})
 		_node.Address = value
+	}
+	if value, ok := pc.mutation.About(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: pinfo.FieldAbout,
+		})
+		_node.About = value
 	}
 	if nodes := pc.mutation.WhoIsTheOwnerOfThisPInfoIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

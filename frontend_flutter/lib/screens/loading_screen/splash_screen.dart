@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:frontend_flutter/screens/signupandsignin/signin_userscreen.dart';
+import 'package:frontend_flutter/screens/signupandsignin/signin_user_screen.dart';
 import 'package:video_player/video_player.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -33,7 +33,7 @@ class _SplashScreenState extends State<SplashScreen> {
               Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                      builder: (BuildContext context) => SignInScreen()));
+                      builder: (BuildContext context) => SignInUserScreen()));
             });
   }
 

@@ -75,13 +75,23 @@ class _CalendarUserWidgetState extends State<CalendarUserWidget> {
     var _dataCollection = <DateTime, List<Appointment>>{};
     if (_appointments != null) {
       for (int i = 0; i < _appointments.length; i++) {
+        Color color = Colors.grey;
+        if (_appointments[i].status == "Confirm") {
+          color = Colors.greenAccent;
+        } else if (_appointments[i].status == "Waiting") {
+          color = Colors.yellowAccent;
+        } else if (_appointments[i].status == "Reject") {
+          color = Colors.redAccent;
+        } else {
+          color = Colors.grey;
+        }
         final Appointment meeting = Appointment(
             id: _appointments[i].id,
             subject: _appointments[i].reasonForAppointment!,
             startTime: _appointments[i].startTime!,
             endTime: _appointments[i].endTime!,
             notes: _appointments[i].detail,
-            color: Colors.greenAccent,
+            color: color,
             isAllDay: false);
 
         final DateTime rangeStartDate = DateTime(
@@ -111,12 +121,12 @@ class _CalendarUserWidgetState extends State<CalendarUserWidget> {
         CalendarView.week,
       ],
       selectionDecoration: BoxDecoration(
-        color: Colors.cyan,
-        border: Border.all(color: Colors.cyanAccent, width: 2),
+        color: Color.fromARGB(235, 190, 242, 229),
+        border: Border.all(color: Colors.blueGrey, width: 2),
         borderRadius: const BorderRadius.all(Radius.circular(4)),
         shape: BoxShape.rectangle,
       ),
-      cellBorderColor: Colors.black,
+      cellBorderColor: Colors.blueGrey,
       dataSource: _calendarDataSource,
       controller: _controller,
       firstDayOfWeek: 7,

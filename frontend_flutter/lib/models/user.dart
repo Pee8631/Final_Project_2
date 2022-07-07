@@ -5,6 +5,7 @@
 import 'dart:convert';
 
 import 'package:frontend_flutter/models/certification.dart';
+import 'package:frontend_flutter/models/pInfo.dart';
 
 User userFromJson(String str) => User.fromJson(json.decode(str));
 
@@ -17,7 +18,8 @@ class User {
       required this.department,
       required this.hospital,
       required this.roleId,
-      required this.certification});
+      required this.certification,
+      required this.pInfo});
 
   String? username;
   String? password;
@@ -25,6 +27,7 @@ class User {
   int? hospital;
   int? roleId;
   Certification? certification;
+  PInfo? pInfo;
 
   factory User.fromJson(Map<String, dynamic> json) => User(
         username: json["Username"] == null ? null : json["Username"],
@@ -32,7 +35,8 @@ class User {
         department: json["Department"] == null ? null : json["Department"],
         hospital: json["Hospital"] == null ? null : json["Hospital"],
         roleId: json["RoleId"] == null ? null : json["RoleId"],
-        certification: json["Certification"] == null ? null : certificationFromJson(json["Certification"]),
+        certification: json["Certification"] == null ? null : certificationFromJson(json["Certification"]), 
+        pInfo: json["PInfo"] == null ? null : pInfoFromJson(json["PInfo"]),
       );
 
   Map<String, dynamic> toJson() => {
@@ -42,5 +46,6 @@ class User {
         "Hospital": hospital == null ? null : hospital,
         "RoleId": roleId == null ? null : roleId,
         "Certification": certification == certificationToJson(certification!),
+        "pInfo": certification == certificationToJson(certification!),
       };
 }

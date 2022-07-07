@@ -93,10 +93,24 @@ func IDLTE(id int) predicate.PInfo {
 	})
 }
 
+// Profile applies equality check predicate on the "profile" field. It's identical to ProfileEQ.
+func Profile(v string) predicate.PInfo {
+	return predicate.PInfo(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldProfile), v))
+	})
+}
+
 // IdCardNumber applies equality check predicate on the "idCardNumber" field. It's identical to IdCardNumberEQ.
 func IdCardNumber(v string) predicate.PInfo {
 	return predicate.PInfo(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldIdCardNumber), v))
+	})
+}
+
+// Prefix applies equality check predicate on the "prefix" field. It's identical to PrefixEQ.
+func Prefix(v string) predicate.PInfo {
+	return predicate.PInfo(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldPrefix), v))
 	})
 }
 
@@ -139,6 +153,124 @@ func BloodGroup(v string) predicate.PInfo {
 func Address(v string) predicate.PInfo {
 	return predicate.PInfo(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldAddress), v))
+	})
+}
+
+// About applies equality check predicate on the "about" field. It's identical to AboutEQ.
+func About(v string) predicate.PInfo {
+	return predicate.PInfo(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldAbout), v))
+	})
+}
+
+// ProfileEQ applies the EQ predicate on the "profile" field.
+func ProfileEQ(v string) predicate.PInfo {
+	return predicate.PInfo(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldProfile), v))
+	})
+}
+
+// ProfileNEQ applies the NEQ predicate on the "profile" field.
+func ProfileNEQ(v string) predicate.PInfo {
+	return predicate.PInfo(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldProfile), v))
+	})
+}
+
+// ProfileIn applies the In predicate on the "profile" field.
+func ProfileIn(vs ...string) predicate.PInfo {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.PInfo(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldProfile), v...))
+	})
+}
+
+// ProfileNotIn applies the NotIn predicate on the "profile" field.
+func ProfileNotIn(vs ...string) predicate.PInfo {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.PInfo(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldProfile), v...))
+	})
+}
+
+// ProfileGT applies the GT predicate on the "profile" field.
+func ProfileGT(v string) predicate.PInfo {
+	return predicate.PInfo(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldProfile), v))
+	})
+}
+
+// ProfileGTE applies the GTE predicate on the "profile" field.
+func ProfileGTE(v string) predicate.PInfo {
+	return predicate.PInfo(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldProfile), v))
+	})
+}
+
+// ProfileLT applies the LT predicate on the "profile" field.
+func ProfileLT(v string) predicate.PInfo {
+	return predicate.PInfo(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldProfile), v))
+	})
+}
+
+// ProfileLTE applies the LTE predicate on the "profile" field.
+func ProfileLTE(v string) predicate.PInfo {
+	return predicate.PInfo(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldProfile), v))
+	})
+}
+
+// ProfileContains applies the Contains predicate on the "profile" field.
+func ProfileContains(v string) predicate.PInfo {
+	return predicate.PInfo(func(s *sql.Selector) {
+		s.Where(sql.Contains(s.C(FieldProfile), v))
+	})
+}
+
+// ProfileHasPrefix applies the HasPrefix predicate on the "profile" field.
+func ProfileHasPrefix(v string) predicate.PInfo {
+	return predicate.PInfo(func(s *sql.Selector) {
+		s.Where(sql.HasPrefix(s.C(FieldProfile), v))
+	})
+}
+
+// ProfileHasSuffix applies the HasSuffix predicate on the "profile" field.
+func ProfileHasSuffix(v string) predicate.PInfo {
+	return predicate.PInfo(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldProfile), v))
+	})
+}
+
+// ProfileEqualFold applies the EqualFold predicate on the "profile" field.
+func ProfileEqualFold(v string) predicate.PInfo {
+	return predicate.PInfo(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldProfile), v))
+	})
+}
+
+// ProfileContainsFold applies the ContainsFold predicate on the "profile" field.
+func ProfileContainsFold(v string) predicate.PInfo {
+	return predicate.PInfo(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldProfile), v))
 	})
 }
 
@@ -250,6 +382,117 @@ func IdCardNumberEqualFold(v string) predicate.PInfo {
 func IdCardNumberContainsFold(v string) predicate.PInfo {
 	return predicate.PInfo(func(s *sql.Selector) {
 		s.Where(sql.ContainsFold(s.C(FieldIdCardNumber), v))
+	})
+}
+
+// PrefixEQ applies the EQ predicate on the "prefix" field.
+func PrefixEQ(v string) predicate.PInfo {
+	return predicate.PInfo(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldPrefix), v))
+	})
+}
+
+// PrefixNEQ applies the NEQ predicate on the "prefix" field.
+func PrefixNEQ(v string) predicate.PInfo {
+	return predicate.PInfo(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldPrefix), v))
+	})
+}
+
+// PrefixIn applies the In predicate on the "prefix" field.
+func PrefixIn(vs ...string) predicate.PInfo {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.PInfo(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldPrefix), v...))
+	})
+}
+
+// PrefixNotIn applies the NotIn predicate on the "prefix" field.
+func PrefixNotIn(vs ...string) predicate.PInfo {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.PInfo(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldPrefix), v...))
+	})
+}
+
+// PrefixGT applies the GT predicate on the "prefix" field.
+func PrefixGT(v string) predicate.PInfo {
+	return predicate.PInfo(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldPrefix), v))
+	})
+}
+
+// PrefixGTE applies the GTE predicate on the "prefix" field.
+func PrefixGTE(v string) predicate.PInfo {
+	return predicate.PInfo(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldPrefix), v))
+	})
+}
+
+// PrefixLT applies the LT predicate on the "prefix" field.
+func PrefixLT(v string) predicate.PInfo {
+	return predicate.PInfo(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldPrefix), v))
+	})
+}
+
+// PrefixLTE applies the LTE predicate on the "prefix" field.
+func PrefixLTE(v string) predicate.PInfo {
+	return predicate.PInfo(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldPrefix), v))
+	})
+}
+
+// PrefixContains applies the Contains predicate on the "prefix" field.
+func PrefixContains(v string) predicate.PInfo {
+	return predicate.PInfo(func(s *sql.Selector) {
+		s.Where(sql.Contains(s.C(FieldPrefix), v))
+	})
+}
+
+// PrefixHasPrefix applies the HasPrefix predicate on the "prefix" field.
+func PrefixHasPrefix(v string) predicate.PInfo {
+	return predicate.PInfo(func(s *sql.Selector) {
+		s.Where(sql.HasPrefix(s.C(FieldPrefix), v))
+	})
+}
+
+// PrefixHasSuffix applies the HasSuffix predicate on the "prefix" field.
+func PrefixHasSuffix(v string) predicate.PInfo {
+	return predicate.PInfo(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldPrefix), v))
+	})
+}
+
+// PrefixEqualFold applies the EqualFold predicate on the "prefix" field.
+func PrefixEqualFold(v string) predicate.PInfo {
+	return predicate.PInfo(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldPrefix), v))
+	})
+}
+
+// PrefixContainsFold applies the ContainsFold predicate on the "prefix" field.
+func PrefixContainsFold(v string) predicate.PInfo {
+	return predicate.PInfo(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldPrefix), v))
 	})
 }
 
@@ -860,6 +1103,117 @@ func AddressEqualFold(v string) predicate.PInfo {
 func AddressContainsFold(v string) predicate.PInfo {
 	return predicate.PInfo(func(s *sql.Selector) {
 		s.Where(sql.ContainsFold(s.C(FieldAddress), v))
+	})
+}
+
+// AboutEQ applies the EQ predicate on the "about" field.
+func AboutEQ(v string) predicate.PInfo {
+	return predicate.PInfo(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldAbout), v))
+	})
+}
+
+// AboutNEQ applies the NEQ predicate on the "about" field.
+func AboutNEQ(v string) predicate.PInfo {
+	return predicate.PInfo(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldAbout), v))
+	})
+}
+
+// AboutIn applies the In predicate on the "about" field.
+func AboutIn(vs ...string) predicate.PInfo {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.PInfo(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldAbout), v...))
+	})
+}
+
+// AboutNotIn applies the NotIn predicate on the "about" field.
+func AboutNotIn(vs ...string) predicate.PInfo {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.PInfo(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldAbout), v...))
+	})
+}
+
+// AboutGT applies the GT predicate on the "about" field.
+func AboutGT(v string) predicate.PInfo {
+	return predicate.PInfo(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldAbout), v))
+	})
+}
+
+// AboutGTE applies the GTE predicate on the "about" field.
+func AboutGTE(v string) predicate.PInfo {
+	return predicate.PInfo(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldAbout), v))
+	})
+}
+
+// AboutLT applies the LT predicate on the "about" field.
+func AboutLT(v string) predicate.PInfo {
+	return predicate.PInfo(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldAbout), v))
+	})
+}
+
+// AboutLTE applies the LTE predicate on the "about" field.
+func AboutLTE(v string) predicate.PInfo {
+	return predicate.PInfo(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldAbout), v))
+	})
+}
+
+// AboutContains applies the Contains predicate on the "about" field.
+func AboutContains(v string) predicate.PInfo {
+	return predicate.PInfo(func(s *sql.Selector) {
+		s.Where(sql.Contains(s.C(FieldAbout), v))
+	})
+}
+
+// AboutHasPrefix applies the HasPrefix predicate on the "about" field.
+func AboutHasPrefix(v string) predicate.PInfo {
+	return predicate.PInfo(func(s *sql.Selector) {
+		s.Where(sql.HasPrefix(s.C(FieldAbout), v))
+	})
+}
+
+// AboutHasSuffix applies the HasSuffix predicate on the "about" field.
+func AboutHasSuffix(v string) predicate.PInfo {
+	return predicate.PInfo(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldAbout), v))
+	})
+}
+
+// AboutEqualFold applies the EqualFold predicate on the "about" field.
+func AboutEqualFold(v string) predicate.PInfo {
+	return predicate.PInfo(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldAbout), v))
+	})
+}
+
+// AboutContainsFold applies the ContainsFold predicate on the "about" field.
+func AboutContainsFold(v string) predicate.PInfo {
+	return predicate.PInfo(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldAbout), v))
 	})
 }
 

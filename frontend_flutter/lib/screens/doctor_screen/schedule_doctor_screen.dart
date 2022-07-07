@@ -29,7 +29,9 @@ class _ScheduleDoctorScreenState extends State<ScheduleDoctorScreen> {
     }
 
     return Scaffold(
+      backgroundColor: Color.fromARGB(255, 208, 244, 255),
       appBar: AppBar(
+        backgroundColor: Color.fromARGB(255, 208, 244, 255),
         centerTitle: true,
         title: Row(
           children: [
@@ -53,7 +55,6 @@ class _ScheduleDoctorScreenState extends State<ScheduleDoctorScreen> {
           ],
         ),
         shadowColor: Colors.transparent,
-        backgroundColor: Colors.transparent,
       ),
       body: builderCalendarWidget(),
       floatingActionButton: FloatingActionButton(
@@ -61,7 +62,7 @@ class _ScheduleDoctorScreenState extends State<ScheduleDoctorScreen> {
             Icons.add,
             color: Colors.white,
           ),
-          backgroundColor: Colors.grey,
+          backgroundColor: Color.fromARGB(230, 96, 239, 220),
           onPressed: () => Navigator.of(context).push(
                 MaterialPageRoute(
                     builder: (context) =>

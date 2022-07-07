@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend_flutter/screens/signupandsignin/signin_userscreen.dart';
+import 'package:frontend_flutter/screens/signupandsignin/signin_user_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../screens/user_screen/edit_personal_user_screen.dart';
@@ -22,7 +22,7 @@ class SmallProfileWidget extends StatelessWidget {
   }
 
   Widget buildImage(BuildContext context) {
-    final image = NetworkImage(imagePath);
+    final image = AssetImage(imagePath);
 
     return PopupMenuButton<int>(
         onSelected: (item) => onSelected(context, item),
@@ -40,15 +40,11 @@ class SmallProfileWidget extends StatelessWidget {
         itemBuilder: (BuildContext context) => [
               PopupMenuItem<int>(
                 value: 0,
-                child: Text('Edit Profile'),
+                child: Text('แก้ไขข้อมูลส่วนตัวของคุณ'),
               ),
               PopupMenuItem<int>(
                 value: 1,
-                child: Text('Settings'),
-              ),
-              PopupMenuItem<int>(
-                value: 2,
-                child: Text('Log Out'),
+                child: Text('ออกจากระบบ'),
               ),
             ]);
   }
@@ -62,11 +58,6 @@ class SmallProfileWidget extends StatelessWidget {
     }
     switch (item) {
       case 1:
-        print('Clicked Settings');
-        break;
-    }
-    switch (item) {
-      case 2:
         SharedPreferences sharedPreferences =
             await SharedPreferences.getInstance();
         sharedPreferences.clear();
@@ -76,7 +67,7 @@ class SmallProfileWidget extends StatelessWidget {
         sharedPreferences.remove('role');
         Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(
-                builder: (BuildContext context) => SignInScreen()),
+                builder: (BuildContext context) => SignInUserScreen()),
             (route) => false);
         break;
     }

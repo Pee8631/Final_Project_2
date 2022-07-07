@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:frontend_flutter/provider/event_provider.dart';
 import 'package:frontend_flutter/screens/loading_screen/splash_screen.dart';
 import 'package:intl/intl.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 
 Future<void> main() async {
@@ -13,7 +14,7 @@ Future<void> main() async {
   ]);
 
   Intl.defaultLocale = "th";
-  //initializeDateFormatting();
+  initializeDateFormatting();
   
   runApp(MyApp());
 }

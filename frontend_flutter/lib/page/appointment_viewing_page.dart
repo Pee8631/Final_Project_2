@@ -69,7 +69,7 @@ class _AppointmentViewingPageState extends State<AppointmentViewingPage> {
       var results = pInfoFromJson(response.body);
       return await results;
     } else {
-      throw ('Schedule Not Found');
+      throw ('PInfo Not Found');
     }
   }
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend_flutter/widget/small_profile_widget.dart';
 
-AppBar buildAppBarMain(BuildContext context, String name) {
+AppBar buildAppBarMain(BuildContext context, String name, String profile) {
   return AppBar(
     // leading: context.widget.toString() == "DoctorsScreen"
     //     BackButton(
@@ -25,7 +25,7 @@ AppBar buildAppBarMain(BuildContext context, String name) {
           ),
           SmallProfileWidget(
             imagePath:
-                'https://www.jumpstarttech.com/files/2018/08/Network-Profile.png',
+                profile,
           ),
           // PopupMenuButton<int>(
 

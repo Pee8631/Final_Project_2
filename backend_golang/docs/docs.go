@@ -3831,6 +3831,10 @@ const docTemplate = `{
         "ent.PInfo": {
             "type": "object",
             "properties": {
+                "about": {
+                    "description": "About holds the value of the \"about\" field.",
+                    "type": "string"
+                },
                 "address": {
                     "description": "Address holds the value of the \"address\" field.",
                     "type": "string"
@@ -3865,6 +3869,14 @@ const docTemplate = `{
                 },
                 "lastName": {
                     "description": "LastName holds the value of the \"lastName\" field.",
+                    "type": "string"
+                },
+                "prefix": {
+                    "description": "Prefix holds the value of the \"prefix\" field.",
+                    "type": "string"
+                },
+                "profile": {
+                    "description": "Profile holds the value of the \"profile\" field.",
                     "type": "string"
                 }
             }

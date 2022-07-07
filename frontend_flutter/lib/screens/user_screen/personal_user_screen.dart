@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:frontend_flutter/models/pInfo.dart';
 import 'package:frontend_flutter/screens/user_screen/edit_personal_user_screen.dart';
 import 'package:frontend_flutter/util/user_preferences.dart';
-import 'package:frontend_flutter/widget/button_widget.dart';
 import 'package:frontend_flutter/widget/large_profile_widget.dart';
 import 'package:frontend_flutter/widget/personal_button.dart';
 import 'package:http/http.dart' as http;
@@ -21,13 +20,22 @@ class PersonalUserScreen extends StatefulWidget {
 
 class _PersonalUserScreenState extends State<PersonalUserScreen> {
   final profile = UserPreferences.myProfile;
-  final text = 'แก้ไขโปรไฟล์ของคุณ';
-  int _UserId = 0;
+  final text = "แก้ไขโปรไฟล์ของคุณ";
+  String _name = "FristName LastName";
+  String _Profile = "assets/images/Profile_Default.png";
+  var BD_format = DateFormat.yMMM();
   late Future<PInfo> pInfos;
   @override
   initState() {
+    getName();
     pInfos = getPInfo();
     super.initState();
+  }
+
+  Future<void> getName() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    final String? name = sharedPreferences.getString('username');
+    setState(() => _name = name!);
   }
 
   Future<String> getToken() async {
@@ -78,6 +86,36 @@ class _PersonalUserScreenState extends State<PersonalUserScreen> {
             ),
           );
         } else if (snapshot.connectionState == ConnectionState.done) {
+          _Profile = snapshot.data!.profile != null ? snapshot.data!.profile! :  _Profile;
+          String IdCardNumber = snapshot.data == null
+              ? 'ยังไม่มีข้อมูล'
+              : snapshot.data!.idCardNumber;
+          String BrithDate = snapshot.data!.brithDate == null
+              ? 'ยังไม่มีข้อมูล'
+              : BD_format.format(snapshot.data!.brithDate!);
+          String Age = snapshot.data!.brithDate == null
+              ? 'ยังไม่มีข้อมูล'
+              : BD_format.format(DateTime(
+                  DateTime.now().year - snapshot.data!.brithDate!.year));
+          String Gender = 'ยังไม่มีข้อมูล';
+          if (snapshot.data != null) {
+            if (snapshot.data!.gender == 1) {
+              Gender = 'ชาย';
+            } else if (snapshot.data!.gender == 2) {
+              Gender = 'หญิง';
+            } else {
+              Gender = 'ยังไม่มีข้อมูล';
+            }
+          }
+          String BloodGroup = snapshot.data == null
+              ? 'ยังไม่มีข้อมูล'
+              : snapshot.data!.bloodGroup;
+          String Address = snapshot.data!.address == null
+              ? 'ยังไม่มีข้อมูล'
+              : snapshot.data!.address!;
+          String About = (snapshot.data!.about == '' || snapshot.data!.about == null)
+              ? 'ยังไม่มีข้อมูล'
+              : snapshot.data!.about!;
           return Scaffold(
             backgroundColor: Color.fromARGB(255, 208, 244, 255),
             body: ListView(
@@ -87,11 +125,11 @@ class _PersonalUserScreenState extends State<PersonalUserScreen> {
                   height: 10,
                 ),
                 LargeProfileWidget(
-                  imagePath: profile.imagePath,
+                  imagePath: _Profile,
                   onClicked: () async {
                     Navigator.pushReplacement(context,
                         MaterialPageRoute(builder: (context) {
-                      return HomeScreen();
+                      return EditPersonalUserScreen();
                     }));
                   },
                 ),
@@ -99,14 +137,13 @@ class _PersonalUserScreenState extends State<PersonalUserScreen> {
                   height: 24,
                 ),
                 buildName(snapshot.data!),
-                const SizedBox(
-                  height: 24,
-                ),
-                Center(child: buildUpgradeButton()),
-                const SizedBox(
-                  height: 24,
-                ),
-                buildAbout(snapshot.data!),
+                buildData('เลขบัตรประชาชน', IdCardNumber),
+                buildData('วันเดือนปีเกิด', BrithDate),
+                buildData('อายุ', Age + ' ปี'),
+                buildData('เพศ', Gender),
+                buildData('กรุ๊ปเลือด', BloodGroup),
+                buildDetails('ที่อยู่', Address),
+                buildDetails('เกี่ยวกับ', About),
                 const SizedBox(
                   height: 24,
                 ),
@@ -155,20 +192,6 @@ class _PersonalUserScreenState extends State<PersonalUserScreen> {
                       SizedBox(
                         height: 3,
                       ),
-                      PersonalButtonWidget(
-                        text: 'ตั้งค่า',
-                        onClicked: () {},
-                      ),
-                      SizedBox(
-                        height: 3,
-                      ),
-                      Container(
-                        height: 1,
-                        color: Colors.grey,
-                      ),
-                      SizedBox(
-                        height: 3,
-                      ),
                     ],
                   ),
                 ),
@@ -199,38 +222,67 @@ class _PersonalUserScreenState extends State<PersonalUserScreen> {
             height: 4,
           ),
           Text(
-            DateFormat('yyyy-MM-dd').format(profile.brithDate!).toString(),
+            _name,
             style: TextStyle(
                 fontWeight: FontWeight.bold, fontSize: 15, color: Colors.grey),
           ),
         ],
       );
 
-  Widget buildUpgradeButton() => ButtonWidget(
-        onClicked: () {},
-        text: text,
+  buildData(String title, String data) => Container(
+        padding: EdgeInsets.only(left: 48, top: 5, bottom: 5, right: 48),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Expanded(
+              flex: 1,
+              child: Text(
+                title,
+                style: TextStyle(
+                  //fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+            Expanded(
+              flex: 1,
+              child: Text(
+                data,
+                style: TextStyle(
+                  //fontWeight: FontWeight.bold,
+                  color:
+                      data != 'ยังไม่มีข้อมูล' ? Colors.black87 : Colors.grey,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+          ],
+        ),
       );
 
-  buildAbout(PInfo profile) => Container(
+  buildDetails(String title, String data) => Container(
+        margin: const EdgeInsets.only(top: 5, bottom: 5,),
         padding: EdgeInsets.symmetric(horizontal: 48),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'เกี่ยวกับ',
+              title,
               style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 24,
+                //fontWeight: FontWeight.bold,
+                fontSize: 18,
               ),
             ),
             const SizedBox(
               height: 16,
             ),
             Text(
-              profile.address,
+              data,
               style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 15,
+                //fontWeight: FontWeight.bold,
+                color: data != 'ยังไม่มีข้อมูล' ? Colors.black87 : Colors.grey,
+                fontSize: 14,
               ),
             ),
           ],

@@ -6,12 +6,14 @@ import 'package:form_field_validator/form_field_validator.dart';
 import 'package:frontend_flutter/models/pInfo.dart';
 import 'package:frontend_flutter/screens/user_screen/main_user_screen.dart';
 import 'package:frontend_flutter/util/http_exception.dart';
-import 'package:frontend_flutter/widget/addbar_personal_data_screen.dart';
+import 'package:frontend_flutter/widget/addbar_edit_personal_doctor_screen.dart';
+import 'package:frontend_flutter/widget/appbar_edit_personal_user_screen.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class EditPersonalUserScreen extends StatefulWidget {
+
   const EditPersonalUserScreen({Key? key}) : super(key: key);
 
   @override
@@ -34,7 +36,10 @@ class _EditPersonalUserScreenState extends State<EditPersonalUserScreen> {
       idCardNumber: '',
       lastName: '',
       user: 0,
-      id: 0);
+      id: 0,
+      about: '',
+      prefix: '',
+      profile: '');
 
   Future<void> getToken() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
@@ -94,7 +99,11 @@ class _EditPersonalUserScreenState extends State<EditPersonalUserScreen> {
           gender: results.gender,
           idCardNumber: results.idCardNumber,
           lastName: results.lastName,
-          user: results.user, id: results.id);
+          user: results.user,
+          id: results.id,
+          about: results.about,
+          prefix: results.prefix,
+          profile: results.profile);
     } else {
       return false;
     }
@@ -110,7 +119,7 @@ class _EditPersonalUserScreenState extends State<EditPersonalUserScreen> {
         'Content-Type': 'application/json; charset=UTF-8',
       },
       body: jsonEncode(<String, dynamic>{
-        "Id" : 0,
+        "Id": 0,
         "IdCardNumber": pinfo.idCardNumber,
         "FirstName": pinfo.firstName,
         "LastName": pinfo.lastName,
@@ -139,7 +148,7 @@ class _EditPersonalUserScreenState extends State<EditPersonalUserScreen> {
         'Content-Type': 'application/json; charset=UTF-8',
       },
       body: jsonEncode(<String, dynamic>{
-        "Id" : _pinfo.id,
+        "Id": _pinfo.id,
         "IdCardNumber": pinfo.idCardNumber,
         "FirstName": pinfo.firstName,
         "LastName": pinfo.lastName,
@@ -175,7 +184,8 @@ class _EditPersonalUserScreenState extends State<EditPersonalUserScreen> {
           if (snapshot.connectionState == ConnectionState.done ||
               snapshot.hasData == true) {
             return Scaffold(
-              appBar: buildAppBarPersonalScreen(context, _name),
+              backgroundColor: Color.fromARGB(255, 208, 244, 255),
+              appBar: buildAppBarEditPersonalUserScreen(context),
               body: Container(
                 padding: const EdgeInsets.all(10.0),
                 child: Form(
@@ -184,225 +194,340 @@ class _EditPersonalUserScreenState extends State<EditPersonalUserScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        SizedBox(
-                          height: 15,
-                        ),
-                        Text(
-                          "เลขบัตรประชาชน",
-                          style: TextStyle(fontSize: 20),
-                        ),
-                        SizedBox(
-                          height: 5,
-                        ),
-                        TextFormField(
-                          initialValue: _pinfo.idCardNumber,
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: 'ตัวอย่าง 1-2345-67890-12-3',
-                          ),
-                          validator: MultiValidator([
-                            RequiredValidator(
-                                errorText: "กรุณาป้อนเลขบัตรประชาชน"),
-                          ]),
-                          /*onSaved: (IDCardNumber) {
-                            _pinfo.idCardNumber = IDCardNumber;
-                          },*/
-                          onChanged: (IDCardNumber) {
-                            _pinfo.idCardNumber = IDCardNumber;
-                          },
-                        ),
-                        SizedBox(
-                          height: 15,
-                        ),
-                        Text(
-                          "ชื่อ",
-                          style: TextStyle(fontSize: 20),
-                        ),
-                        SizedBox(
-                          height: 5,
-                        ),
-                        TextFormField(
-                            initialValue: _pinfo.firstName,
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(),
-                              labelText: 'ชื่อ',
-                            ),
+                        Container(
+                          margin: const EdgeInsets.only(top: 7.5, bottom: 7.5),
+                          child: TextFormField(
+                            initialValue: _pinfo.idCardNumber,
                             validator: MultiValidator([
-                              RequiredValidator(errorText: "กรุณาป้อนชื่อ"),
+                              RequiredValidator(
+                                  errorText: "กรุณาป้อนเลขบัตรประชาชน 13 หลัก"),
+                              MaxLengthValidator(13,
+                                  errorText: 'เลขบัตรประชาชน 13 หลัก'),
+                              MinLengthValidator(13,
+                                  errorText: 'เลขบัตรประชาชน 13 หลัก')
                             ]),
-                            /*onSaved: (Firstname) {
-                              _pinfo.firstName = Firstname;
-                            },*/
-                            onChanged: (Firstname) {
-                              _pinfo.firstName = Firstname;
-                            }),
-                        SizedBox(
-                          height: 15,
-                        ),
-                        Text(
-                          "นามสกุล",
-                          style: TextStyle(fontSize: 20),
-                        ),
-                        SizedBox(
-                          height: 5,
-                        ),
-                        TextFormField(
-                          initialValue: _pinfo.lastName,
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: 'นามสกุล',
-                          ),
-                          validator: MultiValidator([
-                            RequiredValidator(errorText: "กรุณาป้อนนามสกุล"),
-                          ]),
-                          /*onSaved: (Lastname) {
-                            _pinfo.lastName = Lastname;
-                          },*/
-                          onChanged: (Lastname) {
-                            _pinfo.lastName = Lastname;
-                          },
-                        ),
-                        SizedBox(
-                          height: 15,
-                        ),
-                        Text(
-                          "วันเดือนปีเกิด",
-                          style: TextStyle(fontSize: 20),
-                        ),
-                        SizedBox(
-                          height: 5,
-                        ),
-                        ElevatedButton(
-                          child: Text(_formatdate.toString()),
-                          onPressed: () {
-                            showDatePicker(
-                                    context: context,
-                                    initialDate:
-                                        _pinfo.brithDate ?? _selectdate,
-                                    firstDate: DateTime(1990),
-                                    lastDate: DateTime(2025))
-                                .then((date) {
-                              setState(() {
-                                _pinfo.brithDate = date!;
-                              });
-                            });
-                          },
-                        ),
-                        SizedBox(
-                          height: 15,
-                        ),
-                        Text(
-                          "เพศ",
-                          style: TextStyle(fontSize: 20),
-                        ),
-                        SizedBox(
-                          height: 5,
-                        ),
-                        ListTile(
-                          title: const Text('Male'),
-                          leading: Radio<int>(
-                            value: 1,
-                            groupValue: _pinfo.gender,
-                            onChanged: (int? value) {
-                              setState(() {
-                                _pinfo.gender = value!;
-                              });
+                            decoration: InputDecoration(
+                              labelText: "เลขบัตรประชาชน 13 หลัก",
+                              fillColor: Colors.white,
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(25.0),
+                                borderSide: BorderSide(
+                                  color: Color.fromARGB(228, 96, 239, 220),
+                                  width: 3.0,
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(25.0),
+                                borderSide: BorderSide(
+                                  color: Color.fromARGB(235, 111, 137, 162),
+                                  width: 3.0,
+                                ),
+                              ),
+                            ),
+                            onSaved: (IDCardNumber) {
+                              _pinfo.idCardNumber = IDCardNumber!;
                             },
                           ),
                         ),
-                        ListTile(
-                          title: const Text('Female'),
-                          leading: Radio<int>(
-                            value: 2,
-                            groupValue: _pinfo.gender,
-                            onChanged: (int? value) {
-                              setState(() {
-                                _pinfo.gender = value!;
-                              });
-                            },
-                          ),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              flex: 1,
+                              child: Container(
+                                margin: const EdgeInsets.only(
+                                    left: 1, top: 7.5, bottom: 7.5, right: 1),
+                                child: TextFormField(
+                                  initialValue: _pinfo.firstName,
+                                    validator: MultiValidator([
+                                      RequiredValidator(
+                                          errorText: "กรุณาป้อนชื่อ"),
+                                    ]),
+                                    decoration: InputDecoration(
+                                      labelText: "ชื่อ",
+                                      fillColor: Colors.white,
+                                      focusedBorder: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(25.0),
+                                        borderSide: BorderSide(
+                                          color:
+                                              Color.fromARGB(228, 96, 239, 220),
+                                          width: 3.0,
+                                        ),
+                                      ),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(25.0),
+                                        borderSide: BorderSide(
+                                          color: Color.fromARGB(
+                                              235, 111, 137, 162),
+                                          width: 3.0,
+                                        ),
+                                      ),
+                                    ),
+                                    onChanged: (Firstname) {
+                                      _pinfo.firstName = Firstname;
+                                    }),
+                              ),
+                            ),
+                            Expanded(
+                              flex: 1,
+                              child: Container(
+                                margin: const EdgeInsets.only(
+                                  left: 1,
+                                  top: 7.5,
+                                  bottom: 7.5,
+                                ),
+                                child: TextFormField(
+                                  initialValue: _pinfo.lastName,
+                                  validator: MultiValidator([
+                                    RequiredValidator(
+                                        errorText: "กรุณาป้อนนามสกุล"),
+                                  ]),
+                                  decoration: InputDecoration(
+                                    labelText: "นามสกุล",
+                                    fillColor: Colors.white,
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(25.0),
+                                      borderSide: BorderSide(
+                                        color:
+                                            Color.fromARGB(228, 96, 239, 220),
+                                        width: 3.0,
+                                      ),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(25.0),
+                                      borderSide: BorderSide(
+                                        color:
+                                            Color.fromARGB(235, 111, 137, 162),
+                                        width: 3.0,
+                                      ),
+                                    ),
+                                  ),
+                                  onChanged: (Lastname) {
+                                    _pinfo.lastName = Lastname;
+                                  },
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                        SizedBox(
-                          height: 15,
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              flex: 1,
+                              child: Text(
+                                "วันเดือนปีเกิด",
+                                style: TextStyle(fontSize: 16),
+                              ),
+                            ),
+                            Expanded(
+                              flex: 1,
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  primary: Color.fromARGB(220, 96, 239, 220),
+                                  onPrimary: Colors.white,
+                                  shadowColor: Colors.greenAccent,
+                                  elevation: 3,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius:
+                                          BorderRadius.circular(32.0)),
+                                  maximumSize: Size(100, 40), //////// HERE
+                                ),
+                                child: Text(_formatdate.toString()),
+                                onPressed: () {
+                                  showDatePicker(
+                                          context: context,
+                                          initialDate:
+                                              _pinfo.brithDate ?? _selectdate,
+                                          firstDate: DateTime(1990),
+                                          lastDate: DateTime(2025))
+                                      .then((date) {
+                                    setState(() {
+                                      _pinfo.brithDate = date!;
+                                    });
+                                  });
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            Expanded(
+                              flex: 1,
+                              child: Text(
+                                "เพศ",
+                                style: TextStyle(fontSize: 16),
+                              ),
+                            ),
+                            Expanded(
+                              flex: 2,
+                              child: ListTile(
+                                title: const Text('ชาย'),
+                                leading: Radio<int>(
+                                  value: 1,
+                                  groupValue: _pinfo.gender,
+                                  onChanged: (int? value) {
+                                    setState(() {
+                                      _pinfo.gender = value!;
+                                    });
+                                  },
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              flex: 2,
+                              child: ListTile(
+                                title: const Text('ผู้หญิง'),
+                                leading: Radio<int>(
+                                  value: 2,
+                                  groupValue: _pinfo.gender,
+                                  onChanged: (int? value) {
+                                    setState(() {
+                                      _pinfo.gender = value!;
+                                    });
+                                  },
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                         Text(
                           "กรุ๊ปเลือด",
-                          style: TextStyle(fontSize: 20),
+                          style: TextStyle(fontSize: 16),
                         ),
-                        SizedBox(
-                          height: 5,
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              flex: 1,
+                              child: ListTile(
+                                title: const Text('A'),
+                                leading: Radio<String>(
+                                  value: 'A',
+                                  groupValue: _pinfo.bloodGroup,
+                                  onChanged: (String? value) {
+                                    setState(() {
+                                      _pinfo.bloodGroup = value!;
+                                    });
+                                  },
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              flex: 1,
+                              child: ListTile(
+                                title: const Text('B'),
+                                leading: Radio<String>(
+                                  value: 'B',
+                                  groupValue: _pinfo.bloodGroup,
+                                  onChanged: (String? value) {
+                                    setState(() {
+                                      _pinfo.bloodGroup = value!;
+                                    });
+                                  },
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              flex: 1,
+                              child: ListTile(
+                                title: Text(
+                                  'AB',
+                                  style: TextStyle(fontSize: 16),
+                                ),
+                                leading: Radio<String>(
+                                  value: 'AB',
+                                  groupValue: _pinfo.bloodGroup,
+                                  onChanged: (String? value) {
+                                    setState(() {
+                                      _pinfo.bloodGroup = value!;
+                                    });
+                                  },
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              flex: 1,
+                              child: ListTile(
+                                title: const Text('O'),
+                                leading: Radio<String>(
+                                  value: 'O',
+                                  groupValue: _pinfo.bloodGroup,
+                                  onChanged: (String? value) {
+                                    setState(() {
+                                      _pinfo.bloodGroup = value!;
+                                    });
+                                  },
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                        ListTile(
-                          title: const Text('A'),
-                          leading: Radio<String>(
-                            value: 'A',
-                            groupValue: _pinfo.bloodGroup,
-                            onChanged: (String? value) {
-                              setState(() {
-                                _pinfo.bloodGroup = value!;
-                              });
+                        Container(
+                          margin: const EdgeInsets.only(top: 5, bottom: 5),
+                          child: TextFormField(
+                            initialValue: _pinfo.address,
+                            keyboardType: TextInputType.multiline,
+                            maxLines: null,
+                            decoration: InputDecoration(
+                              labelText:
+                                  'ที่อยู่ เช่น บ้านเลขที่ หมู่ ตำบล อำเภอ จังหวัด รหัสไปรษณีย์',
+                              fillColor: Colors.white,
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(25.0),
+                                borderSide: BorderSide(
+                                  color: Color.fromARGB(228, 96, 239, 220),
+                                  width: 3.0,
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(25.0),
+                                borderSide: BorderSide(
+                                  color: Color.fromARGB(235, 111, 137, 162),
+                                  width: 3.0,
+                                ),
+                              ),
+                            ),
+                            onChanged: (Address) {
+                              _pinfo.address = Address;
                             },
                           ),
                         ),
-                        ListTile(
-                          title: const Text('B'),
-                          leading: Radio<String>(
-                            value: 'B',
-                            groupValue: _pinfo.bloodGroup,
-                            onChanged: (String? value) {
-                              setState(() {
-                                _pinfo.bloodGroup = value!;
-                              });
-                            },
-                          ),
-                        ),
-                        ListTile(
-                          title: const Text('AB'),
-                          leading: Radio<String>(
-                            value: 'AB',
-                            groupValue: _pinfo.bloodGroup,
-                            onChanged: (String? value) {
-                              setState(() {
-                                _pinfo.bloodGroup = value!;
-                              });
-                            },
-                          ),
-                        ),
-                        ListTile(
-                          title: const Text('O'),
-                          leading: Radio<String>(
-                            value: 'O',
-                            groupValue: _pinfo.bloodGroup,
-                            onChanged: (String? value) {
-                              setState(() {
-                                _pinfo.bloodGroup = value!;
-                              });
+                        Container(
+                          margin: const EdgeInsets.only(top: 5, bottom: 5),
+                          child: TextFormField(
+                            keyboardType: TextInputType.multiline,
+                            maxLines: null,
+                            initialValue: _pinfo.address,
+                            decoration: InputDecoration(
+                              labelText: 'คุณอยากอธิบายอะไรที่เกี่ยวกับตัวเอง',
+                              fillColor: Colors.white,
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(25.0),
+                                borderSide: BorderSide(
+                                  color: Color.fromARGB(228, 96, 239, 220),
+                                  width: 3.0,
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(25.0),
+                                borderSide: BorderSide(
+                                  color: Color.fromARGB(235, 111, 137, 162),
+                                  width: 3.0,
+                                ),
+                              ),
+                            ),
+                            onChanged: (About) {
+                              _pinfo.about = About;
                             },
                           ),
                         ),
                         SizedBox(
                           height: 15,
-                        ),
-                        Text(
-                          "ที่อยู่",
-                          style: TextStyle(fontSize: 20),
-                        ),
-                        SizedBox(
-                          height: 5,
-                        ),
-                        TextFormField(
-                          initialValue: _pinfo.address,
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText:
-                                'บ้านเลขที่ หมู่ ตำบล อำเภอ จังหวัด รหัสไปรษณีย์',
-                          ),
-                          validator: MultiValidator([
-                            RequiredValidator(errorText: "กรุณาป้อนที่อยู่"),
-                          ]),
-                          onChanged: (Address) {
-                            _pinfo.address = Address;
-                          },
                         ),
                         SizedBox(
                           height: 15,
@@ -410,6 +535,16 @@ class _EditPersonalUserScreenState extends State<EditPersonalUserScreen> {
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                                  primary: Color.fromARGB(220, 96, 239, 220),
+                                  onPrimary: Colors.white,
+                                  shadowColor: Colors.greenAccent,
+                                  elevation: 3,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius:
+                                          BorderRadius.circular(32.0)),
+                                  maximumSize: Size(100, 40), //////// HERE
+                                ),
                             child:
                                 Text("บันทึก", style: TextStyle(fontSize: 20)),
                             onPressed: () async {
@@ -420,7 +555,9 @@ class _EditPersonalUserScreenState extends State<EditPersonalUserScreen> {
                                       formkey.currentState!.save();
                                       Navigator.pushReplacement(context,
                                           MaterialPageRoute(builder: (context) {
-                                        return MainUserScreen(ScreenIndex: 4,);
+                                        return MainUserScreen(
+                                          ScreenIndex: 4,
+                                        );
                                       }));
                                     });
                                   } else {
@@ -428,7 +565,9 @@ class _EditPersonalUserScreenState extends State<EditPersonalUserScreen> {
                                       formkey.currentState!.save();
                                       Navigator.pushReplacement(context,
                                           MaterialPageRoute(builder: (context) {
-                                        return MainUserScreen(ScreenIndex: 4,);
+                                        return MainUserScreen(
+                                          ScreenIndex: 4,
+                                        );
                                       }));
                                     });
                                   }
@@ -448,6 +587,16 @@ class _EditPersonalUserScreenState extends State<EditPersonalUserScreen> {
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                                  primary: Color.fromARGB(220, 96, 239, 220),
+                                  onPrimary: Colors.white,
+                                  shadowColor: Colors.greenAccent,
+                                  elevation: 3,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius:
+                                          BorderRadius.circular(32.0)),
+                                  maximumSize: Size(100, 40), //////// HERE
+                                ),
                             child: Text("ลบข้อมูล",
                                 style: TextStyle(fontSize: 20)),
                             onPressed: () async {
@@ -455,7 +604,9 @@ class _EditPersonalUserScreenState extends State<EditPersonalUserScreen> {
                                 await deletePInfo().then((value) {
                                   Navigator.pushReplacement(context,
                                       MaterialPageRoute(builder: (context) {
-                                    return MainUserScreen( ScreenIndex: 4,);
+                                    return MainUserScreen(
+                                      ScreenIndex: 4,
+                                    );
                                   }));
                                 });
                               } on HttpException catch (error) {

@@ -9,8 +9,13 @@ class DoctorProfileScreen extends StatefulWidget {
   final int DoctorId;
   final String Name;
   final int UserId;
+  final String Profile;
   const DoctorProfileScreen(
-      {Key? key, required this.DoctorId, required this.Name, required this.UserId})
+      {Key? key,
+      required this.DoctorId,
+      required this.Name,
+      required this.UserId,
+      required this.Profile})
       : super(key: key);
 
   @override
@@ -19,7 +24,7 @@ class DoctorProfileScreen extends StatefulWidget {
 
 class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
   late Future<Doctor> _user;
-
+  String Profile = 'assets/images/Profile_Default.png';
   @override
   initState() {
     _user = getDoctor();
@@ -53,20 +58,26 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
             ),
           );
         } else if (snapshot.connectionState == ConnectionState.done) {
+          Profile = widget.Profile;
           return Scaffold(
+            backgroundColor: Color.fromARGB(255, 208, 244, 255),
             appBar: buildAppBarBackToScreen(
                 context,
                 widget.Name,
                 DoctorsScreen(
                   DepartmentId: snapshot.data!.edges!.hasDepartment!.id,
-                  name: widget.Name, UserId: widget.UserId,
-                )),
-            body: ListView(
-              physics: BouncingScrollPhysics(),
-              children: [
-                buildDoctorData(snapshot.data!),
-                buildButton(widget.Name, widget.DoctorId),
-              ],
+                  name: widget.Name,
+                  UserId: widget.UserId,
+                  Profile: Profile,
+                ),
+                Profile),
+            body: Container(
+                margin: const EdgeInsets.all(20),
+                child: buildDoctorData(snapshot.data!)),
+            bottomNavigationBar: BottomAppBar(
+              color: Colors.transparent,
+              child: buildButton(widget.Name, widget.DoctorId),
+              elevation: 0,
             ),
           );
         } else {
@@ -81,6 +92,14 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
   }
 
   Widget buildDoctorData(Doctor doctor) {
+    //_Profile = snapshot.data!.profile != null ? _Profile : snapshot.data!.profile!;
+    var Profile;
+    if (doctor.edges!.userHasPInfo != null) {
+      Profile = doctor.edges!.userHasPInfo![0].profile != null
+          ? doctor.edges!.userHasPInfo![0].profile
+          : 'assets/images/Profile_Default.png';
+    }
+
     return Container(
       margin: const EdgeInsets.all(10.0),
       child: Column(
@@ -91,29 +110,38 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
             child: Material(
               color: Colors.transparent,
               child: Ink.image(
-                image: NetworkImage(
-                    'https://i.pinimg.com/474x/65/25/a0/6525a08f1df98a2e3a545fe2ace4be47.jpg'),
+                image:
+                    AssetImage(Profile ?? 'assets/images/Profile_Default.png'),
                 fit: BoxFit.cover,
                 width: 250,
                 height: 250,
               ),
             ),
           ),
-          buildDoctorInfo(doctor),
+          Container(
+              width: double.infinity,
+              margin: const EdgeInsets.only(top: 20, bottom: 20),
+              child: buildDoctorInfo(doctor)),
         ],
       ),
     );
   }
 
-    
   Widget buildDoctorInfo(Doctor doctor) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        buildTitle(),
-        buildData(doctor),
-    ],);
+        Expanded(
+          flex: 1,
+          child: buildTitle(),
+        ),
+        Expanded(
+          flex: 2,
+          child: buildData(doctor),
+        ),
+      ],
+    );
   }
 
   Widget buildTitle() {
@@ -124,7 +152,6 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
         buildText("ชื่อ"),
         buildText("โรงพยาบาล"),
         buildText("แผนก"),
-        buildText("วุฒิบัตร"),
         buildText("เกี่ยวกับ "),
       ],
     );
@@ -136,7 +163,8 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         buildText(
-          "น.พ." +
+          doctor.edges!.userHasPInfo![0].prefix! +
+              " " +
               doctor.edges!.userHasPInfo![0].firstName +
               " " +
               doctor.edges!.userHasPInfo![0].lastName,
@@ -148,10 +176,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
           doctor.edges!.hasDepartment!.name,
         ),
         buildText(
-          doctor.edges!.doctorHasCertification![0].code,
-        ),
-        buildText(
-          doctor.edges!.hasDepartment!.name,
+          doctor.edges!.userHasPInfo![0].about!,
         ),
       ],
     );
@@ -159,30 +184,42 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
 
   Widget buildText(String text) {
     return Container(
-      padding: const EdgeInsets.all(8.0),
-      alignment: Alignment.centerLeft,
+      padding: const EdgeInsets.all(4.0),
+      width: double.maxFinite,
       child: Text(
         text,
         style: TextStyle(fontSize: 16, color: Colors.black),
-        textAlign: TextAlign.left,
       ),
     );
   }
-  
+
   Widget buildButton(String name, int doctorId) {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        child: Text(
-          'นัดหมาย',
-          style: TextStyle(fontSize: 16),
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: SizedBox(
+        width: double.maxFinite,
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            primary: Color.fromARGB(220, 96, 239, 220),
+            onPrimary: Colors.white,
+            shadowColor: Colors.greenAccent,
+            elevation: 3,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(32.0)),
+            maximumSize: Size(100, 40), //////// HERE
+          ),
+          child: Text('นัดหมาย'),
+          onPressed: () {
+            Navigator.pushReplacement(context,
+                MaterialPageRoute(builder: (context) {
+              return AppointmentScreen(
+                  Name: name,
+                  DoctorId: doctorId,
+                  UserId: widget.UserId,
+                  Profile: Profile);
+            }));
+          },
         ),
-        onPressed: () {
-          Navigator.pushReplacement(context,
-              MaterialPageRoute(builder: (context) {
-            return AppointmentScreen(Name: name, DoctorId: doctorId, UserId: widget.UserId);
-          }));
-        },
       ),
     );
   }

@@ -14,8 +14,8 @@ import 'video_message.dart';
 class Message extends StatefulWidget {
   final Messages messages;
   final int UserId;
-
-  const Message({Key? key, required this.messages, required this.UserId}) : super(key: key);
+  final String Profile;
+  const Message({Key? key, required this.messages, required this.UserId , required this.Profile}) : super(key: key);
 
   @override
   State<Message> createState() => _MessageState();
@@ -47,11 +47,11 @@ class _MessageState extends State<Message> {
                       ? MainAxisAlignment.end
                       : MainAxisAlignment.start,
               children: [
-                if (widget.messages.edges.whoSendMessages!.id ==
+                if (widget.messages.edges.whoSendMessages!.id !=
                     widget.UserId) ...[
                   CircleAvatar(
                     radius: 12,
-                    backgroundImage: AssetImage("assets/images/user_2.png"),
+                    backgroundImage: AssetImage(widget.Profile),
                   ),
                 ],
 

@@ -25,7 +25,8 @@ class _MainUserScreenState extends State<MainUserScreen> {
   PageController pageController = PageController();
   int _selectedIndex = 0;
   String _name = 'Fristname Lastname';
-  Future<String>? _futureName;
+  String _Profile = 'assets/images/Profile_Default.png';
+  Future<PInfo>? _futurePInfo;
   int _UserId = 0;
   void _onItemTapped(int index) {
     setState(() {
@@ -43,7 +44,7 @@ class _MainUserScreenState extends State<MainUserScreen> {
     pageController = PageController(initialPage: widget.ScreenIndex);
     setState(() {
       _selectedIndex = widget.ScreenIndex;
-      _futureName = _getPInfo();
+      _futurePInfo = _getPInfo();
     });
     super.initState();
   }
@@ -73,32 +74,36 @@ class _MainUserScreenState extends State<MainUserScreen> {
     }
   }
 
-  Future<String> _getPInfo() async {
+  Future<PInfo>? _getPInfo() async {
     await getUserId();
     //FutureBuilder(future: getToken(), builder: (BuildContext context, AsyncSnapshot<void> snapshot) { },);
     var response = await http.get(
         Uri.parse('http://10.0.2.2:8080/api/v1/pinfos/' + _UserId.toString()));
-    var name = _name;
+    //var name = _name;
+    PInfo results = PInfo(about: '', address: '', bloodGroup: '', brithDate: null, firstName: '', gender: 0, id: 0, idCardNumber: '', lastName: '', prefix: '', profile: '', user: 0);
     if (response.statusCode == 200) {
-      PInfo results = pInfoFromJson(response.body);
-      if (results != null) {
-        name = results.firstName + " " + results.lastName;
-      }
+      results = pInfoFromJson(response.body);
+      // if (results != null) {
+      //   name = results.firstName + " " + results.lastName;
+      // }
     }
-    return name;
+    return results;
   }
 
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: _futureName,
-      builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-        _name = snapshot.data ?? _name;
+      future: _futurePInfo,
+      builder: (BuildContext context, AsyncSnapshot<PInfo> snapshot) {
+        _name = snapshot.data == null ?  _name : snapshot.data!.firstName + " " + snapshot.data!.lastName;
+        if(snapshot.data != null){
+          _Profile = snapshot.data!.profile != null ? snapshot.data!.profile! :  _Profile;
+        }
         return Scaffold(
           backgroundColor: Color.fromARGB(255, 208, 244, 255),
-          appBar: buildAppBarMain(context, _name),
+          appBar: buildAppBarMain(context, _name, _Profile),
           body: PageView(
             children: <Widget>[
-              MenuScreen(name: _name, UserId: _UserId),
+              MenuScreen(name: _name, UserId: _UserId, Profile: _Profile),
               ScheduleUserScreen(UserId: _UserId),
               ChatsScreen(),
               NotificationScreen(),

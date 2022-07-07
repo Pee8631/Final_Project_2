@@ -2,17 +2,18 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:frontend_flutter/models/messages.dart';
+import 'package:frontend_flutter/models/pInfo.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../constants.dart';
-import '../../../../models/chats.dart';
 import 'chat_input_field.dart';
 import 'message.dart';
 
 class Body extends StatefulWidget {
   final int ChatId;
   final List<Messages>? data;
-  const Body(this.ChatId, this.data, {Key? key}) : super(key: key);
+  final PInfo pInfoUser;
+  const Body(this.ChatId, this.data, this.pInfoUser, {Key? key}) : super(key: key);
   //final _ChatId = chatId;
   @override
   State<Body> createState() => _BodyState();
@@ -65,6 +66,9 @@ class _BodyState extends State<Body> {
               ),
             );
           } else if (snapshot.connectionState == ConnectionState.done) {
+            String Profile = widget.pInfoUser.profile == null
+        ? 'assets/images/Profile_Default.png'
+        : widget.pInfoUser.profile!;
             return Column(
               children: [
                 Expanded(
@@ -75,11 +79,11 @@ class _BodyState extends State<Body> {
                       itemCount:
                           widget.data!.length,
                       itemBuilder: (context, index) => Message(
-                          messages: widget.data![index] , UserId: snapshot.data!),
+                          messages: widget.data![index] , UserId: snapshot.data!, Profile: Profile,),
                     ),
                   ),
                 ),
-                ChatInputField(widget.ChatId),
+                ChatInputField(widget.ChatId , widget.pInfoUser),
               ],
             );
           } else {
@@ -99,7 +103,7 @@ class _BodyState extends State<Body> {
               padding: const EdgeInsets.symmetric(horizontal: kDefaultPadding),
             ),
           ),
-          ChatInputField(widget.ChatId),
+          ChatInputField(widget.ChatId, widget.pInfoUser),
         ],
       );
     }

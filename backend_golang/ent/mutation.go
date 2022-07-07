@@ -4732,7 +4732,9 @@ type PInfoMutation struct {
 	op                                    Op
 	typ                                   string
 	id                                    *int
+	profile                               *string
 	idCardNumber                          *string
+	prefix                                *string
 	firstName                             *string
 	lastName                              *string
 	gender                                *int
@@ -4740,6 +4742,7 @@ type PInfoMutation struct {
 	brithDate                             *time.Time
 	bloodGroup                            *string
 	address                               *string
+	about                                 *string
 	clearedFields                         map[string]struct{}
 	who_is_the_owner_of_this_PInfo        *int
 	clearedwho_is_the_owner_of_this_PInfo bool
@@ -4846,6 +4849,42 @@ func (m *PInfoMutation) IDs(ctx context.Context) ([]int, error) {
 	}
 }
 
+// SetProfile sets the "profile" field.
+func (m *PInfoMutation) SetProfile(s string) {
+	m.profile = &s
+}
+
+// Profile returns the value of the "profile" field in the mutation.
+func (m *PInfoMutation) Profile() (r string, exists bool) {
+	v := m.profile
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldProfile returns the old "profile" field's value of the PInfo entity.
+// If the PInfo object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PInfoMutation) OldProfile(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldProfile is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldProfile requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldProfile: %w", err)
+	}
+	return oldValue.Profile, nil
+}
+
+// ResetProfile resets all changes to the "profile" field.
+func (m *PInfoMutation) ResetProfile() {
+	m.profile = nil
+}
+
 // SetIdCardNumber sets the "idCardNumber" field.
 func (m *PInfoMutation) SetIdCardNumber(s string) {
 	m.idCardNumber = &s
@@ -4880,6 +4919,42 @@ func (m *PInfoMutation) OldIdCardNumber(ctx context.Context) (v string, err erro
 // ResetIdCardNumber resets all changes to the "idCardNumber" field.
 func (m *PInfoMutation) ResetIdCardNumber() {
 	m.idCardNumber = nil
+}
+
+// SetPrefix sets the "prefix" field.
+func (m *PInfoMutation) SetPrefix(s string) {
+	m.prefix = &s
+}
+
+// Prefix returns the value of the "prefix" field in the mutation.
+func (m *PInfoMutation) Prefix() (r string, exists bool) {
+	v := m.prefix
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPrefix returns the old "prefix" field's value of the PInfo entity.
+// If the PInfo object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PInfoMutation) OldPrefix(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPrefix is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPrefix requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPrefix: %w", err)
+	}
+	return oldValue.Prefix, nil
+}
+
+// ResetPrefix resets all changes to the "prefix" field.
+func (m *PInfoMutation) ResetPrefix() {
+	m.prefix = nil
 }
 
 // SetFirstName sets the "firstName" field.
@@ -5131,6 +5206,42 @@ func (m *PInfoMutation) ResetAddress() {
 	m.address = nil
 }
 
+// SetAbout sets the "about" field.
+func (m *PInfoMutation) SetAbout(s string) {
+	m.about = &s
+}
+
+// About returns the value of the "about" field in the mutation.
+func (m *PInfoMutation) About() (r string, exists bool) {
+	v := m.about
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAbout returns the old "about" field's value of the PInfo entity.
+// If the PInfo object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PInfoMutation) OldAbout(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAbout is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAbout requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAbout: %w", err)
+	}
+	return oldValue.About, nil
+}
+
+// ResetAbout resets all changes to the "about" field.
+func (m *PInfoMutation) ResetAbout() {
+	m.about = nil
+}
+
 // SetWhoIsTheOwnerOfThisPInfoID sets the "who_is_the_owner_of_this_PInfo" edge to the User entity by id.
 func (m *PInfoMutation) SetWhoIsTheOwnerOfThisPInfoID(id int) {
 	m.who_is_the_owner_of_this_PInfo = &id
@@ -5189,9 +5300,15 @@ func (m *PInfoMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *PInfoMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 10)
+	if m.profile != nil {
+		fields = append(fields, pinfo.FieldProfile)
+	}
 	if m.idCardNumber != nil {
 		fields = append(fields, pinfo.FieldIdCardNumber)
+	}
+	if m.prefix != nil {
+		fields = append(fields, pinfo.FieldPrefix)
 	}
 	if m.firstName != nil {
 		fields = append(fields, pinfo.FieldFirstName)
@@ -5211,6 +5328,9 @@ func (m *PInfoMutation) Fields() []string {
 	if m.address != nil {
 		fields = append(fields, pinfo.FieldAddress)
 	}
+	if m.about != nil {
+		fields = append(fields, pinfo.FieldAbout)
+	}
 	return fields
 }
 
@@ -5219,8 +5339,12 @@ func (m *PInfoMutation) Fields() []string {
 // schema.
 func (m *PInfoMutation) Field(name string) (ent.Value, bool) {
 	switch name {
+	case pinfo.FieldProfile:
+		return m.Profile()
 	case pinfo.FieldIdCardNumber:
 		return m.IdCardNumber()
+	case pinfo.FieldPrefix:
+		return m.Prefix()
 	case pinfo.FieldFirstName:
 		return m.FirstName()
 	case pinfo.FieldLastName:
@@ -5233,6 +5357,8 @@ func (m *PInfoMutation) Field(name string) (ent.Value, bool) {
 		return m.BloodGroup()
 	case pinfo.FieldAddress:
 		return m.Address()
+	case pinfo.FieldAbout:
+		return m.About()
 	}
 	return nil, false
 }
@@ -5242,8 +5368,12 @@ func (m *PInfoMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *PInfoMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
+	case pinfo.FieldProfile:
+		return m.OldProfile(ctx)
 	case pinfo.FieldIdCardNumber:
 		return m.OldIdCardNumber(ctx)
+	case pinfo.FieldPrefix:
+		return m.OldPrefix(ctx)
 	case pinfo.FieldFirstName:
 		return m.OldFirstName(ctx)
 	case pinfo.FieldLastName:
@@ -5256,6 +5386,8 @@ func (m *PInfoMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldBloodGroup(ctx)
 	case pinfo.FieldAddress:
 		return m.OldAddress(ctx)
+	case pinfo.FieldAbout:
+		return m.OldAbout(ctx)
 	}
 	return nil, fmt.Errorf("unknown PInfo field %s", name)
 }
@@ -5265,12 +5397,26 @@ func (m *PInfoMutation) OldField(ctx context.Context, name string) (ent.Value, e
 // type.
 func (m *PInfoMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case pinfo.FieldProfile:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetProfile(v)
+		return nil
 	case pinfo.FieldIdCardNumber:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetIdCardNumber(v)
+		return nil
+	case pinfo.FieldPrefix:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPrefix(v)
 		return nil
 	case pinfo.FieldFirstName:
 		v, ok := value.(string)
@@ -5313,6 +5459,13 @@ func (m *PInfoMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetAddress(v)
+		return nil
+	case pinfo.FieldAbout:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAbout(v)
 		return nil
 	}
 	return fmt.Errorf("unknown PInfo field %s", name)
@@ -5387,8 +5540,14 @@ func (m *PInfoMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *PInfoMutation) ResetField(name string) error {
 	switch name {
+	case pinfo.FieldProfile:
+		m.ResetProfile()
+		return nil
 	case pinfo.FieldIdCardNumber:
 		m.ResetIdCardNumber()
+		return nil
+	case pinfo.FieldPrefix:
+		m.ResetPrefix()
 		return nil
 	case pinfo.FieldFirstName:
 		m.ResetFirstName()
@@ -5407,6 +5566,9 @@ func (m *PInfoMutation) ResetField(name string) error {
 		return nil
 	case pinfo.FieldAddress:
 		m.ResetAddress()
+		return nil
+	case pinfo.FieldAbout:
+		m.ResetAbout()
 		return nil
 	}
 	return fmt.Errorf("unknown PInfo field %s", name)

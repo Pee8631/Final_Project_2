@@ -143,89 +143,119 @@ class _NotificationScreenState extends State<NotificationScreen> {
           List<AppointmentApi> appoint = Appointment;
           noti = List.from(noti.reversed);
           appoint = List.from(appoint.reversed);
-          return Scaffold(
-            backgroundColor: Color.fromARGB(255, 208, 244, 255),
-            appBar: AppBar(
-              backgroundColor: Colors.transparent,
-              elevation: 0,
-              title: Center(
-                  child: Text(
-                "แจ้งเตือน",
-                style: TextStyle(fontSize: 20, color: Colors.black),
-              )),
-            ),
-            body: ListView.separated(
-              padding: const EdgeInsets.all(8.0),
-              itemCount: noti.length,
-              itemBuilder: (BuildContext context, int index) {
-                //var sender = Sender[index].edges!.userHasPInfo![0];
-                AppointmentApi appointment = new AppointmentApi(
-                    id: 0,
-                    reasonForAppointment: "",
-                    detail: null,
-                    startTime: null,
-                    endTime: null,
-                    status: "",
-                    edges: null,
-                    doctorId: 0,
-                    userId: null);
-                var message = noti[index];
-                if (message.appointmentId == appoint[index]) {
-                  appointment = appoint[index];
-                }
-                var time = Jiffy(message.createdDate)
-                    .startOf(Units.MILLISECOND)
-                    .fromNow();
-                return ListTile(
-                  selectedColor: Colors.grey,
-                  onTap: () {},
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(4.0),
-                        child: Text(
-                          message.message,
-                          style:
-                              TextStyle(fontSize: 12, color: Colors.black),
-                          textAlign: TextAlign.left,
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(4.0),
-                        child: Text(
-                          time,
-                          style:
-                              TextStyle(fontSize: 12, color: Colors.black),
-                          textAlign: TextAlign.left,
-                        ),
-                      ),
-                      if (appointment.doctorId == UserId) ...{
-                        if (appointment.status == "Waiting") ...{
-                          buildbuttonWidget(index),
-                        } else if (appointment.status == "Confirm") ...{
-                          Text(
-                            "ยืนยันแล้ว",
-                            style: TextStyle(fontSize: 16),
-                          ),
-                        } else if (appointment.status == "Rejected") ...{
-                          Text(
-                            "ปฏเสธแล้ว",
-                            style: TextStyle(fontSize: 16),
-                          ),
-                        } else
-                          ...{},
-                      },
-                    ],
-                  ),
-                );
-              },
-              separatorBuilder: (BuildContext context, int index) =>
-                  const Divider(
-                color: Colors.black,
+          if (noti.isNotEmpty) {
+            return Scaffold(
+              backgroundColor: Color.fromARGB(255, 208, 244, 255),
+              appBar: AppBar(
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                title: Center(
+                    child: Text(
+                  "กล่องข้อความ",
+                  style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black),
+                )),
               ),
-            ),
-          );
+              body: ListView.separated(
+                padding: const EdgeInsets.all(8.0),
+                itemCount: noti.length,
+                itemBuilder: (BuildContext context, int index) {
+                  //var sender = Sender[index].edges!.userHasPInfo![0];
+                  AppointmentApi appointment = new AppointmentApi(
+                      id: 0,
+                      reasonForAppointment: "",
+                      detail: null,
+                      startTime: null,
+                      endTime: null,
+                      status: "",
+                      edges: null,
+                      doctorId: 0,
+                      userId: null);
+                  var message = noti[index];
+                  if (message.appointmentId == appoint[index]) {
+                    appointment = appoint[index];
+                  }
+                  var time = Jiffy(message.createdDate)
+                      .startOf(Units.MILLISECOND)
+                      .fromNow();
+                  return ListTile(
+                    selectedColor: Colors.grey,
+                    onTap: () {},
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(4.0),
+                          child: Text(
+                            message.message,
+                            style: TextStyle(fontSize: 12, color: Colors.black),
+                            textAlign: TextAlign.left,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(4.0),
+                          child: Text(
+                            time,
+                            style: TextStyle(fontSize: 12, color: Colors.black),
+                            textAlign: TextAlign.left,
+                          ),
+                        ),
+                        if (appointment.doctorId == UserId) ...{
+                          if (appointment.status == "Waiting") ...{
+                            buildbuttonWidget(index),
+                            if (appointment.status == "Confirm") ...{
+                              Text(
+                                "ยืนยันแล้ว",
+                                style: TextStyle(fontSize: 16),
+                              ),
+                              if (appointment.status == "Rejected") ...{
+                                Text(
+                                  "ปฏเสธแล้ว",
+                                  style: TextStyle(fontSize: 16),
+                                ),
+                              } else
+                                ...{},
+                            },
+                          },
+                        },
+                      ],
+                    ),
+                  );
+                },
+                separatorBuilder: (BuildContext context, int index) =>
+                    const Divider(
+                  color: Colors.black,
+                ),
+              ),
+            );
+          } else {
+            return Scaffold(
+              backgroundColor: Color.fromARGB(255, 208, 244, 255),
+              appBar: AppBar(
+                title: Text(
+                  "กล่องข้อความ",
+                  style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87),
+                ),
+                centerTitle: true,
+                backgroundColor: Colors.transparent,
+                shadowColor: Colors.transparent,
+              ),
+              body: Center(
+                child: Text(
+                  "คุณยังไม่มีข้อความเข้ามา",
+                  style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black54),
+                ),
+              ),
+            );
+          }
         } else {
           return Scaffold(
             body: Center(
@@ -250,7 +280,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
                     shape: StadiumBorder(), onPrimary: Colors.white),
                 child: Text("ยอมรับ", style: TextStyle(fontSize: 16)),
                 onPressed: () {
-                  updateAppointment(Appointment[index].id, 'Confirm');
+                  updateAppointment(Appointment[index].id, 'Confirm').then(
+                    (value) => Navigator.pop(context),
+                  );
                 }),
           ),
           Padding(
@@ -260,7 +292,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
                     shape: StadiumBorder(), onPrimary: Colors.red),
                 child: Text("ปฏิเสธ", style: TextStyle(fontSize: 16)),
                 onPressed: () async {
-                  updateAppointment(Appointment[index].id, 'Reject');
+                  updateAppointment(Appointment[index].id, 'Reject').then(
+                    (value) => Navigator.pop(context),
+                  );
                 }),
           ),
         ],

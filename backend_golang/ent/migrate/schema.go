@@ -158,13 +158,16 @@ var (
 	// PinfosColumns holds the columns for the "pinfos" table.
 	PinfosColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "profile", Type: field.TypeString},
 		{Name: "id_card_number", Type: field.TypeString, Unique: true},
+		{Name: "prefix", Type: field.TypeString},
 		{Name: "first_name", Type: field.TypeString},
 		{Name: "last_name", Type: field.TypeString},
 		{Name: "gender", Type: field.TypeInt},
 		{Name: "brith_date", Type: field.TypeTime, Nullable: true, SchemaType: map[string]string{"mysql": "datetime"}},
 		{Name: "blood_group", Type: field.TypeString},
 		{Name: "address", Type: field.TypeString, Size: 2147483647},
+		{Name: "about", Type: field.TypeString, Size: 2147483647},
 		{Name: "user_user_has_p_info", Type: field.TypeInt, Nullable: true},
 	}
 	// PinfosTable holds the schema information for the "pinfos" table.
@@ -175,7 +178,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "pinfos_users_user_has_PInfo",
-				Columns:    []*schema.Column{PinfosColumns[8]},
+				Columns:    []*schema.Column{PinfosColumns[11]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},

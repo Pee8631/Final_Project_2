@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:frontend_flutter/models/appointment.dart';
 import 'package:frontend_flutter/models/chats.dart';
+import 'package:frontend_flutter/models/pInfo.dart';
 import 'package:frontend_flutter/screens/share_screen/messages/message_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -11,7 +12,8 @@ import '../../../../constants.dart';
 
 class ChatInputField extends StatefulWidget {
   final int ChatId;
-  const ChatInputField(this.ChatId, {Key? key}) : super(key: key);
+  final  PInfo pInfoUser;
+  const ChatInputField(this.ChatId, this.pInfoUser, {Key? key}) : super(key: key);
 
   @override
   State<ChatInputField> createState() => _ChatInputFieldState();
@@ -181,7 +183,7 @@ class _ChatInputFieldState extends State<ChatInputField> {
                                             MaterialPageRoute(
                                                 builder: (context) {
                                           return MessagesScreen(
-                                              chatId: widget.ChatId);
+                                              chatId: widget.ChatId, PInfoUser: widget.pInfoUser, );
                                         })));
                                   }
                                 }

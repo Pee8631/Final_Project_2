@@ -29,9 +29,21 @@ func (pu *PInfoUpdate) Where(ps ...predicate.PInfo) *PInfoUpdate {
 	return pu
 }
 
+// SetProfile sets the "profile" field.
+func (pu *PInfoUpdate) SetProfile(s string) *PInfoUpdate {
+	pu.mutation.SetProfile(s)
+	return pu
+}
+
 // SetIdCardNumber sets the "idCardNumber" field.
 func (pu *PInfoUpdate) SetIdCardNumber(s string) *PInfoUpdate {
 	pu.mutation.SetIdCardNumber(s)
+	return pu
+}
+
+// SetPrefix sets the "prefix" field.
+func (pu *PInfoUpdate) SetPrefix(s string) *PInfoUpdate {
+	pu.mutation.SetPrefix(s)
 	return pu
 }
 
@@ -89,6 +101,12 @@ func (pu *PInfoUpdate) SetBloodGroup(s string) *PInfoUpdate {
 // SetAddress sets the "address" field.
 func (pu *PInfoUpdate) SetAddress(s string) *PInfoUpdate {
 	pu.mutation.SetAddress(s)
+	return pu
+}
+
+// SetAbout sets the "about" field.
+func (pu *PInfoUpdate) SetAbout(s string) *PInfoUpdate {
+	pu.mutation.SetAbout(s)
 	return pu
 }
 
@@ -194,11 +212,25 @@ func (pu *PInfoUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
+	if value, ok := pu.mutation.Profile(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: pinfo.FieldProfile,
+		})
+	}
 	if value, ok := pu.mutation.IdCardNumber(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Value:  value,
 			Column: pinfo.FieldIdCardNumber,
+		})
+	}
+	if value, ok := pu.mutation.Prefix(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: pinfo.FieldPrefix,
 		})
 	}
 	if value, ok := pu.mutation.FirstName(); ok {
@@ -256,6 +288,13 @@ func (pu *PInfoUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: pinfo.FieldAddress,
 		})
 	}
+	if value, ok := pu.mutation.About(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: pinfo.FieldAbout,
+		})
+	}
 	if pu.mutation.WhoIsTheOwnerOfThisPInfoCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -310,9 +349,21 @@ type PInfoUpdateOne struct {
 	mutation *PInfoMutation
 }
 
+// SetProfile sets the "profile" field.
+func (puo *PInfoUpdateOne) SetProfile(s string) *PInfoUpdateOne {
+	puo.mutation.SetProfile(s)
+	return puo
+}
+
 // SetIdCardNumber sets the "idCardNumber" field.
 func (puo *PInfoUpdateOne) SetIdCardNumber(s string) *PInfoUpdateOne {
 	puo.mutation.SetIdCardNumber(s)
+	return puo
+}
+
+// SetPrefix sets the "prefix" field.
+func (puo *PInfoUpdateOne) SetPrefix(s string) *PInfoUpdateOne {
+	puo.mutation.SetPrefix(s)
 	return puo
 }
 
@@ -370,6 +421,12 @@ func (puo *PInfoUpdateOne) SetBloodGroup(s string) *PInfoUpdateOne {
 // SetAddress sets the "address" field.
 func (puo *PInfoUpdateOne) SetAddress(s string) *PInfoUpdateOne {
 	puo.mutation.SetAddress(s)
+	return puo
+}
+
+// SetAbout sets the "about" field.
+func (puo *PInfoUpdateOne) SetAbout(s string) *PInfoUpdateOne {
+	puo.mutation.SetAbout(s)
 	return puo
 }
 
@@ -499,11 +556,25 @@ func (puo *PInfoUpdateOne) sqlSave(ctx context.Context) (_node *PInfo, err error
 			}
 		}
 	}
+	if value, ok := puo.mutation.Profile(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: pinfo.FieldProfile,
+		})
+	}
 	if value, ok := puo.mutation.IdCardNumber(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Value:  value,
 			Column: pinfo.FieldIdCardNumber,
+		})
+	}
+	if value, ok := puo.mutation.Prefix(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: pinfo.FieldPrefix,
 		})
 	}
 	if value, ok := puo.mutation.FirstName(); ok {
@@ -559,6 +630,13 @@ func (puo *PInfoUpdateOne) sqlSave(ctx context.Context) (_node *PInfo, err error
 			Type:   field.TypeString,
 			Value:  value,
 			Column: pinfo.FieldAddress,
+		})
+	}
+	if value, ok := puo.mutation.About(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: pinfo.FieldAbout,
 		})
 	}
 	if puo.mutation.WhoIsTheOwnerOfThisPInfoCleared() {

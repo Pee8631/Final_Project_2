@@ -15,7 +15,9 @@ type PInfo struct {
 // Fields of the PInfo.
 func (PInfo) Fields() []ent.Field {
 	return []ent.Field{
+		field.String("profile"),
 		field.String("idCardNumber").Unique(),
+		field.String("prefix"),
 		field.String("firstName"),
 		field.String("lastName"),
 		field.Int("gender"),
@@ -26,6 +28,7 @@ func (PInfo) Fields() []ent.Field {
 			}),
 		field.String("bloodGroup"),
 		field.Text("address"),
+		field.Text("about"),
 	}
 }
 

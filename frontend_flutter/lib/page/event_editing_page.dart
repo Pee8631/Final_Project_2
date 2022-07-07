@@ -61,7 +61,9 @@ class _EventEditingPageState extends State<EventEditingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        backgroundColor: Color.fromARGB(255, 208, 244, 255),
         appBar: AppBar(
+          backgroundColor: Color.fromARGB(232, 100, 180, 255),
           leading: CloseButton(),
           actions: buildEditingActions(),
         ),
@@ -69,17 +71,53 @@ class _EventEditingPageState extends State<EventEditingPage> {
             padding: EdgeInsets.all(12),
             child: Form(
               key: _formKey,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  buildTitle(),
-                  SizedBox(height: 12),
-                  if (isAllDay == false) ...[
-                    buildDateTimePicker(),
+              child: Container(
+                alignment: Alignment.topCenter,
+                height: 550,
+                margin: EdgeInsets.only(top: 10, bottom: 10),
+                padding: EdgeInsets.only(
+                  left: 10,
+                  right: 10,
+                ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(25.0),
+                  color: Colors.white,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    
+                    Container(
+                      alignment: Alignment.center,
+                      height: 150,
+                      margin: EdgeInsets.only(top: 20, bottom: 5),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10.0),
+                        color: Colors.white,
+                      ),
+                      child: buildDateTimePicker(),
+                    ),
+                    Container(
+                      alignment: Alignment.center,
+                      height: 80,
+                      margin: EdgeInsets.only(top: 5, bottom: 5),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(25.0),
+                      ),
+                      child: buildTitle(),
+                    ),
+                    Container(
+                      alignment: Alignment.center,
+                      height: 80,
+                      margin: EdgeInsets.only(top: 5, bottom: 5),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(25.0),
+                        color: Colors.white,
+                      ),
+                      child: buildDescriptions(),
+                    ),
                   ],
-                  //buildAllDayEvents(),
-                  buildDescriptions(),
-                ],
+                ),
               ),
             )));
   }
@@ -96,9 +134,25 @@ class _EventEditingPageState extends State<EventEditingPage> {
       ];
 
   Widget buildTitle() => TextFormField(
-        style: TextStyle(fontSize: 24),
-        decoration:
-            InputDecoration(border: UnderlineInputBorder(), hintText: 'หัวข้อ'),
+        style: TextStyle(fontSize: 20),
+        decoration: InputDecoration(
+          labelText: "หัวข้อ",
+          fillColor: Colors.white,
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(25.0),
+            borderSide: BorderSide(
+              color: Color.fromARGB(228, 96, 239, 220),
+              width: 3.0,
+            ),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(25.0),
+            borderSide: BorderSide(
+              color: Color.fromARGB(235, 111, 137, 162),
+              width: 3.0,
+            ),
+          ),
+        ),
         onFieldSubmitted: (_) => saveForm(),
         validator: (title) =>
             title != null && title.isEmpty ? 'กรุณาระบุหัวข้อ' : null,
@@ -137,13 +191,13 @@ class _EventEditingPageState extends State<EventEditingPage> {
           children: [
             Expanded(
               child: buildDropdownField(
-                text: 'ตั้งแต่ :         ' + Utils.toTime(fromDate),
+                text: 'ตั้งแต่ :' + Utils.toTime(fromDate),
                 onClicked: () => pickFromDateTime(pickDate: false),
               ),
             ),
             Expanded(
               child: buildDropdownField(
-                text: 'จนถึง :         ' + Utils.toTime(toDate),
+                text: 'จนถึง :' + Utils.toTime(toDate),
                 onClicked: () => pickToDateTime(pickDate: false),
               ),
             ),
@@ -263,51 +317,51 @@ class _EventEditingPageState extends State<EventEditingPage> {
     }
   }
 
-  Future<void> editSchedule(int id, String Title, String decscription,
-      DateTime startTime, DateTime endTime, int userId) async {
-    /*String _formatdate =
-        new DateFormat('yyyy-MM-ddTHH:mm:ss.mmmuuuZ').format(_pinfo.brithDate ?? _selectdate);*/
-    var response = await http.put(
-      Uri.parse('http://10.0.2.2:8080/api/v1/schedules/' + id.toString()),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, dynamic>{
-        'Activity': Title,
-        'Detail': decscription,
-        'Status': 'Active',
-        'StartTime': startTime.toIso8601String(),
-        'EndTime': endTime.toIso8601String(),
-        'UserId': userId
-      }),
-    );
-    final results;
-    if (response.statusCode == 200) {
-      results = scheduleFromJson(response.body);
-      setState(() {
-        _schedule = results;
-      });
-    } else {
-      throw ("Can't Save Schedule To Server.");
-    }
-  }
+  // Future<void> editSchedule(int id, String Title, String decscription,
+  //     DateTime startTime, DateTime endTime, int userId) async {
+  //   /*String _formatdate =
+  //       new DateFormat('yyyy-MM-ddTHH:mm:ss.mmmuuuZ').format(_pinfo.brithDate ?? _selectdate);*/
+  //   var response = await http.put(
+  //     Uri.parse('http://10.0.2.2:8080/api/v1/schedules/' + id.toString()),
+  //     headers: <String, String>{
+  //       'Content-Type': 'application/json; charset=UTF-8',
+  //     },
+  //     body: jsonEncode(<String, dynamic>{
+  //       'Activity': Title,
+  //       'Detail': decscription,
+  //       'Status': 'Active',
+  //       'StartTime': startTime.toIso8601String(),
+  //       'EndTime': endTime.toIso8601String(),
+  //       'UserId': userId
+  //     }),
+  //   );
+  //   final results;
+  //   if (response.statusCode == 200) {
+  //     results = scheduleFromJson(response.body);
+  //     setState(() {
+  //       _schedule = results;
+  //     });
+  //   } else {
+  //     throw ("Can't Save Schedule To Server.");
+  //   }
+  // }
 
   Future saveForm() async {
     final isValid = _formKey.currentState!.validate();
     if (isValid) {
       if (toDate.isAfter(fromDate)) {
-        if (widget.appointment == null) {
-          await createSchedule(titleController.text, decsriptionController.text,
-              fromDate, toDate, widget.UserId);
-        } else {
-          await editSchedule(
-              widget.appointment!.id! as int,
-              titleController.text,
-              decsriptionController.text,
-              fromDate,
-              toDate,
-              widget.UserId);
-        }
+        //if (widget.appointment == null) {
+        await createSchedule(titleController.text, decsriptionController.text,
+            fromDate, toDate, widget.UserId);
+        //} else {
+        // await editSchedule(
+        //     widget.appointment!.id! as int,
+        //     titleController.text,
+        //     decsriptionController.text,
+        //     fromDate,
+        //     toDate,
+        //     widget.UserId);
+        //}
         if (_schedule != null) {
           // final event = Event(
           //     title: _schedule.activity,
@@ -357,9 +411,27 @@ class _EventEditingPageState extends State<EventEditingPage> {
       ]);
 
   Widget buildDescriptions() => TextFormField(
-        style: TextStyle(fontSize: 20),
+        style: TextStyle(fontSize: 16),
+        keyboardType: TextInputType.multiline,
+        maxLines: null,
         decoration: InputDecoration(
-            border: UnderlineInputBorder(), hintText: 'รายละเอียด'),
+          labelText: "รายละเอียด",
+          fillColor: Colors.white,
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(25.0),
+            borderSide: BorderSide(
+              color: Color.fromARGB(228, 96, 239, 220),
+              width: 3.0,
+            ),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(25.0),
+            borderSide: BorderSide(
+              color: Color.fromARGB(235, 111, 137, 162),
+              width: 3.0,
+            ),
+          ),
+        ),
         onFieldSubmitted: (_) => saveForm(),
         controller: decsriptionController,
       );

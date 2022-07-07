@@ -4,16 +4,20 @@ import 'package:frontend_flutter/screens/user_screen/main_user_screen.dart';
 import 'package:frontend_flutter/util/user_preferences.dart';
 import 'package:http/http.dart' as http;
 
-import '../../models/listUser.dart';
+import '../../models/listDoctor.dart';
 import '../../widget/appbar_doctors_screen.dart';
-
 
 class DoctorsScreen extends StatefulWidget {
   final int DepartmentId;
   final String name;
   final int UserId;
+  final String Profile;
   const DoctorsScreen(
-      {Key? key, required this.name, required this.DepartmentId, required this.UserId})
+      {Key? key,
+      required this.name,
+      required this.DepartmentId,
+      required this.UserId,
+      required this.Profile})
       : super(key: key);
 
   @override
@@ -22,39 +26,22 @@ class DoctorsScreen extends StatefulWidget {
 
 class _DoctorsScreenState extends State<DoctorsScreen> {
   final profile = UserPreferences.myProfile;
-  PageController pageController = PageController();
-  //int _selectedIndex = 0;
-  final List<String> textList = [
-    "He'd have you",
-    "Heed not the rabble",
-    "Sound of screams",
-    "Who scream",
-    "Revolution is",
-    "Revolution, they..."
-  ];
-
-  late Future<List<ListUser>> getListDoctor;
-  //late List<Department> _getDepartments;
+  String Profile = 'assets/images/Profile_Default.png';
+  late Future<List<ListDoctor>> getListDoctor;
 
   @override
   initState() {
     getListDoctor = _getListDoctor();
     super.initState();
   }
-  //   void _onItemTapped(int index) {
-  //   setState(() {
-  //     _selectedIndex = index;
-  //   });
-  //   pageController.jumpToPage(index);
-  // }
 
-  Future<List<ListUser>> _getListDoctor() async {
+  Future<List<ListDoctor>> _getListDoctor() async {
     //FutureBuilder(future: getToken(), builder: (BuildContext context, AsyncSnapshot<void> snapshot) { },);
     var response = await http.get(Uri.parse(
         'http://10.0.2.2:8080/api/v1/users/getDepartment/' +
             widget.DepartmentId.toString()));
     if (response.statusCode == 200) {
-      List<ListUser> results = listUserFromJson(response.body);
+      List<ListDoctor> results = listDoctorFromJson(response.body);
       return results;
     } else {
       throw ("User Not Found : " + response.reasonPhrase!);
@@ -65,7 +52,8 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
   Widget build(BuildContext context) {
     return FutureBuilder(
       future: getListDoctor,
-      builder: (BuildContext context, AsyncSnapshot<List<ListUser>> snapshot) {
+      builder:
+          (BuildContext context, AsyncSnapshot<List<ListDoctor>> snapshot) {
         if (snapshot.hasError) {
           return Scaffold(
             appBar: AppBar(
@@ -76,8 +64,16 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
             ),
           );
         } else if (snapshot.connectionState == ConnectionState.done) {
+          Profile = widget.Profile;
           return Scaffold(
-            appBar: buildAppBarBackToScreen(context, widget.name, MainUserScreen(ScreenIndex: 0,)),
+            backgroundColor: Color.fromARGB(255, 208, 244, 255),
+            appBar: buildAppBarBackToScreen(
+                context,
+                widget.name,
+                MainUserScreen(
+                  ScreenIndex: 0,
+                ),
+                Profile),
             // appBar: AppBar(
             //   backgroundColor: Colors.transparent,
             //   elevation: 0,
@@ -93,17 +89,22 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
               padding: const EdgeInsets.all(8.0),
               itemCount: snapshot.data!.length,
               itemBuilder: (BuildContext context, int index) {
+                var doctorData = snapshot.data![index];
                 return ListTile(
                   selectedColor: Colors.grey,
                   onTap: () {
                     Navigator.pushReplacement(context,
                         MaterialPageRoute(builder: (context) {
-                      return DoctorProfileScreen(DoctorId: snapshot.data![index].id, Name: widget.name, UserId: widget.UserId);
+                      return DoctorProfileScreen(
+                          DoctorId: snapshot.data![index].id!,
+                          Name: widget.name,
+                          UserId: widget.UserId,
+                          Profile: Profile);
                     }));
                   },
                   leading: ClipOval(
                     child: Image.asset(
-                      "assets/images/Profile_Default.png",
+                      doctorData.edges!.userHasPInfo![0].profile ?? '',
                       width: 60,
                       height: 60,
                     ),
@@ -111,35 +112,16 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
                   title: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        snapshot.data![index].edges!.userHasPInfo![0]
-                                .firstName +
-                            " " +
-                            snapshot
-                                .data![index].edges!.userHasPInfo![0].lastName,
-                        style: TextStyle(fontSize: 12, color: Colors.black),
-                        textAlign: TextAlign.left,
-                      ),
-                      Text(
-                        snapshot.data![index].edges!.fromHospital!.name,
-                        style: TextStyle(fontSize: 12, color: Colors.black),
-                        textAlign: TextAlign.left,
-                      ),
-                      Text(
-                        snapshot.data![index].edges!.hasDepartment!.name,
-                        style: TextStyle(fontSize: 12, color: Colors.black),
-                        textAlign: TextAlign.left,
-                      ),
-                      Text(
-                        "Price$index",
-                        style: TextStyle(fontSize: 12, color: Colors.black),
-                        textAlign: TextAlign.left,
-                      ),
-                      Text(
-                        "about : ${textList[index]}",
-                        style: TextStyle(fontSize: 12, color: Colors.black),
-                        textAlign: TextAlign.left,
-                      ),
+                      buildText(
+                          "ชื่อ",
+                          doctorData.edges!.userHasPInfo![0].prefix! +
+                              " " +
+                              doctorData.edges!.userHasPInfo![0].firstName! +
+                              " " +
+                              doctorData.edges!.userHasPInfo![0].lastName!),
+                      buildText(
+                          "โรงพยาบาล", doctorData.edges!.fromHospital!.name!),
+                      buildText("แผนก", doctorData.edges!.hasDepartment!.name!),
                     ],
                   ),
                 );
@@ -147,39 +129,6 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
               separatorBuilder: (BuildContext context, int index) =>
                   const Divider(color: Colors.black),
             ),
-            // bottomNavigationBar: BottomNavigationBar(
-            //   items: const <BottomNavigationBarItem>[
-            //     BottomNavigationBarItem(
-            //       icon: Icon(Icons.home),
-            //       label: 'หน้าหลัก',
-            //       backgroundColor: Colors.blue,
-            //     ),
-            //     BottomNavigationBarItem(
-            //       icon: Icon(Icons.schedule),
-            //       label: 'ตาราง(ชั่วคราว)',
-            //       backgroundColor: Colors.blue,
-            //     ),
-            //     BottomNavigationBarItem(
-            //       icon: Icon(Icons.chat),
-            //       label: 'ห้องแชท',
-            //       backgroundColor: Colors.blue,
-            //     ),
-            //     BottomNavigationBarItem(
-            //       icon: Icon(Icons.notifications_none),
-            //       label: 'แจ้งเตือน',
-            //       backgroundColor: Colors.blue,
-            //     ),
-            //     BottomNavigationBarItem(
-            //       icon: Icon(Icons.person),
-            //       label: 'ส่วนตัว',
-            //       backgroundColor: Colors.blue,
-            //     ),
-            //   ],
-            //   currentIndex: _selectedIndex,
-            //   selectedItemColor: Colors.white,
-            //   unselectedItemColor: Colors.white,
-            //   onTap: _onItemTapped,
-            // ),
           );
         } else {
           return Scaffold(
@@ -189,6 +138,27 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
           );
         }
       },
+    );
+  }
+
+  Widget buildText(String title, String description) {
+    return Row(
+      children: [
+        Expanded(
+          flex: 1,
+          child: Text(
+            title,
+            style: TextStyle(fontSize: 14, color: Colors.black87),
+          ),
+        ),
+        Expanded(
+          flex: 2,
+          child: Text(
+            description,
+            style: TextStyle(fontSize: 14, color: Colors.black87),
+          ),
+        ),
+      ],
     );
   }
 }

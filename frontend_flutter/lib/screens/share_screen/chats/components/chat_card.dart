@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend_flutter/models/pInfo.dart';
 import 'package:jiffy/jiffy.dart';
 
 import '../../../../constants.dart';
@@ -10,13 +11,14 @@ class ChatCard extends StatelessWidget {
     required this.isChatsLock,
     required this.press,
     required this.chats,
+    required this.PInfoUser,
   }) : super(key: key);
 
   // final CreateChat chat;
   final Chats chats;
   final VoidCallback press;
   final bool isChatsLock;
-
+  final PInfo PInfoUser;
   @override
   Widget build(BuildContext context) {
     String CalculateTime() {
@@ -27,6 +29,12 @@ class ChatCard extends StatelessWidget {
       return time;
     }
 
+    String Profile = PInfoUser.profile == null
+        ? 'assets/images/Profile_Default.png'
+        : PInfoUser.profile!;
+    String ChatName = PInfoUser.firstName == null && PInfoUser.lastName == null
+        ? chats.chatRoomName
+        : PInfoUser.firstName + ' ' + PInfoUser.lastName;
     return InkWell(
       onTap: press,
       child: Padding(
@@ -38,7 +46,7 @@ class ChatCard extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 24,
-                  // backgroundImage: AssetImage(chat.image),
+                  backgroundImage: AssetImage(Profile),
                 ),
                 // if (chat.isActive)
                 //   Positioned(
@@ -66,7 +74,7 @@ class ChatCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      chats.chatRoomName,
+                      ChatName,
                       style:
                           TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                     ),
@@ -77,7 +85,8 @@ class ChatCard extends StatelessWidget {
                         child: Text(
                           chats
                               .edges!
-                              .chatMessage![chats.edges!.chatMessage!.length - 1]
+                              .chatMessage![
+                                  chats.edges!.chatMessage!.length - 1]
                               .messageText,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -94,6 +103,12 @@ class ChatCard extends StatelessWidget {
                 color: Colors.pink,
                 size: 20.0,
               ),
+            } else ...{
+              Icon(
+                Icons.lock_open,
+                color: Colors.greenAccent,
+                size: 20.0,
+              ),
             },
             if (chats.edges!.chatMessage != null) ...{
               Opacity(
@@ -101,7 +116,6 @@ class ChatCard extends StatelessWidget {
                 child: Text(CalculateTime()),
               ),
             },
-            
           ],
         ),
       ),

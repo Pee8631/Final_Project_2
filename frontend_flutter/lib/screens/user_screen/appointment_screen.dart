@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:intl/intl.dart';
 
 import 'package:date_picker_timeline/date_picker_timeline.dart';
 import 'package:flutter/material.dart';
@@ -11,17 +12,18 @@ import 'package:frontend_flutter/util/http_exception.dart';
 import 'package:frontend_flutter/widget/appbar_doctors_screen.dart';
 import 'package:group_button/group_button.dart';
 import 'package:http/http.dart' as http;
-import 'package:intl/intl.dart';
 
 class AppointmentScreen extends StatefulWidget {
   final String Name;
   final int DoctorId;
   final int UserId;
+  final String Profile;
   const AppointmentScreen(
       {Key? key,
       required this.Name,
       required this.DoctorId,
-      required this.UserId})
+      required this.UserId,
+      required this.Profile})
       : super(key: key);
 
   @override
@@ -32,6 +34,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
   DateTime _selectedValue = new DateTime.now();
   List<AppointmentApi> _appointments = <AppointmentApi>[];
   bool _IsSelected = false;
+  //String Profile = 'assets/images/Profile_Default.png';
   AppointmentApi selectedAppointments = new AppointmentApi(
       detail: '',
       edges: null,
@@ -39,7 +42,9 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
       id: 0,
       reasonForAppointment: '',
       startTime: null,
-      status: '', doctorId: 0, userId: null);
+      status: '',
+      doctorId: 0,
+      userId: null);
   late Future<List<AppointmentApi>> _getAppointments;
   final formkey = GlobalKey<FormState>();
 
@@ -77,7 +82,6 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
         "UserId": UserId,
       }),
     );
-
   }
 
   @override
@@ -97,6 +101,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
             ),
           );
         } else if (snapshot.connectionState == ConnectionState.done) {
+          //Profile = widget.Profile;
           _appointments.clear();
           for (int i = 0; i < snapshot.data!.length; i++) {
             var startTimematter = new DateFormat('yyyy-MM-dd');
@@ -109,6 +114,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
             }
           }
           return Scaffold(
+            backgroundColor: Color.fromARGB(255, 208, 244, 255),
             appBar: buildAppBarBackToScreen(
                 context,
                 widget.Name,
@@ -116,19 +122,30 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
                   DoctorId: widget.DoctorId,
                   Name: widget.Name,
                   UserId: widget.UserId,
-                )),
+                  Profile: widget.Profile,
+                ),
+                widget.Profile),
             body: Form(
               key: formkey,
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    buildListDate(snapshot.data!),
-                    buildListAppointment(_appointments),
-                    buildTextFieldTitle(),
-                    buildTextFieldDetail(),
-                    buildSaveButton(),
-                  ],
+              child: Container(
+                alignment: Alignment.topCenter,
+                margin: EdgeInsets.all(20),
+                child: SingleChildScrollView(
+                  //physics: NeverScrollableScrollPhysics(),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      buildListDate(snapshot.data!),
+                      buildListAppointment(_appointments),
+                      buildTextFieldTitle(),
+                      buildTextFieldDetail(),
+                      buildSaveButton(),
+                    ],
+                  ),
+                ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(25.0),
+                  color: Colors.white,
                 ),
               ),
             ),
@@ -183,6 +200,9 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: GroupButton(
+        options: GroupButtonOptions(
+            selectedColor: Colors.greenAccent,
+            unselectedColor: Color.fromARGB(237, 208, 244, 255)),
         isRadio: true,
         onSelected: (text, index, isSelected) {
           setState(() {
@@ -201,8 +221,22 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
         padding: const EdgeInsets.all(8.0),
         child: TextFormField(
           decoration: InputDecoration(
-            border: OutlineInputBorder(),
-            labelText: 'หัวข้อ',
+            labelText: "เรื่อง",
+            fillColor: Colors.white,
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(25.0),
+              borderSide: BorderSide(
+                color: Color.fromARGB(228, 96, 239, 220),
+                width: 3.0,
+              ),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(25.0),
+              borderSide: BorderSide(
+                color: Color.fromARGB(235, 111, 137, 162),
+                width: 3.0,
+              ),
+            ),
           ),
           validator: MultiValidator([
             RequiredValidator(
@@ -218,9 +252,25 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
   buildTextFieldDetail() => Padding(
         padding: const EdgeInsets.all(8.0),
         child: TextFormField(
+          keyboardType: TextInputType.multiline,
+          maxLines: null,
           decoration: InputDecoration(
-            border: OutlineInputBorder(),
-            labelText: 'รายละเอียด',
+            labelText: "รายละเอียด",
+            fillColor: Colors.white,
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(25.0),
+              borderSide: BorderSide(
+                color: Color.fromARGB(228, 96, 239, 220),
+                width: 3.0,
+              ),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(25.0),
+              borderSide: BorderSide(
+                color: Color.fromARGB(235, 111, 137, 162),
+                width: 3.0,
+              ),
+            ),
           ),
           onChanged: (detail) {
             selectedAppointments.detail = detail;
@@ -233,7 +283,14 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
           padding: const EdgeInsets.all(8.0),
           child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                  fixedSize: Size(200, 40), onPrimary: Colors.white),
+                primary: Color.fromARGB(220, 96, 239, 220),
+                onPrimary: Colors.white,
+                shadowColor: Colors.greenAccent,
+                elevation: 3,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(32.0)),
+                maximumSize: Size(300, 40), //////// HERE
+              ),
               child: Text('ยืนยันการนัดหมาย'),
               onPressed: () async {
                 if (formkey.currentState!.validate()) {

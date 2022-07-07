@@ -292,12 +292,12 @@ func (pq *PInfoQuery) WithWhoIsTheOwnerOfThisPInfo(opts ...func(*UserQuery)) *PI
 // Example:
 //
 //	var v []struct {
-//		IdCardNumber string `json:"idCardNumber,omitempty"`
+//		Profile string `json:"profile,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.PInfo.Query().
-//		GroupBy(pinfo.FieldIdCardNumber).
+//		GroupBy(pinfo.FieldProfile).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 //
@@ -319,11 +319,11 @@ func (pq *PInfoQuery) GroupBy(field string, fields ...string) *PInfoGroupBy {
 // Example:
 //
 //	var v []struct {
-//		IdCardNumber string `json:"idCardNumber,omitempty"`
+//		Profile string `json:"profile,omitempty"`
 //	}
 //
 //	client.PInfo.Query().
-//		Select(pinfo.FieldIdCardNumber).
+//		Select(pinfo.FieldProfile).
 //		Scan(ctx, &v)
 //
 func (pq *PInfoQuery) Select(fields ...string) *PInfoSelect {

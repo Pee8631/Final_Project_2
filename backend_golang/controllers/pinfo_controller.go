@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"FinalProject/ent"
-	
+
 	"FinalProject/ent/user"
 	"context"
 	"fmt"
@@ -11,17 +11,21 @@ import (
 
 	"github.com/gin-gonic/gin"
 )
+
 //"FinalProject/ent/pinfo"
 // "FinalProject/ent/predicate"
 // PInfo defines the struct for the pinfo
 type PInfo struct {
+	Profile      string
 	IdCardNumber string
+	Prefix       string
 	FirstName    string
 	LastName     string
 	Gender       int
 	BrithDate    string
 	BloodGroup   string
 	Address      string
+	About        string
 	User         int
 }
 
@@ -51,7 +55,7 @@ func (ctl *PInfoController) CreatePInfo(c *gin.Context) {
 		})
 		return
 	}
-	obj.BrithDate += "Z";
+	obj.BrithDate += "Z"
 	brithDate, err := time.Parse(time.RFC3339, obj.BrithDate)
 	if err != nil {
 		fmt.Println(err)
@@ -64,13 +68,16 @@ func (ctl *PInfoController) CreatePInfo(c *gin.Context) {
 
 	insertPInfo, err := ctl.client.PInfo.
 		Create().
+		SetProfile(obj.Profile).
 		SetIdCardNumber(obj.IdCardNumber).
+		SetPrefix(obj.Prefix).
 		SetFirstName(obj.FirstName).
 		SetLastName(obj.LastName).
 		SetGender(obj.Gender).
 		SetBrithDate(brithDate).
 		SetBloodGroup(obj.BloodGroup).
 		SetAddress(obj.Address).
+		SetAbout(obj.About).
 		SetWhoIsTheOwnerOfThisPInfoID(obj.User).
 		Save(context.Background())
 	if err != nil {
@@ -84,7 +91,7 @@ func (ctl *PInfoController) CreatePInfo(c *gin.Context) {
 
 	c.JSON(200, gin.H{
 		"status": true,
-		"pinfo":   insertPInfo,
+		"pinfo":  insertPInfo,
 	})
 }
 
@@ -122,20 +129,23 @@ func (ctl *PInfoController) GetPInfo(c *gin.Context) {
 	if len(getUser.Edges.UserHasPInfo) > 0 {
 		layout := "2006-01-02 15:04:05"
 		values := map[string]interface{}{
-			"Id":   		getUser.Edges.UserHasPInfo[0].ID,
+			"Id":           getUser.Edges.UserHasPInfo[0].ID,
+			"Profile":      getUser.Edges.UserHasPInfo[0].Profile,
 			"IdCardNumber": getUser.Edges.UserHasPInfo[0].IdCardNumber,
-			"FirstName":   	getUser.Edges.UserHasPInfo[0].FirstName,
+			"Prefix":       getUser.Edges.UserHasPInfo[0].Prefix,
+			"FirstName":    getUser.Edges.UserHasPInfo[0].FirstName,
 			"LastName":     getUser.Edges.UserHasPInfo[0].LastName,
 			"BrithDate":    getUser.Edges.UserHasPInfo[0].BrithDate.Format(layout),
-			"Gender":     	getUser.Edges.UserHasPInfo[0].Gender,
+			"Gender":       getUser.Edges.UserHasPInfo[0].Gender,
 			"BloodGroup":   getUser.Edges.UserHasPInfo[0].BloodGroup,
 			"Address":      getUser.Edges.UserHasPInfo[0].Address,
-			"User":     	getUser.ID,
+			"About":        getUser.Edges.UserHasPInfo[0].About,
+			"User":         getUser.ID,
 		}
 
 		c.JSON(200, values)
 
-	}else {
+	} else {
 		c.JSON(404, gin.H{
 			"error": "PInfo Not Found",
 		})
@@ -165,35 +175,16 @@ func (ctl *PInfoController) GetPInfo(c *gin.Context) {
 // @Failure 500 {object} gin.H
 // @Router /pinfos [get]
 func (ctl *PInfoController) ListPInfo(c *gin.Context) {
-	limitQuery := c.Query("limit")
-	limit := 10
-	if limitQuery != "" {
-		limit64, err := strconv.ParseInt(limitQuery, 10, 64)
-		if err == nil {
-			limit = int(limit64)
-		}
-	}
-	offsetQuery := c.Query("offset")
-	offset := 0
-	if offsetQuery != "" {
-		offset64, err := strconv.ParseInt(offsetQuery, 10, 64)
-		if err == nil {
-			offset = int(offset64)
-		}
-	}
-
 
 	listPInfo, err := ctl.client.PInfo.
 		Query().
-		Limit(limit).
-		Offset(offset).
 		All(context.Background())
 	if err != nil {
 		c.JSON(404, gin.H{"error": err.Error()})
 		return // proper error handling instead of panic in your app
 	}
 
-		c.JSON(200, listPInfo)
+	c.JSON(200, listPInfo)
 
 }
 
@@ -218,8 +209,8 @@ func (ctl *PInfoController) DeletePInfo(c *gin.Context) {
 	}
 
 	err = ctl.client.PInfo.
-	DeleteOneID(int(id)).
-	Exec(context.Background())
+		DeleteOneID(int(id)).
+		Exec(context.Background())
 	if err != nil {
 		c.JSON(404, gin.H{
 			"error": err.Error(),
@@ -257,8 +248,8 @@ func (ctl *PInfoController) UpdatePInfo(c *gin.Context) {
 		})
 		return
 	}
-	
-	obj.BrithDate += "Z";
+
+	obj.BrithDate += "Z"
 	brithDate, err := time.Parse(time.RFC3339, obj.BrithDate)
 	if err != nil {
 		fmt.Println(err)
@@ -271,13 +262,16 @@ func (ctl *PInfoController) UpdatePInfo(c *gin.Context) {
 
 	UpdatePInfo, err := ctl.client.PInfo.
 		UpdateOneID(int(id)).
+		SetProfile(obj.Profile).
 		SetIdCardNumber(obj.IdCardNumber).
+		SetPrefix(obj.Prefix).
 		SetFirstName(obj.FirstName).
 		SetLastName(obj.LastName).
 		SetGender(obj.Gender).
 		SetBrithDate(brithDate).
 		SetBloodGroup(obj.BloodGroup).
 		SetAddress(obj.Address).
+		SetAbout(obj.About).
 		SetWhoIsTheOwnerOfThisPInfoID(obj.User).
 		Save(context.Background())
 	if err != nil {
@@ -287,7 +281,7 @@ func (ctl *PInfoController) UpdatePInfo(c *gin.Context) {
 
 	c.JSON(200, gin.H{
 		"status": true,
-		"pinfo":   UpdatePInfo,
+		"pinfo":  UpdatePInfo,
 	})
 }
 
