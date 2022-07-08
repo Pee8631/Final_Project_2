@@ -355,7 +355,7 @@ func (ctl *AppointmentController) UpdateAppointment(c *gin.Context) {
 				" น. จนถึง " + strconv.Itoa(int(ehr)) + ":" + paddinge + strconv.Itoa(int(emin)) +
 				" น. คุณยืนยันที่จะให้คำปรึกษาหรือไม่"
 		}
-		CreatedDate := time.Now()
+		CreatedDate := time.Now().UTC().Add(time.Hour * 7)
 
 		insertNotification, err := ctl.client.Notification.
 			Create().

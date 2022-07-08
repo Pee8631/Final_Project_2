@@ -141,8 +141,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
         } else if (snapshot.connectionState == ConnectionState.done) {
           List<NotificationApi> noti = snapshot.data!;
           List<AppointmentApi> appoint = Appointment;
-          noti = List.from(noti.reversed);
-          appoint = List.from(appoint.reversed);
+          noti = List.from(noti);
+          appoint = List.from(appoint);
           if (noti.isNotEmpty) {
             return Scaffold(
               backgroundColor: Color.fromARGB(255, 208, 244, 255),
@@ -174,7 +174,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                       doctorId: 0,
                       userId: null);
                   var message = noti[index];
-                  if (message.appointmentId == appoint[index]) {
+                  if (message.appointmentId == appoint[index].id) {
                     appointment = appoint[index];
                   }
                   var time = Jiffy(message.createdDate)
@@ -205,20 +205,19 @@ class _NotificationScreenState extends State<NotificationScreen> {
                         if (appointment.doctorId == UserId) ...{
                           if (appointment.status == "Waiting") ...{
                             buildbuttonWidget(index),
-                            if (appointment.status == "Confirm") ...{
-                              Text(
-                                "ยืนยันแล้ว",
-                                style: TextStyle(fontSize: 16),
-                              ),
-                              if (appointment.status == "Rejected") ...{
-                                Text(
-                                  "ปฏเสธแล้ว",
-                                  style: TextStyle(fontSize: 16),
-                                ),
-                              } else
-                                ...{},
-                            },
-                          },
+                          } else if (appointment.status == "Confirm") ...{
+                            Text(
+                              "ยืนยันแล้ว",
+                              style:
+                                  TextStyle(fontSize: 16, color: Colors.green),
+                            ),
+                          } else if (appointment.status == "Reject") ...{
+                            Text(
+                              "ปฏเสธแล้ว",
+                              style: TextStyle(fontSize: 16, color: Colors.red),
+                            ),
+                          } else
+                            ...{},
                         },
                       ],
                     ),
@@ -277,24 +276,34 @@ class _NotificationScreenState extends State<NotificationScreen> {
             padding: const EdgeInsets.all(8.0),
             child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                    shape: StadiumBorder(), onPrimary: Colors.white),
+                  primary: Color.fromARGB(220, 96, 239, 220),
+                  onPrimary: Colors.white,
+                  shadowColor: Colors.greenAccent,
+                  elevation: 3,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(32.0)),
+                  maximumSize: Size(100, 40), //////// HERE
+                ),
                 child: Text("ยอมรับ", style: TextStyle(fontSize: 16)),
                 onPressed: () {
-                  updateAppointment(Appointment[index].id, 'Confirm').then(
-                    (value) => Navigator.pop(context),
-                  );
+                  updateAppointment(Appointment[index].id, 'Confirm');
                 }),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                    shape: StadiumBorder(), onPrimary: Colors.red),
+                  primary: Color.fromARGB(220, 239, 96, 96),
+                  onPrimary: Colors.white,
+                  shadowColor: Colors.redAccent,
+                  elevation: 3,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(32.0)),
+                  maximumSize: Size(100, 40), //////// HERE
+                ),
                 child: Text("ปฏิเสธ", style: TextStyle(fontSize: 16)),
                 onPressed: () async {
-                  updateAppointment(Appointment[index].id, 'Reject').then(
-                    (value) => Navigator.pop(context),
-                  );
+                  updateAppointment(Appointment[index].id, 'Reject');
                 }),
           ),
         ],

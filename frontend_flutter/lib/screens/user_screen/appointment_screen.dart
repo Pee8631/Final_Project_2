@@ -109,7 +109,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
                 startTimematter.format(snapshot.data![i].startTime!);
             var selectedValuematter = new DateFormat('yyyy-MM-dd');
             String selectDate = selectedValuematter.format(_selectedValue);
-            if (startDate == selectDate && snapshot.data![i].status == 'None') {
+            if (startDate == selectDate && (snapshot.data![i].status == 'None' || snapshot.data![i].status == 'Reject')) {
               _appointments.add(snapshot.data![i]);
             }
           }

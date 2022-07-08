@@ -115,7 +115,7 @@ class _BodyState extends State<Body> {
             ),
           );
         } else if (snapshot.connectionState == ConnectionState.done) {
-          if (snapshot.data!.length < 0) {
+          if (snapshot.data!.length > 0) {
             return Scaffold(
               backgroundColor: Color.fromARGB(255, 208, 244, 255),
               appBar: AppBar(

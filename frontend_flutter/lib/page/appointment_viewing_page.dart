@@ -121,6 +121,20 @@ class _AppointmentViewingPageState extends State<AppointmentViewingPage> {
                 ),
                 Container(
                   alignment: Alignment.center,
+                  height: 40,
+                  margin: EdgeInsets.only(top: 5, bottom: 5),
+                  padding: EdgeInsets.only(
+                    left: 10,
+                    right: 10,
+                  ),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10.0),
+                    color: Colors.white,
+                  ),
+                  child: buildStatus(_appointment.status),
+                ),
+                Container(
+                  alignment: Alignment.center,
                   height: 110,
                   margin: EdgeInsets.only(top: 5, bottom: 5),
                   padding: EdgeInsets.only(
@@ -175,7 +189,7 @@ class _AppointmentViewingPageState extends State<AppointmentViewingPage> {
     );
   }
 
-    buildDoctorData(PInfo pInfo) {
+  buildDoctorData(PInfo pInfo) {
     return Row(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.end,
@@ -199,6 +213,45 @@ class _AppointmentViewingPageState extends State<AppointmentViewingPage> {
         ]);
   }
 
+  buildStatus(String status) {
+    String StatusInThai;
+    Color StatusColor;
+    if (status == "Confirm"){
+      StatusInThai = "ยืนยันแล้ว";
+      StatusColor = Colors.greenAccent;
+    } else if (status == "Waiting") {
+      StatusInThai = "กำลังรอการยืนยัน";
+      StatusColor = Colors.yellowAccent;
+    } else if (status == "Reject") {
+      StatusInThai = "ปฏิเสธ";
+      StatusColor = Colors.redAccent;
+    } else {
+      StatusInThai = "ยังไม่มีการจอง";
+      StatusColor = Colors.grey;
+    }
+    return Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Expanded(
+            flex: 1,
+            child: Text(
+              "สถานะนัดหมาย: ",
+              textAlign: TextAlign.justify,
+              style: TextStyle(fontSize: 16),
+            ),
+          ),
+          Expanded(
+            flex: 2,
+            child: Text(
+              StatusInThai,
+              textAlign: TextAlign.left,
+              style: TextStyle(fontSize: 16, color: StatusColor),
+            ),
+          ),
+        ]);
+  }
+
   Widget buildDateTime(AppointmentApi? appointment) {
     return Column(
       children: [
@@ -216,26 +269,26 @@ class _AppointmentViewingPageState extends State<AppointmentViewingPage> {
 
   Widget buildDate(String Title, DateTime date) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-      Expanded(
-        flex: 1,
-        child: Text(
-          Title,
-          textAlign: TextAlign.left,
-          style: TextStyle(fontSize: 16),
-        ),
-      ),
-      Expanded(
-        flex: 2,
-        child: Text(
-          DateFormat.yMMMMEEEEd().add_Hm().format(date),
-          textAlign: TextAlign.left,
-          style: TextStyle(fontSize: 16),
-        ),
-      ),
-    ]);
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            flex: 1,
+            child: Text(
+              Title,
+              textAlign: TextAlign.left,
+              style: TextStyle(fontSize: 16),
+            ),
+          ),
+          Expanded(
+            flex: 2,
+            child: Text(
+              DateFormat.yMMMMEEEEd().add_Hm().format(date),
+              textAlign: TextAlign.left,
+              style: TextStyle(fontSize: 16),
+            ),
+          ),
+        ]);
   }
 
   Widget buildReason(String reason) {
@@ -245,7 +298,7 @@ class _AppointmentViewingPageState extends State<AppointmentViewingPage> {
         Expanded(
           flex: 1,
           child: Padding(
-            padding: const EdgeInsets.only( top: 4.0, bottom: 4.0),
+            padding: const EdgeInsets.only(top: 4.0, bottom: 4.0),
             child: Text(
               'เรื่อง:',
               style: TextStyle(color: Colors.black87, fontSize: 16),

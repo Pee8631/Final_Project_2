@@ -110,8 +110,8 @@ class _MainDoctorScreenState extends State<MainDoctorScreen> {
               : snapshot.data!.firstName + " " + snapshot.data!.lastName;
           if (snapshot.data != null) {
             _Profile = snapshot.data!.profile != null
-                ? _Profile
-                : snapshot.data!.profile!;
+                ? snapshot.data!.profile!
+                : _Profile;
           }
 
           return Scaffold(
